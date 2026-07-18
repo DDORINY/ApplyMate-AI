@@ -1,0 +1,64 @@
+"use client";
+
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
+import { logout, me } from "@/lib/api/auth";
+
+export function ProtectedUserPanel() {
+  const router = useRouter();
+  const query = useQuery({
+    queryKey: ["me"],
+    queryFn: me,
+    retry: false,
+  });
+  const logoutMutation = useMutation({
+    mutationFn: logout,
+    onSuccess: () => router.push("/login"),
+  });
+
+  useEffect(() => {
+    if (query.isError) {
+      router.push("/login");
+    }
+  }, [query.isError, router]);
+
+  if (query.isLoading) {
+    return <div className="panel">로그인 상태를 확인하고 있습니다.</div>;
+  }
+
+  if (query.isError || !query.data) {
+    return <div className="panel">로그인이 필요합니다.</div>;
+  }
+
+  const user = query.data.data;
+
+  return (
+    <div className="panel grid gap-4">
+      <div>
+        <p className="text-sm text-slate-500">현재 사용자</p>
+        <h2 className="mt-1 text-2xl font-semibold text-slate-950">{user.name}</h2>
+        <p className="mt-1 text-slate-600">{user.email}</p>
+      </div>
+      <dl className="grid gap-3 text-sm text-slate-700">
+        <div className="flex justify-between gap-4">
+          <dt>상태</dt>
+          <dd className="font-medium">{user.status}</dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt>최근 로그인</dt>
+          <dd className="font-medium">{user.last_login_at ?? "기록 없음"}</dd>
+        </div>
+      </dl>
+      <button
+        className="button-secondary"
+        type="button"
+        disabled={logoutMutation.isPending}
+        onClick={() => logoutMutation.mutate()}
+      >
+        {logoutMutation.isPending ? "로그아웃 중..." : "로그아웃"}
+      </button>
+    </div>
+  );
+}

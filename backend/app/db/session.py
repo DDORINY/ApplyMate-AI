@@ -7,6 +7,11 @@ engine = create_async_engine(settings.database_url, pool_pre_ping=True)
 AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 
+async def get_session():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
 async def check_database() -> str:
     try:
         async with engine.connect() as connection:

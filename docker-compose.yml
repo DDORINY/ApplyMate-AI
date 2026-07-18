@@ -34,6 +34,12 @@ services:
       BACKEND_URL: ${BACKEND_URL:-http://localhost:8000}
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://applymate:change_me@postgres:5432/applymate}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-}
+      JWT_REFRESH_SECRET_KEY: ${JWT_REFRESH_SECRET_KEY:-}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      REFRESH_TOKEN_EXPIRE_DAYS: ${REFRESH_TOKEN_EXPIRE_DAYS:-14}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      COOKIE_SAMESITE: ${COOKIE_SAMESITE:-lax}
     ports:
       - "8000:8000"
     depends_on:
