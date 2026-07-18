@@ -138,3 +138,34 @@ v0.1.2 범위의 단일 화면 안에서 카드형 섹션으로 관리합니다.
 | 소셜 계정 연결 | `frontend/src/app/settings/accounts/page.tsx`, `frontend/src/components/auth/oauth-accounts-manager.tsx` |
 | 커리어 프로필 | `frontend/src/app/profile/page.tsx`, `frontend/src/components/profile/profile-manager.tsx` |
 | 공통 네비게이션 | `frontend/src/components/app-header.tsx` |
+# v0.2.0 채용공고 화면 구조
+
+## Navigation
+
+상단 공통 내비게이션에 `채용공고` 메뉴를 추가한다.
+
+```text
+홈
+회원가입
+로그인
+내 계정
+프로필
+채용공고
+계정 연결
+보안
+```
+
+## Routes
+
+| Route | 목적 | 주요 기능 |
+| --- | --- | --- |
+| `/jobs` | 채용공고 목록 | 검색, 필터, 페이지네이션, 관심 토글 |
+| `/jobs/new` | 채용공고 등록 | 직접 입력, URL 등록 |
+| `/jobs/{jobId}` | 채용공고 상세 | 상세 조회, 수정, 삭제, 원문 URL 열기 |
+
+## 화면 원칙
+
+- 로그인하지 않은 사용자는 보호 API 호출 시 `/login`으로 이동한다.
+- 목록은 로딩, 오류, 빈 상태를 모두 표시한다.
+- 상세 화면은 사용자가 직접 수정해야 하는 자동 추출값을 빠르게 보정할 수 있어야 한다.
+- URL 등록 화면은 자동 수집의 한계와 보안 제한을 안내한다.

@@ -62,3 +62,12 @@ alembic upgrade head
 | v0.5.x | `external_accounts`, `calendar_sync_logs` | 외부 서비스 연동 |
 
 pgvector는 v0.3.x 이후 의미 기반 검색과 분석이 필요할 때 도입합니다. v0.1.3에서는 확장 설치나 벡터 컬럼을 만들지 않습니다.
+# v0.2.0 채용공고 DB 변경 요약
+
+- `companies` 테이블을 추가한다.
+- `job_postings` 테이블을 추가한다.
+- `job_postings.user_id`로 사용자 소유권을 관리한다.
+- `job_postings.company_id`로 기업 정보를 참조한다.
+- enum으로 기업 규모, source type, 상태, 고용 형태, 근무 형태, 마감 유형을 제한한다.
+- 동일 사용자 기준 `source_url`, `content_hash`, `company_id + title + deadline_at`으로 중복을 방지한다.
+- migration 파일은 `backend/alembic/versions/20260719_1200_create_job_posting_tables.py`이다.

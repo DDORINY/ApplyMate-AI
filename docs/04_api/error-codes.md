@@ -99,3 +99,15 @@ API 오류 응답은 다음 공통 구조를 사용합니다.
 - 비밀번호, 토큰, Secret 값은 오류 응답에 포함하지 않습니다.
 - 로그인 실패 시 이메일 존재 여부를 구체적으로 노출하지 않습니다.
 - 다른 사용자의 리소스 접근은 존재 여부 노출을 최소화하기 위해 404로 처리합니다.
+# v0.2.0 채용공고 오류 코드
+
+| Code | HTTP Status | 설명 |
+| --- | ---: | --- |
+| `JOB_POSTING_NOT_FOUND` | 404 | 채용공고를 찾을 수 없거나 사용자가 소유하지 않은 공고입니다. |
+| `JOB_POSTING_ALREADY_EXISTS` | 409 | 동일 사용자 기준 중복 채용공고입니다. |
+| `JOB_INVALID_URL` | 422 | URL 형식, scheme, host, 응답 형식이 허용되지 않습니다. |
+| `JOB_URL_FETCH_FAILED` | 422 | URL 응답을 가져오지 못했습니다. |
+| `JOB_URL_TOO_LARGE` | 422 | URL 응답 본문이 허용 크기를 초과했습니다. |
+| `JOB_INVALID_SALARY_RANGE` | 422 | 최대 급여가 최소 급여보다 작습니다. |
+| `JOB_INVALID_DEADLINE` | 422 | 마감일이 게시일보다 빠릅니다. |
+| `JOB_DEADLINE_REQUIRED` | 422 | 고정 마감 공고에 마감일이 없습니다. |

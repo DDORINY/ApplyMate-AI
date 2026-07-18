@@ -164,3 +164,51 @@ erDiagram
 - `oauth_accounts(provider, provider_user_id)`는 provider 계정의 전역 중복 연결을 방지합니다.
 - `oauth_accounts(user_id, provider)`는 사용자당 provider 1개만 연결하도록 제한합니다.
 - `oauth_states.state_hash`, `oauth_login_tickets.ticket_hash`는 1회용 값을 hash로만 저장합니다.
+# ApplyMate AI ERD
+
+## v0.2.0 채용공고
+
+```mermaid
+erDiagram
+  users ||--o{ job_postings : owns
+  companies ||--o{ job_postings : has
+
+  companies {
+    bigint id PK
+    varchar name
+    varchar normalized_name UK
+    varchar website_url
+    varchar industry
+    enum company_size
+    text description
+    timestamptz created_at
+    timestamptz updated_at
+  }
+
+  job_postings {
+    bigint id PK
+    bigint user_id FK
+    bigint company_id FK
+    varchar title
+    varchar position
+    enum employment_type
+    varchar career_requirement
+    varchar education_requirement
+    varchar location
+    enum work_type
+    integer salary_min
+    integer salary_max
+    text description
+    enum source_type
+    varchar source_url
+    varchar content_hash
+    timestamptz deadline_at
+    enum deadline_type
+    enum status
+    boolean is_favorite
+    text notes
+    timestamptz collected_at
+    timestamptz created_at
+    timestamptz updated_at
+  }
+```
