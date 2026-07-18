@@ -10,6 +10,30 @@
 | AUTH-004 | 토큰 재발급 | 만료된 Access Token을 갱신한다. | 필수   |
 | AUTH-005 | 회원 탈퇴  | 사용자 계정과 관련 데이터를 삭제한다.   | 확장   |
 
+### v0.1.1 구현 범위
+
+| 기능 ID    | 구현 상태 | 구현 내용 |
+| ---------- | --------- | --------- |
+| AUTH-001 | 완료 | 이메일, 이름, 비밀번호 기반 회원가입을 제공한다. 이메일은 공백 제거 및 소문자 정규화 후 저장하며 중복 가입을 차단한다. |
+| AUTH-002 | 완료 | 이메일과 비밀번호 로그인, 비활성 사용자 로그인 차단, 마지막 로그인 시각 갱신을 제공한다. |
+| AUTH-003 | 완료 | Refresh Token을 폐기하고 HttpOnly Cookie를 제거한다. 같은 요청이 여러 번 호출되어도 내부 오류가 발생하지 않는다. |
+| AUTH-004 | 완료 | Refresh Token 검증 후 Access Token을 재발급하며 Refresh Token rotation을 적용한다. |
+| AUTH-ME | 완료 | Bearer Access Token으로 현재 로그인 사용자 공개 정보를 조회한다. |
+
+### v0.1.1 인증 정책
+
+```text
+로그인 식별자: email
+비밀번호 최소 길이: 8자
+비밀번호 저장: 평문 저장 금지, PBKDF2-SHA256 해시 사용
+Access Token 만료: 30분
+Refresh Token 만료: 14일
+Access Token 전달: Authorization Bearer
+Refresh Token 저장: HttpOnly Cookie
+날짜 저장 기준: UTC
+사용자 상태: ACTIVE, INACTIVE, WITHDRAWN
+```
+
 ## 2. 커리어 프로필
 
 | 기능 ID       | 기능명         | 설명                       | 우선순위 |

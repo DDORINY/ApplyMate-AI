@@ -5,10 +5,12 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+pytest-cache-files-*/
 .ruff_cache/
 .mypy_cache/
 .venv/
 venv/
+*.egg-info/
 
 node_modules/
 .next/

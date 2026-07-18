@@ -36,11 +36,7 @@ Authorization: Bearer {access_token}
 }
 ```
 
-## 2. 인증 API
-
-v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는 서비스 상태 확인용 Health API이다.
-
-## 2.1 Health API
+## 2. Health API
 
 | Method | Endpoint  | 설명 |
 | ------ | --------- | ---- |
@@ -60,6 +56,8 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 }
 ```
 
+## 3. 인증 API
+
 | Method | Endpoint        | 설명               |
 | ------ | --------------- | ---------------- |
 | POST   | `/auth/signup`  | 회원가입             |
@@ -68,7 +66,110 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | POST   | `/auth/logout`  | 로그아웃             |
 | GET    | `/auth/me`      | 로그인 사용자 조회       |
 
-## 3. 커리어 프로필 API
+### 인증 정책
+
+```text
+Access Token: Authorization: Bearer {access_token}
+Refresh Token: applymate_refresh_token HttpOnly Cookie
+Access Token 만료: 30분
+Refresh Token 만료: 14일
+Refresh Token 저장: 원문 저장 금지, SHA-256 해시만 DB 저장
+Refresh Token 재발급 정책: rotation 적용, 기존 토큰 폐기
+```
+
+### POST /auth/signup
+
+요청:
+
+```json
+{
+  "name": "도하",
+  "email": "doha@example.com",
+  "password": "password123"
+}
+```
+
+응답:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "email": "doha@example.com",
+    "name": "도하",
+    "status": "ACTIVE",
+    "last_login_at": null,
+    "created_at": "2026-07-18T06:00:00Z"
+  },
+  "message": "회원가입이 완료되었습니다."
+}
+```
+
+### POST /auth/login
+
+요청:
+
+```json
+{
+  "email": "doha@example.com",
+  "password": "password123"
+}
+```
+
+응답 본문:
+
+```json
+{
+  "success": true,
+  "data": {
+    "access_token": "jwt-access-token",
+    "token_type": "Bearer",
+    "expires_in": 1800,
+    "user": {
+      "id": 1,
+      "email": "doha@example.com",
+      "name": "도하",
+      "status": "ACTIVE",
+      "last_login_at": "2026-07-18T06:00:00Z",
+      "created_at": "2026-07-18T06:00:00Z"
+    }
+  },
+  "message": "로그인되었습니다."
+}
+```
+
+Refresh Token은 `applymate_refresh_token` HttpOnly Cookie로 전달한다.
+
+### POST /auth/refresh
+
+요청 본문은 없고 `applymate_refresh_token` Cookie를 사용한다. 성공 시 새 Access Token을 응답하고 새 Refresh Token Cookie를 설정한다.
+
+### POST /auth/logout
+
+요청 본문은 없고 현재 Refresh Token Cookie가 있으면 폐기한다. 성공 시 Cookie를 제거한다.
+
+### GET /auth/me
+
+`Authorization: Bearer {access_token}` 헤더가 필요하다.
+
+### 인증 오류 코드
+
+```text
+AUTH_EMAIL_ALREADY_EXISTS
+AUTH_INVALID_CREDENTIALS
+AUTH_TOKEN_MISSING
+AUTH_TOKEN_INVALID
+AUTH_TOKEN_EXPIRED
+AUTH_REFRESH_TOKEN_INVALID
+AUTH_REFRESH_TOKEN_EXPIRED
+AUTH_REFRESH_TOKEN_REVOKED
+AUTH_USER_INACTIVE
+AUTH_UNAUTHORIZED
+VALIDATION_ERROR
+```
+
+## 4. 커리어 프로필 API
 
 | Method | Endpoint                        | 설명           |
 | ------ | ------------------------------- | ------------ |
@@ -83,7 +184,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | GET    | `/profiles/me/projects`         | 프로젝트 목록 조회   |
 | POST   | `/profiles/me/projects`         | 프로젝트 추가      |
 
-## 4. 이력서 API
+## 5. 이력서 API
 
 | Method | Endpoint                    | 설명        |
 | ------ | --------------------------- | --------- |
@@ -93,7 +194,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | POST   | `/resumes/{resumeId}/parse` | 이력서 내용 분석 |
 | DELETE | `/resumes/{resumeId}`       | 이력서 삭제    |
 
-## 5. 채용공고 API
+## 6. 채용공고 API
 
 | Method | Endpoint                | 설명           |
 | ------ | ----------------------- | ------------ |
@@ -105,7 +206,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | DELETE | `/jobs/{jobId}`         | 채용공고 삭제      |
 | POST   | `/jobs/{jobId}/analyze` | 채용공고 분석      |
 
-## 6. 적합도 분석 API
+## 7. 적합도 분석 API
 
 | Method | Endpoint                         | 설명           |
 | ------ | -------------------------------- | ------------ |
@@ -114,7 +215,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | GET    | `/matches`                       | 전체 적합도 분석 목록 |
 | POST   | `/matches/{matchId}/recalculate` | 적합도 재분석      |
 
-## 7. 기업 분석 API
+## 8. 기업 분석 API
 
 | Method | Endpoint                         | 설명          |
 | ------ | -------------------------------- | ----------- |
@@ -122,7 +223,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | POST   | `/companies/{companyId}/analyze` | 기업 인재상 분석   |
 | GET    | `/companies/{companyId}/values`  | 기업 핵심 가치 조회 |
 
-## 8. AI 문서 생성 API
+## 9. AI 문서 생성 API
 
 | Method | Endpoint                             | 설명          |
 | ------ | ------------------------------------ | ----------- |
@@ -165,7 +266,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 }
 ```
 
-## 9. 지원 관리 API
+## 10. 지원 관리 API
 
 | Method | Endpoint                               | 설명       |
 | ------ | -------------------------------------- | -------- |
@@ -176,7 +277,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | PATCH  | `/applications/{applicationId}/status` | 지원 상태 변경 |
 | DELETE | `/applications/{applicationId}`        | 지원 삭제    |
 
-## 10. 일정 API
+## 11. 일정 API
 
 | Method | Endpoint                          | 설명                  |
 | ------ | --------------------------------- | ------------------- |
@@ -188,7 +289,7 @@ v0.1.0에서는 인증 기능을 구현하지 않는다. 현재 구현된 API는
 | POST   | `/calendar/google/connect`        | Google Calendar 연결  |
 | POST   | `/calendar/events/{eventId}/sync` | Google Calendar 동기화 |
 
-## 11. 추천 API
+## 12. 추천 API
 
 | Method | Endpoint                                       | 설명           |
 | ------ | ---------------------------------------------- | ------------ |

@@ -1,10 +1,12 @@
 # ApplyMate AI
 
+현재 버전: v0.1.1
+
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 경력, 기술, 프로젝트 경험을 기반으로 채용공고 추천, 지원 문서 작성, 지원 현황 및 일정 관리를 단계적으로 구현합니다.
 
 ## 기술 스택
 
-* Frontend: Next.js, TypeScript, Tailwind CSS, App Router
+* Frontend: Next.js, TypeScript, Tailwind CSS, App Router, TanStack Query, React Hook Form, Zod
 * Backend: Python, FastAPI, SQLAlchemy, Alembic, Pydantic
 * Database: PostgreSQL
 * Cache: Redis
@@ -47,6 +49,7 @@ Backend:
 
 ```bash
 cd backend
+alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
@@ -102,10 +105,56 @@ GET http://localhost:8000/api/v1/health
 }
 ```
 
+## 인증 API
+
+Base URL은 `/api/v1`입니다.
+
+```text
+POST /auth/signup
+POST /auth/login
+POST /auth/refresh
+POST /auth/logout
+GET  /auth/me
+```
+
+로그인은 Access Token을 응답 본문으로 반환하고 Refresh Token은 HttpOnly Cookie로 전달합니다. 보호 API는 `Authorization: Bearer {access_token}` 헤더를 사용합니다.
+
+## 회원가입 및 로그인
+
+Frontend 실행 후 다음 화면을 사용합니다.
+
+```text
+http://localhost:3000/signup
+http://localhost:3000/login
+http://localhost:3000/me
+```
+
+`/me`는 인증이 필요한 보호 화면이며, 미인증 사용자는 로그인 화면으로 이동합니다.
+
+## Migration
+
+```bash
+cd backend
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+```
+
+## v0.1.1 구현 범위
+
+* 이메일 회원가입 및 로그인
+* PBKDF2 기반 비밀번호 해시 저장
+* JWT Access Token 발급 및 검증
+* HttpOnly Cookie 기반 Refresh Token 발급, 저장, rotation, 폐기
+* 현재 로그인 사용자 조회
+* 사용자 및 Refresh Token 테이블과 Alembic migration
+* 회원가입, 로그인, 보호 페이지 Frontend 연결
+* 인증 오류 코드 및 테스트
+
 ## 현재 구현 범위
 
-v0.1.0에서는 프로젝트 기반 구축, Backend Health API, Frontend 서비스 상태 화면, Docker Compose 개발 환경, 환경변수 예시, 기본 테스트를 구현했습니다.
+v0.1.1에서는 v0.1.0 프로젝트 기반 위에 회원 및 인증 기능을 구현했습니다.
 
 ## 다음 개발 버전
 
-v0.1.1에서는 회원가입, 로그인, JWT 인증, 사용자 정보 조회를 구현합니다.
+v0.1.2에서는 커리어 프로필 기능을 구현합니다.
