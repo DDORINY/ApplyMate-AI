@@ -2,11 +2,14 @@
 
 ## 현재 구현 스키마
 
-v0.1.2 기준 구현 테이블:
+v0.1.3 기준 구현 테이블:
 
 ```text
 users
 refresh_tokens
+oauth_accounts
+oauth_states
+oauth_login_tickets
 career_profiles
 skills
 user_skills
@@ -20,247 +23,143 @@ portfolio_links
 
 ## Migration
 
-v0.1.1:
+| 버전 | 파일 |
+| --- | --- |
+| v0.1.1 | `backend/alembic/versions/20260718_1501_create_auth_tables.py` |
+| v0.1.2 | `backend/alembic/versions/20260718_1900_create_career_profile_tables.py` |
+| v0.1.3 | `backend/alembic/versions/20260718_2100_add_social_auth.py` |
 
-```text
-backend/alembic/versions/20260718_1501_create_auth_tables.py
-```
-
-v0.1.2:
-
-```text
-backend/alembic/versions/20260718_1900_create_career_profile_tables.py
-```
-
-v0.1.2 downgrade는 커리어 프로필 관련 테이블과 Enum만 제거한다. `users`, `refresh_tokens`는 유지한다.
+v0.1.3 downgrade는 social-only 사용자(`users.password_hash IS NULL`)가 있으면 중단합니다. 비밀번호 없는 사용자가 남아 있는 상태에서 `users.password_hash`를 다시 NOT NULL로 되돌리면 데이터 정합성이 깨지기 때문입니다.
 
 ## 공통 원칙
 
-- 사용자 소유 데이터는 `user_id`를 기준으로 격리한다.
-- 모든 보호 API는 현재 인증된 사용자의 데이터만 조회/수정한다.
-- 날짜/시간은 timezone-aware UTC 기준으로 저장한다.
-- 상태값은 Enum으로 제한한다.
-- 중복 방지가 필요한 조합에는 unique constraint를 둔다.
-- 자주 조회하는 `user_id`, FK, 정렬 기준에는 index를 둔다.
-- 운영 데이터 삭제는 migration으로 임의 수행하지 않는다.
+- 사용자 소유 데이터는 `user_id`를 기준으로 격리합니다.
+- 모든 보호 API는 현재 인증된 사용자의 데이터만 조회/수정합니다.
+- 날짜/시간은 timezone-aware UTC 기준으로 저장합니다.
+- 상태 값은 Enum으로 제한합니다.
+- 중복 방지가 필요한 조합에는 unique constraint를 둡니다.
+- 자주 조회하는 `user_id`, FK, 만료 시간, token/state hash에는 index를 둡니다.
 
-## career_profiles
+## users
 
-사용자당 하나의 기본 커리어 프로필을 저장한다.
-
-주요 컬럼:
-
-```text
-id
-user_id
-display_name
-headline
-career_level
-years_of_experience
-desired_job_title
-introduction
-created_at
-updated_at
-```
-
-제약:
-
-- `user_id` unique
-- `users.id` FK, `ondelete=CASCADE`
-- `years_of_experience >= 0`
-- `career_level`: `ENTRY`, `JUNIOR`, `MID`, `SENIOR`, `CAREER_CHANGE`
-
-## skills
-
-기술 마스터 테이블이다.
+서비스 사용자 계정입니다.
 
 주요 컬럼:
 
 ```text
 id
+email
+password_hash
 name
-normalized_name
-category
+status
+email_verified
+last_login_at
 created_at
+updated_at
 ```
 
-제약:
+정책:
 
-- `normalized_name` unique
-- `category`: `LANGUAGE`, `FRAMEWORK`, `DATABASE`, `AI_ML`, `DEVOPS`, `CLOUD`, `FRONTEND`, `BACKEND`, `TOOL`, `ETC`
+- `email`은 unique입니다.
+- v0.1.3부터 `password_hash`는 nullable입니다. 소셜 로그인으로만 생성된 계정은 비밀번호가 없을 수 있습니다.
+- `email_verified`는 provider 검증 이메일로 생성된 소셜 계정에서 true가 됩니다.
 
-## user_skills
+## refresh_tokens
 
-사용자가 보유한 기술과 숙련도를 저장한다.
+Refresh Token의 원문이 아니라 hash를 저장합니다.
+
+정책:
+
+- refresh token rotation을 적용합니다.
+- 로그아웃 또는 재발급 시 기존 token은 `revoked_at`으로 폐기합니다.
+
+## oauth_accounts
+
+사용자와 OAuth provider 계정의 연결 정보를 저장합니다. provider access token은 저장하지 않습니다.
 
 주요 컬럼:
 
 ```text
 id
 user_id
-skill_id
-proficiency_level
-years_of_experience
-is_primary
+provider
+provider_user_id
+provider_email
+provider_username
+provider_display_name
+email_verified
 created_at
 updated_at
+last_login_at
 ```
 
 제약:
 
-- `(user_id, skill_id)` unique
+- `(provider, provider_user_id)` unique
+- `(user_id, provider)` unique
 - `users.id` FK, `ondelete=CASCADE`
-- `skills.id` FK, `ondelete=RESTRICT`
-- `proficiency_level`: `BEGINNER`, `INTERMEDIATE`, `ADVANCED`, `EXPERT`
+- `provider`: `GOOGLE`, `GITHUB`
 
-## experiences
+## oauth_states
 
-사용자 경력 이력을 저장한다.
+OAuth CSRF 방지용 state의 hash와 목적을 임시 저장합니다.
 
 주요 컬럼:
 
 ```text
 id
+state_hash
+provider
+purpose
 user_id
-company_name
-position
-employment_type
-start_date
-end_date
-is_current
-description
-achievements
+redirect_path
 created_at
-updated_at
+expires_at
+consumed_at
 ```
 
-제약:
+정책:
 
-- `users.id` FK, `ondelete=CASCADE`
-- `employment_type`: `FULL_TIME`, `CONTRACT`, `INTERN`, `FREELANCE`, `PART_TIME`, `SELF_EMPLOYED`, `OTHER`
-- 서비스 계층에서 시작일/종료일과 재직 중 정책을 검증한다.
+- state 원문은 DB에 저장하지 않고 hash만 저장합니다.
+- `purpose`: `LOGIN`, `LINK`
+- 만료 또는 이미 사용된 state는 거부합니다.
 
-## projects
+## oauth_login_tickets
 
-사용자 프로젝트 경험을 저장한다.
+Provider callback 이후 프론트가 서비스 토큰으로 교환하는 1회용 ticket의 hash입니다.
 
 주요 컬럼:
 
 ```text
 id
+ticket_hash
 user_id
-name
-summary
-role
-start_date
-end_date
-is_ongoing
-description
-responsibilities
-achievements
-repository_url
-service_url
+provider
+redirect_path
 created_at
-updated_at
+expires_at
+consumed_at
 ```
 
-제약:
+정책:
 
-- `users.id` FK, `ondelete=CASCADE`
-- 서비스 계층에서 날짜 범위와 URL scheme을 검증한다.
+- ticket 원문은 DB에 저장하지 않고 hash만 저장합니다.
+- ticket은 1회만 사용할 수 있습니다.
+- 기본 만료 시간은 60초입니다.
 
-## project_skills
+## career_profiles 이하
 
-프로젝트와 기술 마스터의 연결 테이블이다.
+v0.1.2에서 구현된 커리어 프로필 도메인입니다.
 
-주요 컬럼:
-
-```text
-id
-project_id
-skill_id
-created_at
-```
-
-제약:
-
-- `(project_id, skill_id)` unique
-- `projects.id` FK, `ondelete=CASCADE`
-- `skills.id` FK, `ondelete=RESTRICT`
-
-## job_preferences
-
-사용자 희망 근무 조건을 저장한다.
-
-주요 컬럼:
-
-```text
-id
-user_id
-preferred_employment_types
-preferred_locations
-preferred_company_sizes
-remote_preference
-minimum_salary
-desired_roles
-priority_keywords
-created_at
-updated_at
-```
-
-제약:
-
-- `user_id` unique
-- 배열 성격의 값은 JSON 컬럼으로 저장한다.
-- `remote_preference`: `ONSITE`, `HYBRID`, `REMOTE`, `ANY`
-- 서비스 계층에서 최소 연봉 음수를 차단한다.
-
-## excluded_conditions
-
-지원 제외 조건을 저장한다.
-
-주요 컬럼:
-
-```text
-id
-user_id
-condition_type
-value
-reason
-is_active
-created_at
-updated_at
-```
-
-제약:
-
-- `(user_id, condition_type, value)` unique
-- `condition_type`: `EMPLOYMENT_TYPE`, `LOCATION`, `COMPANY_SIZE`, `REQUIRED_SKILL`, `EXCLUDED_KEYWORD`, `MINIMUM_EXPERIENCE`, `EDUCATION_REQUIREMENT`, `OTHER`
-
-## portfolio_links
-
-포트폴리오, GitHub, 블로그 등 외부 링크를 저장한다.
-
-주요 컬럼:
-
-```text
-id
-user_id
-link_type
-title
-url
-is_primary
-display_order
-created_at
-updated_at
-```
-
-제약:
-
-- `(user_id, url)` unique
-- `link_type`: `GITHUB`, `NOTION`, `PORTFOLIO`, `BLOG`, `LINKEDIN`, `OTHER`
-- 서비스 계층에서 `http`, `https` URL만 허용한다.
-- 대표 링크는 서비스 계층에서 사용자당 하나만 유지한다.
+- `career_profiles`: 사용자당 1개의 기본 커리어 프로필
+- `skills`: 기술 마스터
+- `user_skills`: 사용자 보유 기술과 숙련도
+- `experiences`: 경력
+- `projects`: 프로젝트
+- `project_skills`: 프로젝트-기술 연결
+- `job_preferences`: 희망 근무 조건
+- `excluded_conditions`: 지원 제외 조건
+- `portfolio_links`: GitHub, 블로그, 포트폴리오 등 외부 링크
 
 ## 향후 스키마
 

@@ -1,93 +1,100 @@
-# 내비게이션 구조
+# 네비게이션 구조
 
-ApplyMate AI의 화면 이동 구조를 정리합니다. 이 문서는 실제 구현된 프론트 화면과 다음 버전에서 확장할 화면 후보를 함께 관리합니다.
+ApplyMate AI의 화면 이동 구조를 정리합니다. 이 문서는 실제 구현된 프론트 화면과 다음 버전에서 확장될 화면 후보를 함께 관리합니다.
 
-## 1. 현재 구현 화면
+## 현재 구현 화면
 
-v0.1.2 기준으로 실제 구현된 화면은 다음과 같습니다.
+v0.1.3 기준 실제 구현된 화면은 다음과 같습니다.
 
 | 경로 | 화면 이름 | 접근 | 상태 | 역할 |
 | --- | --- | --- | --- | --- |
 | `/` | 홈 | 공개 | 완료 | 서비스 상태 확인과 주요 화면 진입 |
-| `/signup` | 회원가입 | 공개 | 완료 | 이메일 기반 계정 생성 |
-| `/login` | 로그인 | 공개 | 완료 | Access Token/Refresh Token 발급 |
+| `/signup` | 회원가입 | 공개 | 완료 | 이메일 계정 생성 및 소셜 로그인 시작 |
+| `/login` | 로그인 | 공개 | 완료 | 이메일 로그인 및 소셜 로그인 시작 |
+| `/auth/callback` | 소셜 로그인 callback | 공개 | 완료 | OAuth login ticket을 서비스 토큰으로 교환 |
 | `/me` | 내 계정 | 인증 필요 | 완료 | 현재 로그인 사용자 정보 확인 |
-| `/profile` | 커리어 프로필 | 인증 필요 | 완료 | 프로필, 기술, 경력, 프로젝트, 선호 조건 관리 |
+| `/profile` | 커리어 프로필 | 인증 필요 | 완료 | 프로필, 기술, 경력, 프로젝트, 희망 조건 관리 |
+| `/settings/accounts` | 소셜 계정 연결 | 인증 필요 | 완료 | Google/GitHub 계정 연결, 목록 조회, 해제 |
 
-## 2. 공통 내비게이션
+## 공통 네비게이션
 
-모든 주요 화면은 같은 상단 내비게이션을 사용합니다.
+모든 주요 화면은 같은 상단 네비게이션을 사용합니다.
 
 ```text
 ApplyMate AI
-홈 | 회원가입 | 로그인 | 내 계정 | 프로필
+홈 | 회원가입 | 로그인 | 내 계정 | 프로필 | 계정 연결
 ```
 
-내비게이션 원칙:
+정책:
 
-- 사용자는 어느 화면에서든 홈으로 돌아갈 수 있어야 합니다.
-- 인증 관련 화면(`/signup`, `/login`)은 서로 이동할 수 있어야 합니다.
-- 보호 화면(`/me`, `/profile`)은 로그인하지 않은 경우 로그인 화면으로 이동합니다.
-- 현재 구현 범위를 벗어난 메뉴는 아직 노출하지 않습니다.
+- 공개 화면과 보호 화면을 모두 네비게이션에 표시합니다.
+- 보호 화면에서 인증이 없으면 로그인 화면으로 이동합니다.
+- v0.1.3 범위를 벗어난 화면은 아직 네비게이션에 노출하지 않습니다.
 
-## 3. 홈 화면
+## 인증 화면
 
-경로: `/`
-
-홈 화면은 서비스의 현재 상태와 핵심 진입점을 제공합니다.
+### 회원가입 `/signup`
 
 구성:
 
-- 제품명과 현재 버전
-- v0.1.2에서 가능한 작업 설명
-- 회원가입, 로그인, 내 계정, 프로필 버튼
-- Frontend, Backend, Database, Redis 상태 패널
+- Google/GitHub 소셜 로그인 버튼
+- 이메일 회원가입 폼
+- 로그인 화면 이동 링크
 
-## 4. 인증 화면
+완료 후:
 
-### 회원가입
+- 이메일 회원가입 성공 시 `/login`으로 이동합니다.
+- 소셜 로그인 성공 시 `/auth/callback`에서 token 교환 후 `/me`로 이동합니다.
 
-경로: `/signup`
+### 로그인 `/login`
 
-입력 항목:
+구성:
 
-- 이름
-- 이메일
-- 비밀번호
-- 비밀번호 확인
+- Google/GitHub 소셜 로그인 버튼
+- 이메일 로그인 폼
+- 회원가입 화면 이동 링크
 
-완료 후 로그인 화면으로 이동합니다.
+완료 후:
 
-### 로그인
+- 이메일 로그인 성공 시 `/me`로 이동합니다.
+- 소셜 로그인 성공 시 `/auth/callback`에서 token 교환 후 `/me`로 이동합니다.
 
-경로: `/login`
-
-입력 항목:
-
-- 이메일
-- 비밀번호
-
-완료 후 내 계정 화면으로 이동합니다.
-
-## 5. 내 계정 화면
-
-경로: `/me`
+### 소셜 로그인 callback `/auth/callback`
 
 역할:
 
-- 현재 로그인 사용자 이름과 이메일 확인
-- 계정 상태 확인
-- 최근 로그인 시각 확인
+- URL query의 `ticket`, `error`, `redirect_path`를 읽습니다.
+- `ticket`이 있으면 `POST /auth/oauth/exchange`를 호출합니다.
+- 교환 성공 시 응답의 `redirect_path`로 이동합니다.
+- 오류가 있으면 사용자에게 안내 후 `/login`으로 돌아갈 수 있게 합니다.
+
+## 내 계정 `/me`
+
+역할:
+
+- 이름, 이메일, 계정 상태, 이메일 검증 여부, 최근 로그인 시각 표시
+- 프로필 관리 이동
+- 소셜 계정 연결 이동
 - 로그아웃
-- 커리어 프로필 화면으로 이동
 
-인증되지 않은 사용자는 `/login`으로 이동합니다.
+## 소셜 계정 연결 `/settings/accounts`
 
-## 6. 커리어 프로필 화면
+역할:
 
-경로: `/profile`
+- 연결된 Google/GitHub 계정 목록 표시
+- provider 이메일, username, 최근 사용 시각 표시
+- 새 provider 연결 시작
+- 연결 해제
 
-v0.1.2 범위는 한 화면 안에서 카드형 섹션으로 관리합니다.
+정책:
+
+- 마지막 로그인 수단은 해제할 수 없습니다.
+- provider access token은 화면이나 DB에 저장/표시하지 않습니다.
+- 같은 이메일의 기존 계정과 소셜 계정은 자동 병합하지 않습니다.
+
+## 커리어 프로필 `/profile`
+
+v0.1.2 범위의 단일 화면 안에서 카드형 섹션으로 관리합니다.
 
 섹션:
 
@@ -99,17 +106,7 @@ v0.1.2 범위는 한 화면 안에서 카드형 섹션으로 관리합니다.
 6. 지원 제외 조건
 7. 포트폴리오 링크
 
-화면 원칙:
-
-- 모바일에서는 세로 스크롤 중심으로 사용합니다.
-- 각 섹션은 독립적인 저장/추가/삭제 흐름을 가집니다.
-- 삭제 작업은 사용자 확인 후 실행합니다.
-- 입력 검증은 프론트엔드 Zod와 백엔드 Pydantic에서 함께 처리합니다.
-- 인증 만료 시 기존 Refresh Token 흐름을 재사용합니다.
-
-## 7. v0.1.2에서 노출하지 않는 화면
-
-다음 화면은 아직 구현 범위가 아니므로 내비게이션에 노출하지 않습니다.
+## 아직 노출하지 않는 화면
 
 - 채용공고 관리
 - 적합도 분석
@@ -119,23 +116,25 @@ v0.1.2 범위는 한 화면 안에서 카드형 섹션으로 관리합니다.
 - 캘린더
 - 외부 연동 설정
 
-## 8. 향후 화면 후보
+## 향후 화면 후보
 
 | 버전 | 화면 후보 | 목적 |
 | --- | --- | --- |
 | v0.2.0 | `/jobs`, `/jobs/new`, `/jobs/{id}` | 채용공고 관리 |
 | v0.2.2 | `/matches`, `/jobs/{id}/matches` | 적합도 분석 |
-| v0.3.x | `/resumes`, `/documents` | 이력서와 AI 문서 |
+| v0.3.x | `/resumes`, `/documents` | 이력서/AI 문서 |
 | v0.4.x | `/applications`, `/calendar` | 지원 현황과 일정 |
 | v0.5.x | `/settings/integrations` | 외부 서비스 연동 |
 
-## 9. 구현 파일 매핑
+## 구현 파일 매핑
 
 | 화면 | 주요 파일 |
 | --- | --- |
 | 홈 | `frontend/src/app/page.tsx` |
-| 회원가입 | `frontend/src/app/signup/page.tsx`, `frontend/src/components/auth/signup-form.tsx` |
-| 로그인 | `frontend/src/app/login/page.tsx`, `frontend/src/components/auth/login-form.tsx` |
+| 회원가입 | `frontend/src/app/signup/page.tsx`, `frontend/src/components/auth/signup-form.tsx`, `frontend/src/components/auth/oauth-buttons.tsx` |
+| 로그인 | `frontend/src/app/login/page.tsx`, `frontend/src/components/auth/login-form.tsx`, `frontend/src/components/auth/oauth-buttons.tsx` |
+| 소셜 callback | `frontend/src/app/auth/callback/page.tsx`, `frontend/src/components/auth/oauth-callback-panel.tsx` |
 | 내 계정 | `frontend/src/app/me/page.tsx`, `frontend/src/components/auth/protected-user-panel.tsx` |
+| 소셜 계정 연결 | `frontend/src/app/settings/accounts/page.tsx`, `frontend/src/components/auth/oauth-accounts-manager.tsx` |
 | 커리어 프로필 | `frontend/src/app/profile/page.tsx`, `frontend/src/components/profile/profile-manager.tsx` |
-| 공통 내비게이션 | `frontend/src/components/app-header.tsx` |
+| 공통 네비게이션 | `frontend/src/components/app-header.tsx` |

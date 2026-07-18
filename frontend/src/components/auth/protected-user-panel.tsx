@@ -48,6 +48,10 @@ export function ProtectedUserPanel() {
           <dd className="font-medium">{user.status}</dd>
         </div>
         <div className="flex justify-between gap-4">
+          <dt>이메일 검증</dt>
+          <dd className="font-medium">{user.email_verified ? "완료" : "미검증"}</dd>
+        </div>
+        <div className="flex justify-between gap-4">
           <dt>최근 로그인</dt>
           <dd className="font-medium">{user.last_login_at ?? "기록 없음"}</dd>
         </div>
@@ -56,10 +60,13 @@ export function ProtectedUserPanel() {
         <Link className="button-primary" href="/profile">
           프로필 관리
         </Link>
+        <Link className="button-secondary" href="/settings/accounts">
+          계정 연결
+        </Link>
         <button
           className="button-secondary"
-          type="button"
           disabled={logoutMutation.isPending}
+          type="button"
           onClick={() => logoutMutation.mutate()}
         >
           {logoutMutation.isPending ? "로그아웃 중..." : "로그아웃"}

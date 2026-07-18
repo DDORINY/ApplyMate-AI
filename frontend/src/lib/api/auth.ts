@@ -1,6 +1,16 @@
-import { apiBaseUrl } from "@/lib/env/client";
 import { clearAccessToken, getAccessToken, setAccessToken } from "@/lib/auth/token";
-import type { ApiErrorResponse, ApiResponse, AuthTokenData, UserPublic } from "@/types/auth";
+import { apiBaseUrl } from "@/lib/env/client";
+import type {
+  ApiErrorResponse,
+  ApiResponse,
+  AuthTokenData,
+  OAuthAccountsData,
+  OAuthAuthorizationData,
+  OAuthExchangeData,
+  OAuthProvider,
+  OAuthProvidersData,
+  UserPublic,
+} from "@/types/auth";
 
 async function parseError(response: Response): Promise<Error> {
   try {
@@ -26,6 +36,21 @@ async function request<TData>(path: string, init: RequestInit = {}): Promise<Api
   }
 
   return response.json() as Promise<ApiResponse<TData>>;
+}
+
+function withAccessToken(init: RequestInit = {}) {
+  const token = getAccessToken();
+  if (!token) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  return {
+    ...init,
+    headers: {
+      ...(init.headers ?? {}),
+      Authorization: `Bearer ${token}`,
+    },
+  };
 }
 
 export async function signup(payload: { name: string; email: string; password: string }) {
@@ -59,27 +84,49 @@ export async function logout() {
 }
 
 export async function me() {
-  const token = getAccessToken();
-  if (!token) {
-    throw new Error("로그인이 필요합니다.");
-  }
-
   try {
-    return await request<UserPublic>("/auth/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-  } catch (error) {
+    return await request<UserPublic>("/auth/me", withAccessToken());
+  } catch {
     await refreshAccessToken();
-    const refreshedToken = getAccessToken();
-    if (!refreshedToken) {
-      throw error;
-    }
-    return request<UserPublic>("/auth/me", {
-      headers: {
-        Authorization: `Bearer ${refreshedToken}`,
-      },
-    });
+    return request<UserPublic>("/auth/me", withAccessToken());
   }
+}
+
+export async function getOAuthProviders() {
+  return request<OAuthProvidersData>("/auth/oauth/providers");
+}
+
+export async function startOAuth(provider: OAuthProvider, redirectPath = "/me") {
+  const params = new URLSearchParams({ redirect_path: redirectPath });
+  return request<OAuthAuthorizationData>(
+    `/auth/oauth/${provider.toLowerCase()}/authorize?${params.toString()}`,
+  );
+}
+
+export async function exchangeOAuthTicket(ticket: string) {
+  const response = await request<OAuthExchangeData>("/auth/oauth/exchange", {
+    method: "POST",
+    body: JSON.stringify({ ticket }),
+  });
+  setAccessToken(response.data.access_token);
+  return response;
+}
+
+export async function getOAuthAccounts() {
+  return request<OAuthAccountsData>("/auth/oauth/accounts", withAccessToken());
+}
+
+export async function startOAuthLink(provider: OAuthProvider, redirectPath = "/settings/accounts") {
+  const params = new URLSearchParams({ redirect_path: redirectPath });
+  return request<OAuthAuthorizationData>(
+    `/auth/oauth/${provider.toLowerCase()}/link/authorize?${params.toString()}`,
+    withAccessToken(),
+  );
+}
+
+export async function unlinkOAuthAccount(provider: OAuthProvider) {
+  return request<{ unlinked: boolean }>(
+    `/auth/oauth/accounts/${provider.toLowerCase()}`,
+    withAccessToken({ method: "DELETE" }),
+  );
 }

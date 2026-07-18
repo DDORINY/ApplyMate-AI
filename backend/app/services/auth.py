@@ -33,7 +33,7 @@ class AuthService:
             raise AppError("AUTH_EMAIL_ALREADY_EXISTS", "이미 가입된 이메일입니다.", 409)
 
         user = await self.repository.create_user(
-            normalized_email, hash_password(password), name.strip()
+            normalized_email, hash_password(password), name.strip(), email_verified=False
         )
         await self.session.commit()
         return user
@@ -42,13 +42,32 @@ class AuthService:
         self, email: str, password: str, device_info: str | None
     ) -> tuple[User, str, str, datetime]:
         user = await self.repository.get_user_by_email(normalize_email(email))
-        if not user or not verify_password(password, user.password_hash):
+        if not user:
             raise AppError(
-                "AUTH_INVALID_CREDENTIALS", "이메일 또는 비밀번호가 올바르지 않습니다.", 401
+                "AUTH_INVALID_CREDENTIALS",
+                "이메일 또는 비밀번호가 올바르지 않습니다.",
+                401,
+            )
+        if user.password_hash is None:
+            raise AppError(
+                "AUTH_PASSWORD_NOT_CONFIGURED",
+                "소셜 로그인으로 가입한 계정입니다. 연결된 소셜 계정으로 로그인해 주세요.",
+                401,
+            )
+        if not verify_password(password, user.password_hash):
+            raise AppError(
+                "AUTH_INVALID_CREDENTIALS",
+                "이메일 또는 비밀번호가 올바르지 않습니다.",
+                401,
             )
         if user.status != UserStatus.ACTIVE:
             raise AppError("AUTH_USER_INACTIVE", "비활성 사용자입니다.", 403)
 
+        return await self.issue_tokens(user, device_info)
+
+    async def issue_tokens(
+        self, user: User, device_info: str | None
+    ) -> tuple[User, str, str, datetime]:
         access_token = create_access_token(user.id)
         refresh_token, _jti, refresh_expires_at = create_refresh_token(user.id)
         await self.repository.save_refresh_token(
