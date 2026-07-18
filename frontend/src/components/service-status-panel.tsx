@@ -10,7 +10,7 @@ type LoadState = "loading" | "ready" | "error";
 export function ServiceStatusPanel() {
   const [state, setState] = useState<LoadState>("loading");
   const [health, setHealth] = useState<HealthData | null>(null);
-  const [message, setMessage] = useState("상태를 확인하고 있습니다.");
+  const [message, setMessage] = useState("서비스 상태를 확인하고 있습니다.");
 
   useEffect(() => {
     let isMounted = true;

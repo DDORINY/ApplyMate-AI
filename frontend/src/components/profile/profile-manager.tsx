@@ -2,13 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { logout, me } from "@/lib/api/auth";
+import { me } from "@/lib/api/auth";
 import { profileApi } from "@/lib/api/profile";
 import type {
   CareerProfile,
@@ -39,7 +39,7 @@ const skillSchema = z.object({
 const experienceSchema = z
   .object({
     company_name: z.string().min(1, "회사명을 입력해 주세요."),
-    position: z.string().min(1, "직무를 입력해 주세요."),
+    position: z.string().min(1, "직무 또는 직책을 입력해 주세요."),
     employment_type: z.enum([
       "FULL_TIME",
       "CONTRACT",
@@ -67,8 +67,8 @@ const projectSchema = z.object({
   start_date: z.string().min(1, "시작일을 입력해 주세요."),
   end_date: z.string().optional(),
   is_ongoing: z.boolean(),
-  repository_url: z.string().url().optional().or(z.literal("")),
-  service_url: z.string().url().optional().or(z.literal("")),
+  repository_url: z.string().url("올바른 URL을 입력해 주세요.").optional().or(z.literal("")),
+  service_url: z.string().url("올바른 URL을 입력해 주세요.").optional().or(z.literal("")),
   skill_names: z.string().optional(),
 });
 
@@ -103,6 +103,21 @@ const portfolioSchema = z.object({
   is_primary: z.boolean(),
   display_order: z.number().min(0),
 });
+
+const careerLevelLabels = {
+  ENTRY: "신입",
+  JUNIOR: "주니어",
+  MID: "미들",
+  SENIOR: "시니어",
+  CAREER_CHANGE: "커리어 전환",
+};
+
+const proficiencyLabels = {
+  BEGINNER: "입문",
+  INTERMEDIATE: "중급",
+  ADVANCED: "고급",
+  EXPERT: "전문가",
+};
 
 export function ProfileManager() {
   const router = useRouter();
@@ -143,7 +158,6 @@ export function ProfileManager() {
   }, [router, userQuery.isError]);
 
   const invalidate = (key: string[]) => queryClient.invalidateQueries({ queryKey: key });
-  const logoutMutation = useMutation({ mutationFn: logout, onSuccess: () => router.push("/login") });
 
   if (userQuery.isLoading) {
     return <div className="panel mx-auto max-w-3xl">로그인 상태를 확인하고 있습니다.</div>;
@@ -155,22 +169,12 @@ export function ProfileManager() {
 
   return (
     <section className="mx-auto grid w-full max-w-6xl gap-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-medium text-sky-700">ApplyMate AI v0.1.2</p>
-          <h1 className="mt-2 text-3xl font-semibold text-slate-950">커리어 프로필</h1>
-          <p className="mt-2 text-slate-600">
-            지원 전략의 기준이 되는 경력, 기술, 프로젝트, 선호 조건을 관리합니다.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link className="button-secondary" href="/me">
-            내 계정
-          </Link>
-          <button className="button-secondary" onClick={() => logoutMutation.mutate()} type="button">
-            로그아웃
-          </button>
-        </div>
+      <header>
+        <p className="text-sm font-medium text-sky-700">ApplyMate AI v0.1.2</p>
+        <h1 className="mt-2 text-3xl font-semibold text-slate-950">커리어 프로필</h1>
+        <p className="mt-2 max-w-3xl text-slate-600">
+          지원 전략의 기준이 되는 기본 프로필, 기술 스택, 경력, 프로젝트, 희망 조건을 한 화면에서 관리합니다.
+        </p>
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
@@ -218,10 +222,19 @@ function optionalUrl(value?: string) {
   return value?.trim() ? value.trim() : null;
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description?: string;
+  children: ReactNode;
+}) {
   return (
     <section className="panel max-w-none">
       <h2 className="text-xl font-semibold text-slate-950">{title}</h2>
+      {description ? <p className="mt-1 text-sm leading-6 text-slate-500">{description}</p> : null}
       <div className="mt-4">{children}</div>
     </section>
   );
@@ -242,13 +255,15 @@ function ProfileForm({ initial, onSaved }: { initial?: CareerProfile; onSaved: (
   const mutation = useMutation({ mutationFn: profileApi.saveProfile, onSuccess: onSaved });
 
   return (
-    <Section title="기본 프로필">
+    <Section title="1. 기본 프로필" description="채용공고 분석과 지원 문서 생성의 기준 정보입니다.">
       <form className="grid gap-3" onSubmit={form.handleSubmit((value) => mutation.mutate(value))}>
         <input className="input" placeholder="표시 이름" {...form.register("display_name")} />
         <input className="input" placeholder="한 줄 소개" {...form.register("headline")} />
         <select className="input" {...form.register("career_level")}>
-          {["ENTRY", "JUNIOR", "MID", "SENIOR", "CAREER_CHANGE"].map((item) => (
-            <option key={item}>{item}</option>
+          {Object.entries(careerLevelLabels).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
           ))}
         </select>
         <input
@@ -259,6 +274,7 @@ function ProfileForm({ initial, onSaved }: { initial?: CareerProfile; onSaved: (
         />
         <input className="input" placeholder="희망 직무" {...form.register("desired_job_title")} />
         <textarea className="input min-h-24" placeholder="자기소개" {...form.register("introduction")} />
+        <FormError message={mutation.error?.message} />
         <SubmitButton pending={mutation.isPending} label="프로필 저장" />
       </form>
     </Section>
@@ -279,15 +295,17 @@ function SkillSection({ items, onChanged }: { items: UserSkill[]; onChanged: () 
   const remove = useMutation({ mutationFn: profileApi.deleteSkill, onSuccess: onChanged });
 
   return (
-    <Section title="기술 스택">
+    <Section title="2. 기술 스택" description="주요 기술과 숙련도, 대표 기술 여부를 기록합니다.">
       <form
         className="grid gap-3"
         onSubmit={form.handleSubmit((value) => add.mutate(value, { onSuccess: () => form.reset() }))}
       >
-        <input className="input" placeholder="기술명" {...form.register("name")} />
+        <input className="input" placeholder="기술명 예: FastAPI" {...form.register("name")} />
         <select className="input" {...form.register("proficiency_level")}>
-          {["BEGINNER", "INTERMEDIATE", "ADVANCED", "EXPERT"].map((item) => (
-            <option key={item}>{item}</option>
+          {Object.entries(proficiencyLabels).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
           ))}
         </select>
         <input
@@ -296,15 +314,16 @@ function SkillSection({ items, onChanged }: { items: UserSkill[]; onChanged: () 
           placeholder="경력 연수"
           {...form.register("years_of_experience", { valueAsNumber: true })}
         />
-        <label className="text-sm">
+        <label className="text-sm text-slate-700">
           <input type="checkbox" {...form.register("is_primary")} /> 대표 기술
         </label>
+        <FormError message={add.error?.message} />
         <SubmitButton pending={add.isPending} label="기술 추가" />
       </form>
       <List
         items={items.map(
           (item) =>
-            `${item.skill.name} · ${item.proficiency_level}${item.is_primary ? " · 대표" : ""}`,
+            `${item.skill.name} · ${proficiencyLabels[item.proficiency_level]}${item.is_primary ? " · 대표" : ""}`,
         )}
         ids={items.map((item) => item.id)}
         onDelete={(id) => remove.mutate(id)}
@@ -329,8 +348,9 @@ function ExperienceSection({ items, onChanged }: { items: Experience[]; onChange
   });
   const add = useMutation({ mutationFn: profileApi.addExperience, onSuccess: onChanged });
   const remove = useMutation({ mutationFn: profileApi.deleteExperience, onSuccess: onChanged });
+
   return (
-    <Section title="경력">
+    <Section title="3. 경력" description="회사, 직무, 재직 기간과 담당 업무를 기록합니다.">
       <form
         className="grid gap-3"
         onSubmit={form.handleSubmit((value) =>
@@ -345,16 +365,20 @@ function ExperienceSection({ items, onChanged }: { items: Experience[]; onChange
         <select className="input" {...form.register("employment_type")}>
           {["FULL_TIME", "CONTRACT", "INTERN", "FREELANCE", "PART_TIME", "SELF_EMPLOYED", "OTHER"].map(
             (item) => (
-              <option key={item}>{item}</option>
+              <option key={item} value={item}>
+                {item}
+              </option>
             ),
           )}
         </select>
         <input className="input" type="date" {...form.register("start_date")} />
         <input className="input" type="date" {...form.register("end_date")} />
-        <label className="text-sm">
+        <label className="text-sm text-slate-700">
           <input type="checkbox" {...form.register("is_current")} /> 재직 중
         </label>
         <textarea className="input" placeholder="담당 업무" {...form.register("description")} />
+        <textarea className="input" placeholder="주요 성과" {...form.register("achievements")} />
+        <FormError message={add.error?.message} />
         <SubmitButton pending={add.isPending} label="경력 추가" />
       </form>
       <List
@@ -383,8 +407,9 @@ function ProjectSection({ items, onChanged }: { items: Project[]; onChanged: () 
   });
   const add = useMutation({ mutationFn: profileApi.addProject, onSuccess: onChanged });
   const remove = useMutation({ mutationFn: profileApi.deleteProject, onSuccess: onChanged });
+
   return (
-    <Section title="프로젝트">
+    <Section title="4. 프로젝트" description="프로젝트 경험과 사용 기술을 연결합니다.">
       <form
         className="grid gap-3"
         onSubmit={form.handleSubmit((value) =>
@@ -404,8 +429,14 @@ function ProjectSection({ items, onChanged }: { items: Project[]; onChanged: () 
         <input className="input" placeholder="역할" {...form.register("role")} />
         <input className="input" type="date" {...form.register("start_date")} />
         <input className="input" type="date" {...form.register("end_date")} />
+        <label className="text-sm text-slate-700">
+          <input type="checkbox" {...form.register("is_ongoing")} /> 진행 중
+        </label>
         <input className="input" placeholder="기술 스택, 쉼표로 구분" {...form.register("skill_names")} />
         <input className="input" placeholder="GitHub URL" {...form.register("repository_url")} />
+        <input className="input" placeholder="서비스 URL" {...form.register("service_url")} />
+        <textarea className="input" placeholder="프로젝트 요약" {...form.register("summary")} />
+        <FormError message={add.error?.message} />
         <SubmitButton pending={add.isPending} label="프로젝트 추가" />
       </form>
       <List
@@ -429,8 +460,9 @@ function PreferenceSection({ initial, onChanged }: { initial?: JobPreference; on
     },
   });
   const save = useMutation({ mutationFn: profileApi.savePreferences, onSuccess: onChanged });
+
   return (
-    <Section title="희망 조건">
+    <Section title="5. 희망 조건" description="희망 지역, 직무, 원격 선호와 우선 키워드를 저장합니다.">
       <form
         className="grid gap-3"
         onSubmit={form.handleSubmit((value) =>
@@ -447,9 +479,12 @@ function PreferenceSection({ initial, onChanged }: { initial?: JobPreference; on
       >
         <input className="input" placeholder="희망 지역, 쉼표로 구분" {...form.register("preferred_locations")} />
         <input className="input" placeholder="희망 직무, 쉼표로 구분" {...form.register("desired_roles")} />
+        <input className="input" placeholder="우선 키워드, 쉼표로 구분" {...form.register("priority_keywords")} />
         <select className="input" {...form.register("remote_preference")}>
           {["ANY", "ONSITE", "HYBRID", "REMOTE"].map((item) => (
-            <option key={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
         <input
@@ -458,6 +493,7 @@ function PreferenceSection({ initial, onChanged }: { initial?: JobPreference; on
           placeholder="최소 희망 연봉"
           {...form.register("minimum_salary", { valueAsNumber: true })}
         />
+        <FormError message={save.error?.message} />
         <SubmitButton pending={save.isPending} label="희망 조건 저장" />
       </form>
     </Section>
@@ -471,19 +507,26 @@ function ExclusionSection({ items, onChanged }: { items: ExcludedCondition[]; on
   });
   const add = useMutation({ mutationFn: profileApi.addExclusion, onSuccess: onChanged });
   const remove = useMutation({ mutationFn: profileApi.deleteExclusion, onSuccess: onChanged });
+
   return (
-    <Section title="지원 제외 조건">
+    <Section title="6. 지원 제외 조건" description="지원하지 않을 조건을 미리 기록합니다.">
       <form
         className="grid gap-3"
         onSubmit={form.handleSubmit((value) => add.mutate(value, { onSuccess: () => form.reset() }))}
       >
         <select className="input" {...form.register("condition_type")}>
           {["LOCATION", "COMPANY_SIZE", "REQUIRED_SKILL", "EXCLUDED_KEYWORD", "OTHER"].map((item) => (
-            <option key={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
         <input className="input" placeholder="제외 값" {...form.register("value")} />
         <input className="input" placeholder="이유" {...form.register("reason")} />
+        <label className="text-sm text-slate-700">
+          <input type="checkbox" {...form.register("is_active")} /> 활성 조건
+        </label>
+        <FormError message={add.error?.message} />
         <SubmitButton pending={add.isPending} label="제외 조건 추가" />
       </form>
       <List
@@ -510,22 +553,32 @@ function PortfolioSection({ items, onChanged }: { items: PortfolioLink[]; onChan
   });
   const add = useMutation({ mutationFn: profileApi.addPortfolioLink, onSuccess: onChanged });
   const remove = useMutation({ mutationFn: profileApi.deletePortfolioLink, onSuccess: onChanged });
+
   return (
-    <Section title="포트폴리오 링크">
+    <Section title="7. 포트폴리오 링크" description="GitHub, Notion, 블로그 등 외부 링크를 관리합니다.">
       <form
         className="grid gap-3"
         onSubmit={form.handleSubmit((value) => add.mutate(value, { onSuccess: () => form.reset() }))}
       >
         <select className="input" {...form.register("link_type")}>
           {["GITHUB", "NOTION", "PORTFOLIO", "BLOG", "LINKEDIN", "OTHER"].map((item) => (
-            <option key={item}>{item}</option>
+            <option key={item} value={item}>
+              {item}
+            </option>
           ))}
         </select>
         <input className="input" placeholder="제목" {...form.register("title")} />
         <input className="input" placeholder="https://..." {...form.register("url")} />
-        <label className="text-sm">
+        <label className="text-sm text-slate-700">
           <input type="checkbox" {...form.register("is_primary")} /> 대표 링크
         </label>
+        <input
+          className="input"
+          type="number"
+          placeholder="정렬 순서"
+          {...form.register("display_order", { valueAsNumber: true })}
+        />
+        <FormError message={add.error?.message} />
         <SubmitButton pending={add.isPending} label="링크 추가" />
       </form>
       <List
@@ -545,10 +598,19 @@ function SubmitButton({ pending, label }: { pending: boolean; label: string }) {
   );
 }
 
+function FormError({ message }: { message?: string }) {
+  if (!message) {
+    return null;
+  }
+
+  return <p className="text-sm text-rose-700">{message}</p>;
+}
+
 function List({ items, ids, onDelete }: { items: string[]; ids: number[]; onDelete: (id: number) => void }) {
   if (items.length === 0) {
     return <p className="mt-4 text-sm text-slate-500">아직 등록된 항목이 없습니다.</p>;
   }
+
   return (
     <ul className="mt-4 grid gap-2">
       {items.map((item, index) => (

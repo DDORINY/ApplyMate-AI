@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -51,14 +52,19 @@ export function ProtectedUserPanel() {
           <dd className="font-medium">{user.last_login_at ?? "기록 없음"}</dd>
         </div>
       </dl>
-      <button
-        className="button-secondary"
-        type="button"
-        disabled={logoutMutation.isPending}
-        onClick={() => logoutMutation.mutate()}
-      >
-        {logoutMutation.isPending ? "로그아웃 중..." : "로그아웃"}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <Link className="button-primary" href="/profile">
+          프로필 관리
+        </Link>
+        <button
+          className="button-secondary"
+          type="button"
+          disabled={logoutMutation.isPending}
+          onClick={() => logoutMutation.mutate()}
+        >
+          {logoutMutation.isPending ? "로그아웃 중..." : "로그아웃"}
+        </button>
+      </div>
     </div>
   );
 }
