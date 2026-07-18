@@ -1,6 +1,6 @@
 # ApplyMate AI 버전별 개발 로드맵
 
-## 버전 전략
+## 버전 요약
 
 ```text
 v0.1.x: 서비스 기반 구축
@@ -16,39 +16,32 @@ v1.0.0: 정식 MVP
 
 상태: 완료
 
-구현 범위:
-
 - Next.js 프론트엔드
 - FastAPI 백엔드
 - PostgreSQL, Redis 연결
 - Docker Compose 개발 환경
 - Health API
-- 공통 응답과 오류 구조
+- 공통 응답/오류 구조
 
 ## v0.1.1 회원 및 인증
 
 상태: 완료
 
-구현 범위:
-
 - 이메일 회원가입
-- 로그인
+- 이메일 로그인
 - JWT Access Token
 - Refresh Token HttpOnly Cookie
-- Refresh Token DB 해시 저장, rotation, 폐기
+- Refresh Token DB hash 저장, rotation, 폐기
 - 현재 사용자 조회
 - 로그아웃
-- 회원가입, 로그인, 보호 화면
+- 회원가입/로그인/보호 페이지
 - 인증 테스트와 문서 갱신
 
 ## v0.1.2 커리어 프로필
 
 상태: 완료
 
-구현 범위:
-
 - 기본 커리어 프로필 관리
-- 희망 직무와 경력 구분 관리
 - 기술 스택 관리
 - 경력 관리
 - 프로젝트 관리
@@ -61,25 +54,35 @@ v1.0.0: 정식 MVP
 - `/profile` 프론트엔드 화면
 - Alembic migration과 Backend 테스트
 
+## v0.1.3 소셜 로그인
+
+상태: 완료
+
+구현 범위:
+
+- Google OAuth 로그인
+- GitHub OAuth 로그인
+- OAuth provider 활성화 상태 API
+- OAuth authorize URL 생성 API
+- Provider callback 처리
+- 1회용 OAuth login ticket 교환 API
+- 소셜 로그인 사용자 생성
+- 기존 이메일 계정과 동일 이메일 소셜 계정의 자동 병합 방지
+- 로그인 후 명시적 소셜 계정 연결
+- 연결된 소셜 계정 조회/해제
+- 마지막 로그인 수단 해제 방지
+- `email_verified`, nullable `password_hash`
+- `oauth_accounts`, `oauth_states`, `oauth_login_tickets`
+- `/auth/callback`, `/settings/accounts` 프론트 화면
+- OAuth 테스트, migration, 문서 업데이트
+
 제외 범위:
 
-- 교육 이력
-- 자격증
-- 이력서 파일 업로드
-- 채용공고 등록
-- AI 적합도 분석
-- AI 지원 문서 생성
-- 외부 서비스 연동
-- pgvector 임베딩
-
-완료 조건:
-
-- 사용자별 커리어 프로필 생성/조회/수정 가능
-- 기술, 경력, 프로젝트, 희망 조건, 제외 조건, 포트폴리오 링크 관리 가능
-- v0.1.1 인증 기능 유지
-- Backend test, ruff 통과
-- Frontend lint, type-check, build 통과
-- Docker Compose와 migration 검증
+- Kakao/Naver/Apple 로그인
+- Google Calendar/Gmail 연동
+- GitHub repository 수집
+- provider access token 저장
+- production OAuth app 생성/배포
 
 ## v0.2.0 채용공고 관리
 
@@ -87,8 +90,8 @@ v1.0.0: 정식 MVP
 
 목표:
 
-- 사용자가 채용공고를 직접 등록하고 관리한다.
-- 이후 적합도 분석에 사용할 구조화된 공고 데이터를 저장한다.
+- 사용자가 채용공고를 직접 등록하고 관리합니다.
+- 이후 적합도 분석에 사용할 구조화된 공고 데이터를 저장합니다.
 
 예정 범위:
 
@@ -104,8 +107,6 @@ v1.0.0: 정식 MVP
 
 상태: 예정
 
-예정 범위:
-
 - 공고 본문 전처리
 - 주요 업무 추출
 - 필수/우대 조건 추출
@@ -113,24 +114,20 @@ v1.0.0: 정식 MVP
 - 경력 조건 추출
 - 채용 절차와 마감일 추출
 
-## v0.2.2 사용자 적합도 분석
+## v0.2.2 사용자-공고 적합도 분석
 
 상태: 예정
-
-예정 범위:
 
 - 직무 적합도 계산
 - 기술 적합도 계산
 - 경력 적합도 계산
 - 프로젝트 적합도 계산
 - 지원 위험 요소 표시
-- 강점/보완점 제시
+- 강점/보완점 표시
 
-## v0.3.x 이력서와 AI 문서
+## v0.3.x 이력서/AI 문서
 
 상태: 예정
-
-예정 범위:
 
 - PDF/DOCX 이력서 업로드
 - 이력서 텍스트 추출
@@ -142,8 +139,6 @@ v1.0.0: 정식 MVP
 
 상태: 예정
 
-예정 범위:
-
 - 지원 공고 등록
 - 지원 상태 관리
 - 서류/면접/과제/마감 일정 관리
@@ -153,8 +148,6 @@ v1.0.0: 정식 MVP
 
 상태: 예정
 
-예정 범위:
-
 - Google Calendar 연동
 - Gmail 채용 메일 분석
 - 외부 계정 연결/해제
@@ -163,8 +156,6 @@ v1.0.0: 정식 MVP
 ## v0.6.x 자동 추천
 
 상태: 예정
-
-예정 범위:
 
 - 매일 추천 공고 생성
 - 사용자 조건 기반 필터링

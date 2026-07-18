@@ -18,8 +18,15 @@ class AuthRepository:
     async def get_user_by_id(self, user_id: int) -> User | None:
         return await self.session.get(User, user_id)
 
-    async def create_user(self, email: str, password_hash: str, name: str) -> User:
-        user = User(email=email, password_hash=password_hash, name=name)
+    async def create_user(
+        self, email: str, password_hash: str | None, name: str, email_verified: bool = False
+    ) -> User:
+        user = User(
+            email=email,
+            password_hash=password_hash,
+            name=name,
+            email_verified=email_verified,
+        )
         self.session.add(user)
         await self.session.flush()
         await self.session.refresh(user)

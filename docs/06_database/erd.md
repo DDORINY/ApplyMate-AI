@@ -1,121 +1,166 @@
-# ApplyMate AI ERD
+# ERD
 
-## v0.1.2 관계 개요
+v0.1.3 기준 핵심 관계입니다.
 
 ```mermaid
 erDiagram
-  users ||--o{ refresh_tokens : owns
-  users ||--|| career_profiles : owns
+  users ||--o{ refresh_tokens : has
+  users ||--o{ oauth_accounts : links
+  users ||--o{ oauth_states : creates
+  users ||--o{ oauth_login_tickets : receives
+  users ||--o| career_profiles : owns
   users ||--o{ user_skills : owns
   users ||--o{ experiences : owns
   users ||--o{ projects : owns
-  users ||--|| job_preferences : owns
+  users ||--o| job_preferences : owns
   users ||--o{ excluded_conditions : owns
   users ||--o{ portfolio_links : owns
 
   skills ||--o{ user_skills : referenced_by
-  projects ||--o{ project_skills : has
-  skills ||--o{ project_skills : used_in
+  projects ||--o{ project_skills : uses
+  skills ||--o{ project_skills : referenced_by
+
+  users {
+    bigint id PK
+    string email UK
+    string password_hash
+    string name
+    enum status
+    boolean email_verified
+    datetime last_login_at
+    datetime created_at
+    datetime updated_at
+  }
+
+  refresh_tokens {
+    bigint id PK
+    bigint user_id FK
+    string token_hash UK
+    string token_id UK
+    datetime expires_at
+    datetime revoked_at
+    datetime created_at
+  }
+
+  oauth_accounts {
+    bigint id PK
+    bigint user_id FK
+    enum provider
+    string provider_user_id
+    string provider_email
+    string provider_username
+    string provider_display_name
+    boolean email_verified
+    datetime last_login_at
+    datetime created_at
+    datetime updated_at
+  }
+
+  oauth_states {
+    bigint id PK
+    string state_hash UK
+    enum provider
+    enum purpose
+    bigint user_id FK
+    string redirect_path
+    datetime expires_at
+    datetime consumed_at
+  }
+
+  oauth_login_tickets {
+    bigint id PK
+    string ticket_hash UK
+    bigint user_id FK
+    enum provider
+    string redirect_path
+    datetime expires_at
+    datetime consumed_at
+  }
+
+  career_profiles {
+    bigint id PK
+    bigint user_id FK
+    string display_name
+    string headline
+    enum career_level
+    int years_of_experience
+    string desired_job_title
+  }
+
+  skills {
+    bigint id PK
+    string name
+    string normalized_name UK
+    enum category
+  }
+
+  user_skills {
+    bigint id PK
+    bigint user_id FK
+    bigint skill_id FK
+    enum proficiency_level
+    int years_of_experience
+    boolean is_primary
+  }
+
+  experiences {
+    bigint id PK
+    bigint user_id FK
+    string company_name
+    string position
+    enum employment_type
+    date start_date
+    date end_date
+    boolean is_current
+  }
+
+  projects {
+    bigint id PK
+    bigint user_id FK
+    string name
+    string summary
+    string role
+    date start_date
+    date end_date
+    boolean is_ongoing
+  }
+
+  project_skills {
+    bigint id PK
+    bigint project_id FK
+    bigint skill_id FK
+  }
+
+  job_preferences {
+    bigint id PK
+    bigint user_id FK
+    json preferred_employment_types
+    json preferred_locations
+    json preferred_company_sizes
+    enum remote_preference
+    int minimum_salary
+  }
+
+  excluded_conditions {
+    bigint id PK
+    bigint user_id FK
+    enum condition_type
+    string value
+    boolean is_active
+  }
+
+  portfolio_links {
+    bigint id PK
+    bigint user_id FK
+    enum link_type
+    string title
+    string url
+    boolean is_primary
+  }
 ```
 
-## 테이블별 핵심 관계
+## OAuth unique constraints
 
-### users
-
-회원의 기준 테이블이다.
-
-- `users.id`는 인증과 사용자 소유 데이터의 기준 PK다.
-- 사용자 삭제 시 v0.1.2 커리어 프로필 관련 데이터는 cascade 삭제된다.
-
-### refresh_tokens
-
-- `refresh_tokens.user_id -> users.id`
-- 사용자별 Refresh Token을 해시로 저장한다.
-- 원문 토큰은 DB에 저장하지 않는다.
-
-### career_profiles
-
-- `career_profiles.user_id -> users.id`
-- 사용자당 1개만 허용한다.
-- unique: `user_id`
-
-### skills
-
-- 전역 기술 마스터다.
-- unique: `normalized_name`
-- 사용자별 소유 데이터가 아니므로 직접 `user_id`를 갖지 않는다.
-
-### user_skills
-
-- `user_skills.user_id -> users.id`
-- `user_skills.skill_id -> skills.id`
-- unique: `(user_id, skill_id)`
-- 현재 사용자가 가진 기술과 숙련도를 표현한다.
-
-### experiences
-
-- `experiences.user_id -> users.id`
-- 경력 레코드는 사용자에게 직접 귀속된다.
-
-### projects
-
-- `projects.user_id -> users.id`
-- 프로젝트 레코드는 사용자에게 직접 귀속된다.
-
-### project_skills
-
-- `project_skills.project_id -> projects.id`
-- `project_skills.skill_id -> skills.id`
-- unique: `(project_id, skill_id)`
-- 프로젝트 삭제 시 연결 레코드는 cascade 삭제된다.
-- 기술 마스터 삭제는 제한한다.
-
-### job_preferences
-
-- `job_preferences.user_id -> users.id`
-- 사용자당 1개만 허용한다.
-- unique: `user_id`
-- 희망 고용 형태, 지역, 기업 규모, 원격 선호, 희망 직무, 키워드를 저장한다.
-
-### excluded_conditions
-
-- `excluded_conditions.user_id -> users.id`
-- unique: `(user_id, condition_type, value)`
-- 지원하지 않을 조건을 사용자가 직접 관리한다.
-
-### portfolio_links
-
-- `portfolio_links.user_id -> users.id`
-- unique: `(user_id, url)`
-- GitHub, Notion, 블로그, LinkedIn 등 외부 링크를 저장한다.
-
-## 삭제 정책
-
-| 부모 | 자식 | 정책 |
-| --- | --- | --- |
-| users | refresh_tokens | CASCADE |
-| users | career_profiles | CASCADE |
-| users | user_skills | CASCADE |
-| users | experiences | CASCADE |
-| users | projects | CASCADE |
-| users | job_preferences | CASCADE |
-| users | excluded_conditions | CASCADE |
-| users | portfolio_links | CASCADE |
-| projects | project_skills | CASCADE |
-| skills | user_skills | RESTRICT |
-| skills | project_skills | RESTRICT |
-
-## v0.1.2 migration
-
-```text
-backend/alembic/versions/20260718_1900_create_career_profile_tables.py
-```
-
-검증 순서:
-
-```bash
-cd backend
-alembic upgrade head
-alembic downgrade -1
-alembic upgrade head
-```
+- `oauth_accounts(provider, provider_user_id)`는 provider 계정의 전역 중복 연결을 방지합니다.
+- `oauth_accounts(user_id, provider)`는 사용자당 provider 1개만 연결하도록 제한합니다.
+- `oauth_states.state_hash`, `oauth_login_tickets.ticket_hash`는 1회용 값을 hash로만 저장합니다.

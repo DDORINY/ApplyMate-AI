@@ -16,6 +16,16 @@ class Settings:
     refresh_token_expire_days: int
     cookie_secure: bool
     cookie_samesite: str
+    google_client_id: str
+    google_client_secret: str
+    google_redirect_uri: str
+    github_client_id: str
+    github_client_secret: str
+    github_redirect_uri: str
+    oauth_frontend_callback_url: str
+    oauth_allowed_redirect_paths: tuple[str, ...]
+    oauth_state_expire_seconds: int
+    oauth_ticket_expire_seconds: int
 
 
 @lru_cache
@@ -35,6 +45,31 @@ def get_settings() -> Settings:
         refresh_token_expire_days=int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "14")),
         cookie_secure=os.getenv("COOKIE_SECURE", "false").lower() == "true",
         cookie_samesite=os.getenv("COOKIE_SAMESITE", "lax"),
+        google_client_id=os.getenv("GOOGLE_CLIENT_ID", ""),
+        google_client_secret=os.getenv("GOOGLE_CLIENT_SECRET", ""),
+        google_redirect_uri=os.getenv(
+            "GOOGLE_REDIRECT_URI",
+            "http://localhost:8000/api/v1/auth/oauth/google/callback",
+        ),
+        github_client_id=os.getenv("GITHUB_CLIENT_ID", ""),
+        github_client_secret=os.getenv("GITHUB_CLIENT_SECRET", ""),
+        github_redirect_uri=os.getenv(
+            "GITHUB_REDIRECT_URI",
+            "http://localhost:8000/api/v1/auth/oauth/github/callback",
+        ),
+        oauth_frontend_callback_url=os.getenv(
+            "OAUTH_FRONTEND_CALLBACK_URL",
+            "http://localhost:3000/auth/callback",
+        ),
+        oauth_allowed_redirect_paths=tuple(
+            item.strip()
+            for item in os.getenv(
+                "OAUTH_ALLOWED_REDIRECT_PATHS", "/me,/profile,/settings/accounts"
+            ).split(",")
+            if item.strip()
+        ),
+        oauth_state_expire_seconds=int(os.getenv("OAUTH_STATE_EXPIRE_SECONDS", "300")),
+        oauth_ticket_expire_seconds=int(os.getenv("OAUTH_TICKET_EXPIRE_SECONDS", "60")),
     )
 
 

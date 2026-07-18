@@ -32,6 +32,7 @@ class UserPublic(BaseModel):
     email: str
     name: str
     status: UserStatus
+    email_verified: bool
     last_login_at: datetime | None
     created_at: datetime
 

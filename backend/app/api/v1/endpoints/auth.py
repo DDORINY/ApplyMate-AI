@@ -35,7 +35,9 @@ async def signup(
 ) -> ApiResponse[UserPublic]:
     user = await AuthService(session).signup(payload.email, payload.password, payload.name)
     return ApiResponse(
-        success=True, data=UserPublic.model_validate(user), message="회원가입이 완료되었습니다."
+        success=True,
+        data=UserPublic.model_validate(user),
+        message="회원가입이 완료되었습니다.",
     )
 
 
@@ -46,7 +48,7 @@ async def login(
     response: Response,
     session: AsyncSession = Depends(get_session),
 ) -> ApiResponse[AuthTokenData]:
-    user, access_token, refresh_token, refresh_expires_at = await AuthService(session).login(
+    user, access_token, refresh_token, _refresh_expires_at = await AuthService(session).login(
         payload.email,
         payload.password,
         request.headers.get("user-agent"),
@@ -101,5 +103,5 @@ async def me(current_user: User = Depends(get_current_user)) -> ApiResponse[User
     return ApiResponse(
         success=True,
         data=UserPublic.model_validate(current_user),
-        message="현재 로그인 사용자입니다.",
+        message="현재 로그인한 사용자입니다.",
     )

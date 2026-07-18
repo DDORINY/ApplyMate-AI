@@ -1,5 +1,6 @@
 from app.models.refresh_token import RefreshToken
 from app.models.user import User, UserStatus
+from app.models.oauth import OAuthAccount, OAuthLoginTicket, OAuthProvider, OAuthPurpose, OAuthState
 from app.models.career import (
     CareerLevel,
     CareerProfile,
@@ -29,6 +30,11 @@ __all__ = [
     "ExcludedConditionType",
     "Experience",
     "JobPreference",
+    "OAuthAccount",
+    "OAuthLoginTicket",
+    "OAuthProvider",
+    "OAuthPurpose",
+    "OAuthState",
     "PortfolioLink",
     "PortfolioLinkType",
     "Project",
