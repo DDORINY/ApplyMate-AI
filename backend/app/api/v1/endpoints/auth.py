@@ -34,7 +34,9 @@ async def signup(
     payload: SignupRequest, session: AsyncSession = Depends(get_session)
 ) -> ApiResponse[UserPublic]:
     user = await AuthService(session).signup(payload.email, payload.password, payload.name)
-    return ApiResponse(success=True, data=UserPublic.model_validate(user), message="회원가입이 완료되었습니다.")
+    return ApiResponse(
+        success=True, data=UserPublic.model_validate(user), message="회원가입이 완료되었습니다."
+    )
 
 
 @router.post("/login", response_model=ApiResponse[AuthTokenData])

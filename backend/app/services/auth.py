@@ -43,7 +43,9 @@ class AuthService:
     ) -> tuple[User, str, str, datetime]:
         user = await self.repository.get_user_by_email(normalize_email(email))
         if not user or not verify_password(password, user.password_hash):
-            raise AppError("AUTH_INVALID_CREDENTIALS", "이메일 또는 비밀번호가 올바르지 않습니다.", 401)
+            raise AppError(
+                "AUTH_INVALID_CREDENTIALS", "이메일 또는 비밀번호가 올바르지 않습니다.", 401
+            )
         if user.status != UserStatus.ACTIVE:
             raise AppError("AUTH_USER_INACTIVE", "비활성 사용자입니다.", 403)
 

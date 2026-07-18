@@ -1,6 +1,6 @@
 [project]
 name = "applymate-backend"
-version = "0.1.1"
+version = "0.1.2"
 description = "ApplyMate AI backend service"
 requires-python = ">=3.12"
 dependencies = [

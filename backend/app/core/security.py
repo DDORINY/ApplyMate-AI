@@ -77,7 +77,9 @@ def _secret_for(token_type: str) -> str:
     return secret
 
 
-def create_jwt(subject: int, token_type: str, expires_delta: timedelta, jti: str | None = None) -> str:
+def create_jwt(
+    subject: int, token_type: str, expires_delta: timedelta, jti: str | None = None
+) -> str:
     header = {"alg": "HS256", "typ": "JWT"}
     now = utc_now()
     payload: dict[str, Any] = {
@@ -113,7 +115,9 @@ def decode_jwt(token: str, expected_type: str) -> dict[str, Any]:
         if payload.get("type") != expected_type:
             raise AppError("AUTH_TOKEN_INVALID", "유효하지 않은 토큰입니다.", 401)
         if int(payload["exp"]) < int(utc_now().timestamp()):
-            code = "AUTH_TOKEN_EXPIRED" if expected_type == "access" else "AUTH_REFRESH_TOKEN_EXPIRED"
+            code = (
+                "AUTH_TOKEN_EXPIRED" if expected_type == "access" else "AUTH_REFRESH_TOKEN_EXPIRED"
+            )
             raise AppError(code, "토큰이 만료되었습니다.", 401)
         return payload
     except AppError:
@@ -124,9 +128,7 @@ def decode_jwt(token: str, expected_type: str) -> dict[str, Any]:
 
 
 def create_access_token(user_id: int) -> str:
-    return create_jwt(
-        user_id, "access", timedelta(minutes=settings.access_token_expire_minutes)
-    )
+    return create_jwt(user_id, "access", timedelta(minutes=settings.access_token_expire_minutes))
 
 
 def create_refresh_token(user_id: int) -> tuple[str, str, datetime]:
