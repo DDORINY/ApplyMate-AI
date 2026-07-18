@@ -30,9 +30,25 @@ def validate_email(email: str) -> str:
     return normalized
 
 
-def validate_password(password: str) -> None:
+def validate_password(password: str, email: str | None = None) -> None:
     if len(password) < 8:
         raise AppError("VALIDATION_ERROR", "비밀번호는 8자 이상이어야 합니다.", 422)
+    if len(password) > 128:
+        raise AppError("VALIDATION_ERROR", "비밀번호는 128자를 초과할 수 없습니다.", 422)
+    if password.strip() != password or not password.strip():
+        raise AppError("VALIDATION_ERROR", "비밀번호 앞뒤에는 공백을 사용할 수 없습니다.", 422)
+    if email and password.lower() == normalize_email(email):
+        raise AppError("VALIDATION_ERROR", "이메일과 같은 비밀번호는 사용할 수 없습니다.", 422)
+
+    common_passwords = {
+        "12345678",
+        "applymate",
+        "password",
+        "password1",
+        "qwerty123",
+    }
+    if password.lower() in common_passwords:
+        raise AppError("VALIDATION_ERROR", "너무 쉽게 추측할 수 있는 비밀번호입니다.", 422)
 
 
 def hash_password(password: str) -> str:
@@ -59,6 +75,12 @@ def verify_password(password: str, password_hash: str) -> bool:
 
 def hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
+
+
+def hash_ip_address(ip_address: str | None) -> str | None:
+    if not ip_address:
+        return None
+    return hash_token(ip_address.strip())
 
 
 def _b64encode(data: bytes) -> str:

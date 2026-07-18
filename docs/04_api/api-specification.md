@@ -49,6 +49,61 @@ Authorization: Bearer {access_token}
 | POST | `/auth/refresh` | Refresh Cookie | Access Token 재발급 |
 | POST | `/auth/logout` | Refresh Cookie | 로그아웃 |
 | GET | `/auth/me` | Access Token | 현재 사용자 조회 |
+| POST | `/auth/email-verification/send` | Access Token | 이메일 인증 메일 발송/재발송 |
+| POST | `/auth/email-verification/verify` | 공개 | 이메일 인증 token 검증 |
+| POST | `/auth/password/forgot` | 공개 | 비밀번호 재설정 안내 요청 |
+| POST | `/auth/password/reset` | 공개 | 비밀번호 재설정 |
+| POST | `/auth/password/change` | Access Token | 현재 비밀번호 기반 비밀번호 변경 |
+| POST | `/auth/password/set` | Access Token | 비밀번호 없는 소셜 계정의 비밀번호 설정 |
+| GET | `/auth/sessions` | Access Token | 로그인 세션 목록 |
+| DELETE | `/auth/sessions/{sessionId}` | Access Token | 개별 세션 로그아웃 |
+| DELETE | `/auth/sessions/others` | Access Token | 현재 세션을 제외한 모든 세션 로그아웃 |
+| DELETE | `/auth/sessions` | Access Token | 전체 세션 로그아웃 |
+| GET | `/auth/security-events` | Access Token | 최근 계정 보안 이벤트 목록 조회 |
+
+### 이메일 인증 요청
+
+```json
+{
+  "success": true,
+  "data": {
+    "sent": true,
+    "email": "user@example.com"
+  },
+  "message": "이메일 인증 안내를 발송했습니다."
+}
+```
+
+### 비밀번호 찾기 요청
+
+요청 이메일의 가입 여부와 관계없이 동일한 성공 응답을 반환합니다.
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+### 세션 목록 응답
+
+```json
+{
+  "success": true,
+  "data": {
+    "sessions": [
+      {
+        "session_id": "session-id",
+        "device_name": "Chrome on Windows",
+        "created_at": "2026-07-19T10:00:00Z",
+        "last_used_at": "2026-07-19T10:10:00Z",
+        "expires_at": "2026-08-02T10:00:00Z",
+        "is_current": true
+      }
+    ]
+  },
+  "message": "세션 목록입니다."
+}
+```
 
 ## 소셜 로그인 API
 

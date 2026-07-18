@@ -43,3 +43,7 @@ class User(Base):
     oauth_accounts = relationship(
         "OAuthAccount", back_populates="user", cascade="all, delete-orphan"
     )
+
+    @property
+    def has_password(self) -> bool:
+        return self.password_hash is not None

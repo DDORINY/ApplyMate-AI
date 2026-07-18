@@ -13,6 +13,12 @@ from app.services.auth import AuthService
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+def client_ip(request: Request) -> str | None:
+    if not request.client:
+        return None
+    return request.client.host
+
+
 def set_refresh_cookie(response: Response, token: str, max_age_seconds: int) -> None:
     response.set_cookie(
         key=REFRESH_TOKEN_COOKIE_NAME,
@@ -31,13 +37,21 @@ def clear_refresh_cookie(response: Response) -> None:
 
 @router.post("/signup", response_model=ApiResponse[UserPublic], status_code=status.HTTP_201_CREATED)
 async def signup(
-    payload: SignupRequest, session: AsyncSession = Depends(get_session)
+    payload: SignupRequest,
+    request: Request,
+    session: AsyncSession = Depends(get_session),
 ) -> ApiResponse[UserPublic]:
-    user = await AuthService(session).signup(payload.email, payload.password, payload.name)
+    user = await AuthService(session).signup(
+        payload.email,
+        payload.password,
+        payload.name,
+        user_agent=request.headers.get("user-agent"),
+        ip_address=client_ip(request),
+    )
     return ApiResponse(
         success=True,
         data=UserPublic.model_validate(user),
-        message="회원가입이 완료되었습니다.",
+        message="회원가입이 완료되었습니다. 이메일 인증을 진행해 주세요.",
     )
 
 
@@ -52,6 +66,7 @@ async def login(
         payload.email,
         payload.password,
         request.headers.get("user-agent"),
+        client_ip(request),
     )
     max_age = settings.refresh_token_expire_days * 24 * 60 * 60
     set_refresh_cookie(response, refresh_token, max_age)
@@ -73,7 +88,9 @@ async def refresh(
     session: AsyncSession = Depends(get_session),
 ) -> ApiResponse[AuthTokenData]:
     user, access_token, refresh_token, _refresh_expires_at = await AuthService(session).refresh(
-        request.cookies.get(REFRESH_TOKEN_COOKIE_NAME)
+        request.cookies.get(REFRESH_TOKEN_COOKIE_NAME),
+        request.headers.get("user-agent"),
+        client_ip(request),
     )
     set_refresh_cookie(response, refresh_token, settings.refresh_token_expire_days * 24 * 60 * 60)
     return ApiResponse(
@@ -93,7 +110,10 @@ async def logout(
     response: Response,
     session: AsyncSession = Depends(get_session),
 ) -> ApiResponse[dict[str, bool]]:
-    await AuthService(session).logout(request.cookies.get(REFRESH_TOKEN_COOKIE_NAME))
+    await AuthService(session).logout(
+        request.cookies.get(REFRESH_TOKEN_COOKIE_NAME),
+        user_agent=request.headers.get("user-agent"),
+    )
     clear_refresh_cookie(response)
     return ApiResponse(success=True, data={"logged_out": True}, message="로그아웃되었습니다.")
 

@@ -28,6 +28,23 @@ API 오류 응답은 다음 공통 구조를 사용합니다.
 | `AUTH_EMAIL_ALREADY_EXISTS` | 409 | 이미 가입된 이메일 |
 | `AUTH_INVALID_CREDENTIALS` | 401 | 이메일 또는 비밀번호 오류 |
 | `AUTH_PASSWORD_NOT_CONFIGURED` | 401 | 비밀번호가 없는 소셜 전용 계정의 이메일 로그인 시도 |
+| `AUTH_EMAIL_ALREADY_VERIFIED` | 409 | 이미 이메일 인증이 완료됨 |
+| `AUTH_EMAIL_NOT_VERIFIED` | 403 | 이메일 인증이 필요한 기능 |
+| `AUTH_EMAIL_VERIFICATION_TOKEN_INVALID` | 400 | 이메일 인증 token 없음 또는 불일치 |
+| `AUTH_EMAIL_VERIFICATION_TOKEN_EXPIRED` | 400 | 이메일 인증 token 만료 |
+| `AUTH_EMAIL_VERIFICATION_TOKEN_USED` | 400 | 이미 사용된 이메일 인증 token |
+| `AUTH_EMAIL_VERIFICATION_RESEND_LIMITED` | 429 | 이메일 인증 재발송 제한 |
+| `AUTH_PASSWORD_RESET_TOKEN_INVALID` | 400 | 비밀번호 재설정 token 없음 또는 불일치 |
+| `AUTH_PASSWORD_RESET_TOKEN_EXPIRED` | 400 | 비밀번호 재설정 token 만료 |
+| `AUTH_PASSWORD_RESET_TOKEN_USED` | 400 | 이미 사용된 비밀번호 재설정 token |
+| `AUTH_PASSWORD_MISMATCH` | 422 | 비밀번호 확인 불일치 |
+| `AUTH_PASSWORD_SAME_AS_CURRENT` | 400 | 새 비밀번호가 기존 비밀번호와 같음 |
+| `AUTH_PASSWORD_ALREADY_CONFIGURED` | 409 | 이미 비밀번호가 설정된 계정 |
+| `AUTH_SESSION_NOT_FOUND` | 404 | 세션을 찾을 수 없음 |
+| `AUTH_SESSION_NOT_OWNED` | 404 | 다른 사용자 세션 접근 |
+| `AUTH_TOO_MANY_ATTEMPTS` | 429 | 시도 횟수 제한 초과 |
+| `EMAIL_PROVIDER_DISABLED` | 503 | 이메일 발송 provider 비활성 |
+| `EMAIL_DELIVERY_FAILED` | 502 | 이메일 발송 실패 |
 | `AUTH_TOKEN_MISSING` | 401 | Access Token 없음 |
 | `AUTH_TOKEN_INVALID` | 401 | Access Token 형식, 서명, 타입 오류 |
 | `AUTH_TOKEN_EXPIRED` | 401 | Access Token 만료 |

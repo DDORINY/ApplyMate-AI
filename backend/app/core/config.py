@@ -26,6 +26,21 @@ class Settings:
     oauth_allowed_redirect_paths: tuple[str, ...]
     oauth_state_expire_seconds: int
     oauth_ticket_expire_seconds: int
+    email_provider: str
+    smtp_host: str
+    smtp_port: int
+    smtp_username: str
+    smtp_password: str
+    smtp_use_tls: bool
+    email_from_address: str
+    email_from_name: str
+    frontend_email_verify_url: str
+    frontend_password_reset_url: str
+    email_verification_expire_minutes: int
+    password_reset_expire_minutes: int
+    email_resend_cooldown_seconds: int
+    login_max_failed_attempts: int
+    login_lockout_seconds: int
 
 
 @lru_cache
@@ -70,6 +85,25 @@ def get_settings() -> Settings:
         ),
         oauth_state_expire_seconds=int(os.getenv("OAUTH_STATE_EXPIRE_SECONDS", "300")),
         oauth_ticket_expire_seconds=int(os.getenv("OAUTH_TICKET_EXPIRE_SECONDS", "60")),
+        email_provider=os.getenv("EMAIL_PROVIDER", "development"),
+        smtp_host=os.getenv("SMTP_HOST", ""),
+        smtp_port=int(os.getenv("SMTP_PORT", "587")),
+        smtp_username=os.getenv("SMTP_USERNAME", ""),
+        smtp_password=os.getenv("SMTP_PASSWORD", ""),
+        smtp_use_tls=os.getenv("SMTP_USE_TLS", "true").lower() == "true",
+        email_from_address=os.getenv("EMAIL_FROM_ADDRESS", ""),
+        email_from_name=os.getenv("EMAIL_FROM_NAME", "ApplyMate AI"),
+        frontend_email_verify_url=os.getenv(
+            "FRONTEND_EMAIL_VERIFY_URL", "http://localhost:3000/verify-email"
+        ),
+        frontend_password_reset_url=os.getenv(
+            "FRONTEND_PASSWORD_RESET_URL", "http://localhost:3000/reset-password"
+        ),
+        email_verification_expire_minutes=int(os.getenv("EMAIL_VERIFICATION_EXPIRE_MINUTES", "30")),
+        password_reset_expire_minutes=int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "30")),
+        email_resend_cooldown_seconds=int(os.getenv("EMAIL_RESEND_COOLDOWN_SECONDS", "60")),
+        login_max_failed_attempts=int(os.getenv("LOGIN_MAX_FAILED_ATTEMPTS", "5")),
+        login_lockout_seconds=int(os.getenv("LOGIN_LOCKOUT_SECONDS", "900")),
     )
 
 

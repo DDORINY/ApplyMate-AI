@@ -1,6 +1,6 @@
 # ApplyMate AI
 
-현재 버전: v0.1.3
+현재 버전: v0.1.4
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 계정, 커리어 프로필, 기술 스택, 경력, 프로젝트, 희망 조건을 기반으로 채용공고 관리, 적합도 분석, 지원 문서 생성, 지원 현황 관리를 단계적으로 구현합니다.
 
@@ -33,6 +33,19 @@ docker compose up --build
 /settings/accounts
 ```
 
+## v0.1.4 구현 범위
+
+- 이메일 인증 메일 생성/재발송/검증
+- 비밀번호 찾기와 재설정
+- 로그인 사용자 비밀번호 변경
+- 소셜 로그인 전용 사용자 비밀번호 설정
+- 로그인 세션 목록 조회
+- 개별 세션, 다른 모든 세션, 전체 세션 로그아웃
+- 로그인 실패 횟수 제한
+- 보안 이벤트 기록
+- 개발/SMTP 이메일 발송 Adapter와 설정 문서
+- `/verify-email`, `/forgot-password`, `/reset-password`, `/settings/security` 화면
+
 ## v0.1.3 구현 범위
 
 - Google, GitHub OAuth 로그인
@@ -57,6 +70,17 @@ POST /auth/login
 POST /auth/refresh
 POST /auth/logout
 GET  /auth/me
+POST /auth/email-verification/send
+POST /auth/email-verification/verify
+POST /auth/password/forgot
+POST /auth/password/reset
+POST /auth/password/change
+POST /auth/password/set
+GET  /auth/sessions
+DELETE /auth/sessions/{sessionId}
+DELETE /auth/sessions/others
+DELETE /auth/sessions
+GET  /auth/security-events
 ```
 
 Access Token은 응답 본문으로 반환하고, Refresh Token은 `applymate_refresh_token` HttpOnly Cookie로 전달합니다. 보호 API는 `Authorization: Bearer {access_token}` 헤더를 사용합니다.
@@ -127,6 +151,12 @@ v0.1.3 migration:
 
 ```text
 backend/alembic/versions/20260718_2100_add_social_auth.py
+```
+
+v0.1.4 migration:
+
+```text
+backend/alembic/versions/20260719_1000_add_account_security.py
 ```
 
 ## 검증

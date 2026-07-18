@@ -30,7 +30,7 @@ export function SignupForm() {
   });
   const mutation = useMutation({
     mutationFn: signup,
-    onSuccess: () => router.push("/login"),
+    onSuccess: () => router.push("/login?joined=1"),
   });
 
   return (
@@ -66,6 +66,10 @@ export function SignupForm() {
           autoComplete="new-password"
         />
       </Field>
+      <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-600">
+        가입 후 입력한 이메일로 인증 링크가 발송됩니다. 인증을 완료하면 계정 보안 화면에서
+        세션과 비밀번호를 관리할 수 있어요.
+      </p>
       {mutation.error ? <p className="text-sm text-rose-700">{mutation.error.message}</p> : null}
       <button className="button-primary" type="submit" disabled={mutation.isPending}>
         {mutation.isPending ? "가입 중..." : "회원가입"}
