@@ -7,6 +7,7 @@ const navItems = [
   { href: "/me", label: "내 계정" },
   { href: "/profile", label: "프로필" },
   { href: "/settings/accounts", label: "계정 연결" },
+  { href: "/settings/security", label: "보안" },
 ];
 
 export function AppHeader() {

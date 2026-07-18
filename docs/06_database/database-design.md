@@ -10,6 +10,9 @@ refresh_tokens
 oauth_accounts
 oauth_states
 oauth_login_tickets
+email_verification_tokens
+password_reset_tokens
+security_events
 career_profiles
 skills
 user_skills
@@ -28,6 +31,42 @@ portfolio_links
 | v0.1.1 | `backend/alembic/versions/20260718_1501_create_auth_tables.py` |
 | v0.1.2 | `backend/alembic/versions/20260718_1900_create_career_profile_tables.py` |
 | v0.1.3 | `backend/alembic/versions/20260718_2100_add_social_auth.py` |
+| v0.1.4 | `backend/alembic/versions/20260719_1000_add_account_security.py` |
+
+## v0.1.4 계정 보안 테이블
+
+### email_verification_tokens
+
+이메일 인증용 1회용 token hash를 저장합니다. token 원문은 저장하지 않습니다.
+
+- `user_id` FK, `ondelete=CASCADE`
+- `token_hash` unique
+- `expires_at`, `used_at`, `created_at`
+
+### password_reset_tokens
+
+비밀번호 재설정용 1회용 token hash를 저장합니다. token 원문은 저장하지 않습니다.
+
+- `user_id` FK, `ondelete=CASCADE`
+- `token_hash` unique
+- `expires_at`, `used_at`, `created_at`
+
+### security_events
+
+로그인, 로그아웃, 비밀번호 변경, 이메일 인증 등 주요 보안 이벤트를 기록합니다.
+
+- 민감 정보, token 원문, 비밀번호, secret은 저장하지 않습니다.
+- `metadata`에는 민감하지 않은 제한된 JSON만 저장합니다.
+
+### refresh_tokens 확장
+
+세션 관리를 위해 다음 컬럼을 추가합니다.
+
+- `session_id`
+- `device_name`
+- `user_agent`
+- `ip_address_hash`
+- `last_used_at`
 
 v0.1.3 downgrade는 social-only 사용자(`users.password_hash IS NULL`)가 있으면 중단합니다. 비밀번호 없는 사용자가 남아 있는 상태에서 `users.password_hash`를 다시 NOT NULL로 되돌리면 데이터 정합성이 깨지기 때문입니다.
 

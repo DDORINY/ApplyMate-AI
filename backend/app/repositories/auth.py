@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import utc_now
 from app.models.refresh_token import RefreshToken
 from app.models.user import User
 
@@ -37,13 +38,23 @@ class AuthRepository:
         user_id: int,
         token_hash: str,
         expires_at: datetime,
+        session_id: str,
         device_info: str | None,
+        device_name: str | None,
+        user_agent: str | None,
+        ip_address_hash: str | None,
+        last_used_at: datetime | None = None,
     ) -> RefreshToken:
         token = RefreshToken(
             user_id=user_id,
             token_hash=token_hash,
             expires_at=expires_at,
+            session_id=session_id,
             device_info=device_info,
+            device_name=device_name,
+            user_agent=user_agent,
+            ip_address_hash=ip_address_hash,
+            last_used_at=last_used_at,
         )
         self.session.add(token)
         await self.session.flush()
@@ -54,3 +65,61 @@ class AuthRepository:
             select(RefreshToken).where(RefreshToken.token_hash == token_hash)
         )
         return result.scalar_one_or_none()
+
+    async def list_active_refresh_tokens(self, user_id: int) -> list[RefreshToken]:
+        result = await self.session.execute(
+            select(RefreshToken)
+            .where(
+                RefreshToken.user_id == user_id,
+                RefreshToken.revoked_at.is_(None),
+                RefreshToken.expires_at > utc_now(),
+            )
+            .order_by(RefreshToken.created_at.desc())
+        )
+        return list(result.scalars().all())
+
+    async def get_active_session(self, user_id: int, session_id: str) -> RefreshToken | None:
+        result = await self.session.execute(
+            select(RefreshToken)
+            .where(
+                RefreshToken.user_id == user_id,
+                RefreshToken.session_id == session_id,
+                RefreshToken.revoked_at.is_(None),
+                RefreshToken.expires_at > utc_now(),
+            )
+            .order_by(RefreshToken.created_at.desc())
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
+
+    async def revoke_session(self, user_id: int, session_id: str) -> int:
+        result = await self.session.execute(
+            update(RefreshToken)
+            .where(
+                RefreshToken.user_id == user_id,
+                RefreshToken.session_id == session_id,
+                RefreshToken.revoked_at.is_(None),
+            )
+            .values(revoked_at=utc_now())
+        )
+        return result.rowcount or 0
+
+    async def revoke_other_sessions(self, user_id: int, current_session_id: str) -> int:
+        result = await self.session.execute(
+            update(RefreshToken)
+            .where(
+                RefreshToken.user_id == user_id,
+                RefreshToken.session_id != current_session_id,
+                RefreshToken.revoked_at.is_(None),
+            )
+            .values(revoked_at=utc_now())
+        )
+        return result.rowcount or 0
+
+    async def revoke_all_sessions(self, user_id: int) -> int:
+        result = await self.session.execute(
+            update(RefreshToken)
+            .where(RefreshToken.user_id == user_id, RefreshToken.revoked_at.is_(None))
+            .values(revoked_at=utc_now())
+        )
+        return result.rowcount or 0

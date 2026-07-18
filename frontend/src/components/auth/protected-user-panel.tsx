@@ -48,8 +48,12 @@ export function ProtectedUserPanel() {
           <dd className="font-medium">{user.status}</dd>
         </div>
         <div className="flex justify-between gap-4">
-          <dt>이메일 검증</dt>
-          <dd className="font-medium">{user.email_verified ? "완료" : "미검증"}</dd>
+          <dt>이메일 인증</dt>
+          <dd className="font-medium">{user.email_verified ? "완료" : "미인증"}</dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt>비밀번호 로그인</dt>
+          <dd className="font-medium">{user.has_password ? "설정됨" : "미설정"}</dd>
         </div>
         <div className="flex justify-between gap-4">
           <dt>최근 로그인</dt>
@@ -62,6 +66,9 @@ export function ProtectedUserPanel() {
         </Link>
         <Link className="button-secondary" href="/settings/accounts">
           계정 연결
+        </Link>
+        <Link className="button-secondary" href="/settings/security">
+          보안 설정
         </Link>
         <button
           className="button-secondary"

@@ -9,6 +9,10 @@ import type {
   OAuthExchangeData,
   OAuthProvider,
   OAuthProvidersData,
+  PasswordUpdatedData,
+  SecurityEventsData,
+  SessionRevokedData,
+  SessionsData,
   UserPublic,
 } from "@/types/auth";
 
@@ -129,4 +133,98 @@ export async function unlinkOAuthAccount(provider: OAuthProvider) {
     `/auth/oauth/accounts/${provider.toLowerCase()}`,
     withAccessToken({ method: "DELETE" }),
   );
+}
+
+export async function sendEmailVerification() {
+  return request<{ sent: boolean; email: string }>(
+    "/auth/email-verification/send",
+    withAccessToken({ method: "POST" }),
+  );
+}
+
+export async function verifyEmail(token: string) {
+  return request<UserPublic>("/auth/email-verification/verify", {
+    method: "POST",
+    body: JSON.stringify({ token }),
+  });
+}
+
+export async function forgotPassword(email: string) {
+  return request<{ accepted: boolean }>("/auth/password/forgot", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function resetPassword(payload: {
+  token: string;
+  new_password: string;
+  new_password_confirm: string;
+}) {
+  const response = await request<PasswordUpdatedData>("/auth/password/reset", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  clearAccessToken();
+  return response;
+}
+
+export async function changePassword(payload: {
+  current_password: string;
+  new_password: string;
+  new_password_confirm: string;
+}) {
+  return request<PasswordUpdatedData>(
+    "/auth/password/change",
+    withAccessToken({
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  );
+}
+
+export async function setPassword(payload: {
+  new_password: string;
+  new_password_confirm: string;
+}) {
+  return request<PasswordUpdatedData>(
+    "/auth/password/set",
+    withAccessToken({
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  );
+}
+
+export async function getSessions() {
+  return request<SessionsData>("/auth/sessions", withAccessToken());
+}
+
+export async function revokeSession(sessionId: string) {
+  return request<SessionRevokedData>(
+    `/auth/sessions/${sessionId}`,
+    withAccessToken({ method: "DELETE" }),
+  );
+}
+
+export async function revokeOtherSessions() {
+  return request<SessionRevokedData>(
+    "/auth/sessions/others",
+    withAccessToken({ method: "DELETE" }),
+  );
+}
+
+export async function revokeAllSessions() {
+  try {
+    return await request<SessionRevokedData>(
+      "/auth/sessions",
+      withAccessToken({ method: "DELETE" }),
+    );
+  } finally {
+    clearAccessToken();
+  }
+}
+
+export async function getSecurityEvents() {
+  return request<SecurityEventsData>("/auth/security-events", withAccessToken());
 }

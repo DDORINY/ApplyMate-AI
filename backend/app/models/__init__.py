@@ -1,6 +1,9 @@
-from app.models.refresh_token import RefreshToken
-from app.models.user import User, UserStatus
-from app.models.oauth import OAuthAccount, OAuthLoginTicket, OAuthProvider, OAuthPurpose, OAuthState
+from app.models.account_security import (
+    EmailVerificationToken,
+    PasswordResetToken,
+    SecurityEvent,
+    SecurityEventType,
+)
 from app.models.career import (
     CareerLevel,
     CareerProfile,
@@ -8,6 +11,7 @@ from app.models.career import (
     EmploymentType,
     ExcludedCondition,
     ExcludedConditionType,
+    Experience,
     JobPreference,
     PortfolioLink,
     PortfolioLinkType,
@@ -18,13 +22,22 @@ from app.models.career import (
     Skill,
     SkillCategory,
     UserSkill,
-    Experience,
 )
+from app.models.oauth import (
+    OAuthAccount,
+    OAuthLoginTicket,
+    OAuthProvider,
+    OAuthPurpose,
+    OAuthState,
+)
+from app.models.refresh_token import RefreshToken
+from app.models.user import User, UserStatus
 
 __all__ = [
     "CareerLevel",
     "CareerProfile",
     "CompanySize",
+    "EmailVerificationToken",
     "EmploymentType",
     "ExcludedCondition",
     "ExcludedConditionType",
@@ -35,6 +48,7 @@ __all__ = [
     "OAuthProvider",
     "OAuthPurpose",
     "OAuthState",
+    "PasswordResetToken",
     "PortfolioLink",
     "PortfolioLinkType",
     "Project",
@@ -42,6 +56,8 @@ __all__ = [
     "ProficiencyLevel",
     "RefreshToken",
     "RemotePreference",
+    "SecurityEvent",
+    "SecurityEventType",
     "Skill",
     "SkillCategory",
     "User",
