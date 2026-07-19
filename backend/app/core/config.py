@@ -52,6 +52,10 @@ class Settings:
     ai_store_raw_response: bool
     ai_daily_analysis_limit: int
     ai_analysis_cooldown_seconds: int
+    resume_storage_dir: str
+    resume_max_file_size_bytes: int
+    resume_allowed_extensions: tuple[str, ...]
+    resume_allowed_content_types: tuple[str, ...]
 
 
 @lru_cache
@@ -126,6 +130,21 @@ def get_settings() -> Settings:
         ai_store_raw_response=os.getenv("AI_STORE_RAW_RESPONSE", "false").lower() == "true",
         ai_daily_analysis_limit=int(os.getenv("AI_DAILY_ANALYSIS_LIMIT", "20")),
         ai_analysis_cooldown_seconds=int(os.getenv("AI_ANALYSIS_COOLDOWN_SECONDS", "30")),
+        resume_storage_dir=os.getenv("RESUME_STORAGE_DIR", "storage/resumes"),
+        resume_max_file_size_bytes=int(os.getenv("RESUME_MAX_FILE_SIZE_BYTES", "5242880")),
+        resume_allowed_extensions=tuple(
+            item.strip().lower()
+            for item in os.getenv("RESUME_ALLOWED_EXTENSIONS", ".pdf,.docx").split(",")
+            if item.strip()
+        ),
+        resume_allowed_content_types=tuple(
+            item.strip().lower()
+            for item in os.getenv(
+                "RESUME_ALLOWED_CONTENT_TYPES",
+                "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            ).split(",")
+            if item.strip()
+        ),
     )
 
 

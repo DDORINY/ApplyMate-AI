@@ -9,6 +9,7 @@ from app.api.v1.endpoints.job_match import router as job_match_router
 from app.api.v1.endpoints.jobs import router as jobs_router
 from app.api.v1.endpoints.oauth import router as oauth_router
 from app.api.v1.endpoints.profiles import router as profiles_router
+from app.api.v1.endpoints.resumes import router as resumes_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
@@ -20,3 +21,4 @@ api_router.include_router(job_match_router)
 api_router.include_router(jobs_router)
 api_router.include_router(oauth_router)
 api_router.include_router(profiles_router)
+api_router.include_router(resumes_router)

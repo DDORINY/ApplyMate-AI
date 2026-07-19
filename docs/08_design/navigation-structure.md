@@ -17,6 +17,9 @@
 | `/jobs` | 필요 | v0.2.0 | `job-list-panel` | 채용공고 목록 |
 | `/jobs/new` | 필요 | v0.2.0 | `job-create-panel` | 채용공고 등록 |
 | `/jobs/{jobId}` | 필요 | v0.2.0~v0.2.2 | `job-detail-panel`, `job-analysis-panel`, `job-match-panel` | 공고 상세/분석/적합도 |
+| `/resumes` | 필요 | v0.3.0 | `resume-list-panel` | 이력서 목록 |
+| `/resumes/new` | 필요 | v0.3.0 | `resume-create-panel` | 이력서 업로드 |
+| `/resumes/{resumeId}` | 필요 | v0.3.0 | `resume-detail-panel` | 이력서 상세/파일 관리 |
 | `/settings/accounts` | 필요 | v0.1.3 | `oauth-accounts-manager` | 소셜 계정 관리 |
 | `/settings/security` | 필요 | v0.1.4 | `account-security-panel` | 계정 보안/세션 |
 | `/verify-email` | 불필요 | v0.1.4 | `verify-email-panel` | 이메일 인증 |
@@ -30,6 +33,9 @@ signup
   -> verify-email
   -> login
   -> profile
+  -> resumes
+  -> resumes/new
+  -> resumes/{resumeId}
   -> jobs
   -> jobs/new
   -> jobs/{jobId}
@@ -40,21 +46,19 @@ signup
 
 ## 보호 화면
 
-다음 화면은 access token이 필요하다.
-
 - `/me`
 - `/profile`
 - `/jobs`
 - `/jobs/new`
 - `/jobs/{jobId}`
+- `/resumes`
+- `/resumes/new`
+- `/resumes/{resumeId}`
 - `/settings/accounts`
 - `/settings/security`
 
 ## 아직 없는 경로
 
-다음은 계획 단계이며 현재 App Router에 존재하지 않는다.
-
-- `/resumes`
 - `/documents`
 - `/applications`
 - `/calendar`

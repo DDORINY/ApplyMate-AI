@@ -4,8 +4,8 @@
 
 ## 현재 기준
 
-- 버전: v0.2.2
-- Migration head: `20260719_1400`
+- 버전: v0.3.0
+- Migration head: `20260719_1500`
 - DB: PostgreSQL
 - ORM: SQLAlchemy
 - Migration: Alembic
@@ -37,6 +37,8 @@ job_analysis_runs
 job_matches
 job_match_runs
 job_match_feedback
+resumes
+resume_files
 ```
 
 ## 설계 원칙
@@ -45,4 +47,5 @@ job_match_feedback
 - token/secret 원문은 DB에 저장하지 않는다.
 - 상태값은 Enum으로 제한한다.
 - DB 변경은 Alembic migration으로만 반영한다.
-- 공고 분석과 적합도 분석은 current result와 run history를 분리한다.
+- AI 분석은 current result와 run history를 분리한다.
+- 업로드 파일은 원본 파일명과 내부 저장명을 분리한다.

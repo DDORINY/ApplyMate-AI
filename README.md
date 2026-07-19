@@ -1,5 +1,27 @@
 # ApplyMate AI
 
+현재 버전: `v0.3.0`
+
+ApplyMate AI는 개인용 AI 취업 매니저입니다. 현재는 회원/인증, 커리어 프로필, 채용공고 관리, AI 채용공고 분석, 사용자-공고 적합도 분석, 이력서 파일 업로드 기반까지 구현되어 있습니다.
+
+## v0.3.0 주요 기능
+
+- PDF/DOCX 이력서 업로드
+- 이력서 메타데이터 관리
+- 기본 이력서 지정
+- 파일 다운로드/삭제
+- 확장자/MIME/크기 검증
+- 사용자별 중복 파일 해시 차단
+
+## 문서
+
+- [문서 인덱스](docs/README.md)
+- [현재 상태](docs/00_status/current-project-status.md)
+- [버전 로드맵](docs/05_development-plan/version-roadmap.md)
+- [v1.0.0 완성 마스터 플랜](docs/05_development-plan/master-completion-plan.md)
+- [API 명세](docs/04_api/api-specification.md)
+- [DB 설계](docs/06_database/database-design.md)
+
 현재 버전: v0.2.2
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 기술, 경력, 프로젝트, 희망 조건을 기반으로 채용공고를 관리하고, AI 채용공고 분석과 사용자-공고 적합도 분석을 지원합니다.
