@@ -212,3 +212,36 @@ Rules:
 - 핵심 구조화 항목은 원문에 존재하는 evidence를 가져야 한다.
 - `structured_result`는 AI 원본, `edited_result`는 사용자 수정본이다.
 - 분석 결과는 프로필에 자동 반영하지 않고 후보만 제공한다.
+## v0.3.3 Application Documents
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| POST | `/documents` | Access Token | v0.3.3 | 지원 문서 메타데이터 생성 |
+| GET | `/documents` | Access Token | v0.3.3 | 지원 문서 목록, 검색, 필터, 페이지네이션 |
+| GET | `/documents/{documentId}` | Access Token | v0.3.3 | 지원 문서 상세 및 현재 버전 |
+| PATCH | `/documents/{documentId}` | Access Token | v0.3.3 | 문서 제목, 문항, 지시사항, 말투, 분량 설정 수정 |
+| DELETE | `/documents/{documentId}` | Access Token | v0.3.3 | 지원 문서 보관 처리 |
+| POST | `/documents/{documentId}/generate` | Access Token | v0.3.3 | AI 초안 생성 |
+| POST | `/documents/{documentId}/regenerate` | Access Token | v0.3.3 | AI 초안 재생성 |
+| GET | `/documents/{documentId}/versions` | Access Token | v0.3.3 | 문서 버전 목록 |
+| GET | `/documents/{documentId}/versions/{versionId}` | Access Token | v0.3.3 | 문서 버전 상세 |
+| POST | `/documents/{documentId}/versions` | Access Token | v0.3.3 | 사용자 편집본을 새 버전으로 저장 |
+| POST | `/documents/{documentId}/versions/{versionId}/restore` | Access Token | v0.3.3 | 과거 버전을 새 현재 버전으로 복원 |
+| GET | `/documents/{documentId}/sources` | Access Token | v0.3.3 | 현재/선택 버전의 근거 source 조회 |
+| GET | `/documents/{documentId}/generation-runs` | Access Token | v0.3.3 | 생성 실행 이력 목록 |
+| GET | `/documents/{documentId}/generation-runs/{runId}` | Access Token | v0.3.3 | 생성 실행 이력 상세 |
+| POST | `/documents/{documentId}/duplicate` | Access Token | v0.3.3 | 문서 및 현재 버전 복제 |
+| GET | `/ai/document-providers` | Access Token | v0.3.3 | 지원 문서 AI provider 상태 |
+
+Document types: `MOTIVATION`, `JOB_COMPETENCY`, `SELF_INTRODUCTION`, `PROJECT_EXPERIENCE`, `CAREER_EXPERIENCE`, `FUTURE_PLAN`, `FREE_FORM`, `CUSTOM_QUESTION`
+
+Status: `DRAFT`, `GENERATING`, `COMPLETED`, `FAILED`, `REVIEW_REQUIRED`, `ARCHIVED`
+
+Generation run status: `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`, `INVALID_OUTPUT`, `PROVIDER_UNAVAILABLE`
+
+Rules:
+
+- 모든 연결 source ID는 사용자 소유권을 검증한다.
+- AI 생성 버전은 이전 버전을 덮어쓰지 않는다.
+- 사용자 편집, 재생성, 복원은 모두 새 version number를 만든다.
+- 생성 block은 최소 하나 이상의 source reference를 가져야 한다.

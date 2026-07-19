@@ -72,3 +72,22 @@ signup
 - 현재 헤더의 주요 서비스 메뉴는 `홈`, `프로필`, `채용공고`, `이력서`다.
 - 계정 영역은 `로그인`, `회원가입`, `내 계정`, `계정 연결`, `보안`으로 구성한다.
 - 회원가입은 서비스 주요 네비게이션의 첫 번째 항목으로 배치하지 않는다.
+# v0.3.3 Navigation Update
+
+Main navigation:
+
+- 홈 `/`
+- 프로필 `/profile`
+- 채용공고 `/jobs`
+- 이력서 `/resumes`
+- 지원 문서 `/documents`
+
+Account navigation stays on the right side:
+
+- 로그인 `/login`
+- 회원가입 `/signup`
+- 내 계정 `/me`
+- 계정 연결 `/settings/accounts`
+- 보안 `/settings/security`
+
+The `지원 문서` item belongs to the main product navigation, not the auth/account group.

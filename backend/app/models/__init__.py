@@ -4,6 +4,16 @@ from app.models.account_security import (
     SecurityEvent,
     SecurityEventType,
 )
+from app.models.application_document import (
+    ApplicationDocument,
+    ApplicationDocumentSource,
+    ApplicationDocumentStatus,
+    ApplicationDocumentTone,
+    ApplicationDocumentType,
+    ApplicationDocumentVersion,
+    GenerationRun,
+    GenerationRunStatus,
+)
 from app.models.career import (
     CareerLevel,
     CareerProfile,
@@ -69,6 +79,12 @@ __all__ = [
     "CareerProfile",
     "CompanySize",
     "Company",
+    "ApplicationDocument",
+    "ApplicationDocumentSource",
+    "ApplicationDocumentStatus",
+    "ApplicationDocumentTone",
+    "ApplicationDocumentType",
+    "ApplicationDocumentVersion",
     "EmailVerificationToken",
     "EmploymentType",
     "ExcludedCondition",
@@ -92,6 +108,8 @@ __all__ = [
     "JobPostingStatus",
     "JobSourceType",
     "JobWorkType",
+    "GenerationRun",
+    "GenerationRunStatus",
     "OAuthAccount",
     "OAuthLoginTicket",
     "OAuthProvider",

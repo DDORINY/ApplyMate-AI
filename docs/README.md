@@ -112,3 +112,8 @@
 
 - [v0.3.2 AI Resume Analysis](11_releases/v0.3.2-resume-analysis.md)
 - [v0.3.2 상세 개발계획](05_development-plan/releases/v0.3.2-plan.md)
+# v0.3.3 Added Documents
+
+- [v0.3.3 Application Documents Release](11_releases/v0.3.3-application-documents.md)
+- [Application Document Prompt](10_ai/application-document-prompt.md)
+- [Application Document Schema](10_ai/application-document-schema.md)

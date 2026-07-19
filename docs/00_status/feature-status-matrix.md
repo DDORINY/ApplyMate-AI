@@ -19,3 +19,14 @@
 | 연동 | Google Calendar | 예정 | v0.5.0 |
 | 연동 | Gmail | 예정 | v0.5.1 |
 | 추천 | 공고 추천 | 예정 | v0.6.0 |
+# v0.3.3 Feature Status
+
+| Feature | Status | Verification |
+| --- | --- | --- |
+| Application document CRUD | Complete | Backend API tests |
+| AI draft generation | Complete | Mock provider tests |
+| Evidence/source references | Complete | Backend API tests |
+| Version save/restore | Complete | Backend API tests |
+| Duplicate/archive | Complete | Backend API tests |
+| Documents frontend | Complete | lint, type-check, build |
+| Real OpenAI document generation | Needs verification | Requires real API key/model |

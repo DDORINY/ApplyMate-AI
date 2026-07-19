@@ -5,6 +5,7 @@ const navItems = [
   { href: "/profile", label: "프로필" },
   { href: "/jobs", label: "채용공고" },
   { href: "/resumes", label: "이력서" },
+  { href: "/documents", label: "지원 문서" },
 ];
 
 const accountItems = [
@@ -18,7 +19,7 @@ const accountItems = [
 export function AppHeader() {
   return (
     <header className="border-b border-slate-200 bg-white/90 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-5 py-4 lg:flex-row lg:items-center lg:justify-between sm:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-5 py-4 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
         <Link className="text-lg font-semibold text-slate-950" href="/">
           ApplyMate AI
         </Link>
