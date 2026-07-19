@@ -6,20 +6,27 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import {
+  analyzeResumeFile,
   deleteResume,
   deleteResumeFile,
+  deleteResumeFileAnalysis,
   downloadResumeFile,
   extractResumeFile,
   getResume,
+  getResumeFileAnalysis,
+  getResumeFileAnalysisProfileCandidates,
   getResumeFileExtraction,
+  listResumeFileAnalysisRuns,
   listResumeFileExtractionRuns,
+  retryResumeFileAnalysis,
   retryResumeFileExtraction,
   setDefaultResume,
   updateResume,
+  updateResumeFileAnalysis,
   updateResumeFileExtraction,
   uploadResumeFile,
 } from "@/lib/api/resume";
-import type { ResumeFilePublic } from "@/types/resume";
+import type { ResumeAnalysisStructuredData, ResumeFilePublic } from "@/types/resume";
 
 export function ResumeDetailPanel({ resumeId }: { resumeId: number }) {
   const router = useRouter();
@@ -207,6 +214,7 @@ function ResumeFileCard({
 }) {
   const queryClient = useQueryClient();
   const [editedText, setEditedText] = useState("");
+  const [analysisJson, setAnalysisJson] = useState("");
 
   const extractionQuery = useQuery({
     queryKey: ["resume-file-extraction", resumeId, resumeFile.id],
@@ -218,6 +226,21 @@ function ResumeFileCard({
     queryFn: () => listResumeFileExtractionRuns(resumeId, resumeFile.id),
     retry: false,
   });
+  const analysisQuery = useQuery({
+    queryKey: ["resume-file-analysis", resumeId, resumeFile.id],
+    queryFn: () => getResumeFileAnalysis(resumeId, resumeFile.id),
+    retry: false,
+  });
+  const analysisRunsQuery = useQuery({
+    queryKey: ["resume-file-analysis-runs", resumeId, resumeFile.id],
+    queryFn: () => listResumeFileAnalysisRuns(resumeId, resumeFile.id),
+    retry: false,
+  });
+  const profileCandidatesQuery = useQuery({
+    queryKey: ["resume-file-analysis-profile-candidates", resumeId, resumeFile.id],
+    queryFn: () => getResumeFileAnalysisProfileCandidates(resumeId, resumeFile.id),
+    retry: false,
+  });
 
   useEffect(() => {
     const extraction = extractionQuery.data?.data;
@@ -226,11 +249,19 @@ function ResumeFileCard({
     }
   }, [extractionQuery.data]);
 
+  useEffect(() => {
+    const result = analysisQuery.data?.data.result;
+    if (result) {
+      setAnalysisJson(JSON.stringify(result, null, 2));
+    }
+  }, [analysisQuery.data]);
+
   const extractMutation = useMutation({
     mutationFn: () => extractResumeFile(resumeId, resumeFile.id),
     onSuccess: (response) => {
       queryClient.setQueryData(["resume-file-extraction", resumeId, resumeFile.id], response);
       queryClient.invalidateQueries({ queryKey: ["resume-file-extraction-runs", resumeId, resumeFile.id] });
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis", resumeId, resumeFile.id] });
     },
   });
   const retryMutation = useMutation({
@@ -238,15 +269,54 @@ function ResumeFileCard({
     onSuccess: (response) => {
       queryClient.setQueryData(["resume-file-extraction", resumeId, resumeFile.id], response);
       queryClient.invalidateQueries({ queryKey: ["resume-file-extraction-runs", resumeId, resumeFile.id] });
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis", resumeId, resumeFile.id] });
     },
   });
   const updateExtractionMutation = useMutation({
     mutationFn: () => updateResumeFileExtraction(resumeId, resumeFile.id, editedText),
-    onSuccess: (response) => queryClient.setQueryData(["resume-file-extraction", resumeId, resumeFile.id], response),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["resume-file-extraction", resumeId, resumeFile.id], response);
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis", resumeId, resumeFile.id] });
+    },
+  });
+  const analyzeMutation = useMutation({
+    mutationFn: () => analyzeResumeFile(resumeId, resumeFile.id),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["resume-file-analysis", resumeId, resumeFile.id], response);
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis-runs", resumeId, resumeFile.id] });
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis-profile-candidates", resumeId, resumeFile.id] });
+    },
+  });
+  const retryAnalysisMutation = useMutation({
+    mutationFn: () => retryResumeFileAnalysis(resumeId, resumeFile.id),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["resume-file-analysis", resumeId, resumeFile.id], response);
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis-runs", resumeId, resumeFile.id] });
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis-profile-candidates", resumeId, resumeFile.id] });
+    },
+  });
+  const updateAnalysisMutation = useMutation({
+    mutationFn: () => updateResumeFileAnalysis(resumeId, resumeFile.id, JSON.parse(analysisJson) as ResumeAnalysisStructuredData),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["resume-file-analysis", resumeId, resumeFile.id], response);
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis-profile-candidates", resumeId, resumeFile.id] });
+    },
+  });
+  const deleteAnalysisMutation = useMutation({
+    mutationFn: () => deleteResumeFileAnalysis(resumeId, resumeFile.id),
+    onSuccess: () => {
+      setAnalysisJson("");
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis", resumeId, resumeFile.id] });
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis-runs", resumeId, resumeFile.id] });
+      queryClient.invalidateQueries({ queryKey: ["resume-file-analysis-profile-candidates", resumeId, resumeFile.id] });
+    },
   });
 
   const extraction = extractionQuery.data?.data;
   const isBusy = extractMutation.isPending || retryMutation.isPending || extraction?.status === "PROCESSING";
+  const analysis = analysisQuery.data?.data;
+  const isAnalysisBusy =
+    analyzeMutation.isPending || retryAnalysisMutation.isPending || analysis?.status === "PROCESSING";
 
   return (
     <div className="rounded-2xl border border-slate-200 p-4">
@@ -336,6 +406,121 @@ function ResumeFileCard({
         {extractMutation.error ? <p className="mt-3 text-sm text-rose-700">{extractMutation.error.message}</p> : null}
         {retryMutation.error ? <p className="mt-3 text-sm text-rose-700">{retryMutation.error.message}</p> : null}
         {updateExtractionMutation.error ? <p className="mt-3 text-sm text-rose-700">{updateExtractionMutation.error.message}</p> : null}
+      </div>
+
+      <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/50 p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h3 className="font-semibold text-slate-950">AI 이력서 구조화 분석</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              추출 텍스트를 근거로 기술, 경력, 프로젝트, 학력 후보를 구조화합니다. 프로필에는 자동 반영하지 않습니다.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              className="button-primary"
+              type="button"
+              disabled={isAnalysisBusy || extraction?.status !== "COMPLETED"}
+              onClick={() => analyzeMutation.mutate()}
+            >
+              AI 분석 실행
+            </button>
+            <button
+              className="button-secondary"
+              type="button"
+              disabled={isAnalysisBusy || !analysis}
+              onClick={() => retryAnalysisMutation.mutate()}
+            >
+              재분석
+            </button>
+            <button
+              className="button-secondary border-rose-200 text-rose-700"
+              type="button"
+              disabled={deleteAnalysisMutation.isPending || !analysis}
+              onClick={() => deleteAnalysisMutation.mutate()}
+            >
+              분석 삭제
+            </button>
+          </div>
+        </div>
+
+        {extraction?.status !== "COMPLETED" ? (
+          <p className="mt-3 text-sm text-amber-700">완료된 텍스트 추출 결과가 있어야 AI 분석을 실행할 수 있습니다.</p>
+        ) : null}
+        {analysisQuery.isLoading ? <p className="mt-3 text-sm text-slate-600">AI 분석 결과를 확인하는 중입니다.</p> : null}
+        {analysisQuery.error ? <p className="mt-3 text-sm text-slate-500">아직 AI 분석 결과가 없습니다.</p> : null}
+        {analysis ? (
+          <div className="mt-4 grid gap-4">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="rounded-full bg-white px-3 py-1 font-semibold text-indigo-700">{statusLabel(analysis.status)}</span>
+              <span className="text-slate-600">Provider: {analysis.provider ?? "-"}</span>
+              <span className="text-slate-600">Model: {analysis.model ?? "-"}</span>
+              <span className="text-slate-600">Input: {analysis.input_source}</span>
+              {analysis.is_outdated ? <span className="rounded-full bg-amber-100 px-3 py-1 font-semibold text-amber-700">outdated</span> : null}
+              {analysis.is_user_edited ? <span className="rounded-full bg-emerald-100 px-3 py-1 font-semibold text-emerald-700">사용자 수정본</span> : null}
+            </div>
+            {analysis.provider === "mock" ? (
+              <p className="text-sm text-amber-700">현재 결과는 Mock Provider 기반입니다. 실제 OpenAI 호출 검증은 별도 설정 후 확인해야 합니다.</p>
+            ) : null}
+            {analysis.error_message ? <p className="text-sm text-rose-700">{analysis.error_message}</p> : null}
+            {analysis.result ? (
+              <div className="grid gap-3">
+                <p className="text-sm text-slate-700">{analysis.result.summary}</p>
+                <div className="flex flex-wrap gap-2">
+                  {analysis.result.skills.map((skill) => (
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700" key={skill.name}>
+                      {skill.name}
+                    </span>
+                  ))}
+                </div>
+                <details className="rounded-xl border border-slate-200 bg-white p-3">
+                  <summary className="cursor-pointer text-sm font-semibold text-slate-700">근거 및 구조화 JSON 편집</summary>
+                  <textarea
+                    className="input mt-3 min-h-80 font-mono text-xs"
+                    value={analysisJson}
+                    onChange={(event) => setAnalysisJson(event.target.value)}
+                  />
+                  <button
+                    className="button-primary mt-3"
+                    type="button"
+                    disabled={updateAnalysisMutation.isPending || !analysisJson.trim()}
+                    onClick={() => updateAnalysisMutation.mutate()}
+                  >
+                    분석 수정본 저장
+                  </button>
+                </details>
+              </div>
+            ) : null}
+            {profileCandidatesQuery.data?.data.items.length ? (
+              <details className="rounded-xl border border-slate-200 bg-white p-3">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-700">프로필 반영 후보</summary>
+                <ul className="mt-3 grid gap-2 text-sm text-slate-600">
+                  {profileCandidatesQuery.data.data.items.map((candidate, index) => (
+                    <li className="rounded-lg bg-slate-50 p-3" key={index}>
+                      <span className="font-semibold">{String(candidate.action)}</span> · {String(candidate.target)}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
+            {analysisRunsQuery.data?.data.items.length ? (
+              <details className="rounded-xl border border-slate-200 bg-white p-3">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-700">AI 분석 실행 이력</summary>
+                <ul className="mt-3 grid gap-2 text-sm text-slate-600">
+                  {analysisRunsQuery.data.data.items.map((run) => (
+                    <li className="rounded-lg bg-slate-50 p-3" key={run.id}>
+                      #{run.id} · {statusLabel(run.status)} · {run.provider} · {new Date(run.started_at).toLocaleString()}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : null}
+          </div>
+        ) : null}
+        {analyzeMutation.error ? <p className="mt-3 text-sm text-rose-700">{analyzeMutation.error.message}</p> : null}
+        {retryAnalysisMutation.error ? <p className="mt-3 text-sm text-rose-700">{retryAnalysisMutation.error.message}</p> : null}
+        {updateAnalysisMutation.error ? <p className="mt-3 text-sm text-rose-700">{updateAnalysisMutation.error.message}</p> : null}
+        {deleteAnalysisMutation.error ? <p className="mt-3 text-sm text-rose-700">{deleteAnalysisMutation.error.message}</p> : null}
       </div>
 
       {runsQuery.data?.data.items.length ? (

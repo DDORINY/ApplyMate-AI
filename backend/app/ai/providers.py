@@ -197,12 +197,13 @@ class MockAIProvider:
     ) -> AIProviderResult:
         _ = system_prompt
         started = time.perf_counter()
-        skill_names = _resume_skill_candidates(user_prompt)
-        evidence_text = _first_non_empty_line(user_prompt) or "이력서 텍스트"
-        evidence = ResumeAnalysisEvidence(source="RAW_TEXT", text=evidence_text[:1000], page=None)
+        resume_text = _resume_text_from_prompt(user_prompt)
+        skill_names = _resume_skill_candidates(resume_text)
+        evidence_text = _first_non_empty_line(resume_text) or resume_text[:200]
+        evidence = ResumeAnalysisEvidence(source="RAW_TEXT", source_text=evidence_text[:1000])
         data = ResumeAnalysisStructuredData(
             summary="업로드된 이력서 텍스트를 기반으로 주요 기술과 경력 후보를 구조화했습니다.",
-            headline=_first_non_empty_line(user_prompt),
+            headline=_first_non_empty_line(resume_text),
             skills=[
                 ResumeAnalysisSkill(name=skill, category="TECHNICAL", evidence=[evidence])
                 for skill in skill_names
@@ -438,3 +439,10 @@ def _first_non_empty_line(text: str) -> str | None:
         if cleaned and not cleaned.startswith("---") and ":" not in cleaned[:30]:
             return cleaned[:200]
     return None
+
+
+def _resume_text_from_prompt(prompt: str) -> str:
+    markers = prompt.split("---")
+    if len(markers) >= 3:
+        return markers[-2].strip()
+    return prompt

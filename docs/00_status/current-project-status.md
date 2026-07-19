@@ -2,8 +2,8 @@
 
 ## 현재 버전
 
-- 버전: `v0.3.1`
-- migration head: `20260719_1600`
+- 버전: `v0.3.2`
+- migration head: `20260719_1700`
 - AI provider 검증 기준: `AI_PROVIDER=mock`
 
 ## 현재 구현 완료 기능
@@ -37,7 +37,7 @@
 
 ## 현재 DB
 
-- 최신 migration: `20260719_1600_create_resume_extraction_tables.py`
+- 최신 migration: `20260719_1700_create_resume_analysis_tables.py`
 - 신규 테이블: `resume_file_extractions`, `resume_extraction_runs`
 
 ## 미검증

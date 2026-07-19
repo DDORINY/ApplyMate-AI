@@ -148,6 +148,7 @@ resume_files
 | `20260719_1400` | job matching |
 | `20260719_1500` | resume upload |
 | `20260719_1600` | resume text extraction |
+| `20260719_1700` | resume AI analysis |
 
 ## v0.3.0 보완 DB 제약
 
@@ -220,3 +221,26 @@ uq_resume_files_user_file_hash = (user_id, file_hash)
 - `raw_text`는 재추출 결과로 갱신될 수 있지만 `edited_text`는 사용자가 수정한 값으로 별도 보존한다.
 - 재추출은 실행 이력을 보존하며 최신 결과만 `resume_file_extractions`에 반영한다.
 - OCR은 v0.3.1에서 실행하지 않으며 텍스트 레이어가 없는 PDF는 `OCR_REQUIRED`로 기록한다.
+
+## v0.3.2 Resume AI Analysis
+
+### resume_analyses
+
+- `id`, `resume_id`, `resume_file_id`, `extraction_id`, `user_id`
+- `status`, `provider`, `model`, `prompt_version`, `schema_version`
+- `input_hash`, `resume_file_hash`, `extraction_run_id`, `input_source`, `input_length`
+- `summary`, `structured_result`, `edited_result`, `profile_candidates`
+- `is_user_edited`, `is_outdated`, `latest_run_id`
+- `error_code`, `error_message`, `analyzed_at`, `created_at`, `updated_at`
+
+`resume_file_id`는 최신 분석 1건만 유지하도록 unique 제약을 가진다.
+
+### resume_analysis_runs
+
+- `id`, `analysis_id`, `resume_id`, `resume_file_id`, `extraction_id`, `user_id`
+- `status`, `provider`, `model`, `prompt_version`, `schema_version`
+- `input_hash`, `input_source`, `input_length`
+- `started_at`, `completed_at`, `error_code`, `error_message`
+- `result_snapshot`, `usage_metadata`, `raw_response_metadata`, `created_at`
+
+실행 이력은 재분석과 실패를 포함해 누적 보존한다.

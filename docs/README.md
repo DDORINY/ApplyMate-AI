@@ -107,3 +107,8 @@
 ## 릴리스 문서
 
 - [v0.3.0 이력서 파일 업로드](11_releases/v0.3.0-resume-upload.md)
+
+## v0.3.2
+
+- [v0.3.2 AI Resume Analysis](11_releases/v0.3.2-resume-analysis.md)
+- [v0.3.2 상세 개발계획](05_development-plan/releases/v0.3.2-plan.md)

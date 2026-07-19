@@ -79,3 +79,19 @@
 | `RESUME_EXTRACTION_OCR_REQUIRED` | 422 | 텍스트 레이어가 없어 OCR 필요 |
 | `RESUME_EXTRACTION_PDF_ENCRYPTED` | 422 | 암호화된 PDF라 텍스트 추출 불가 |
 | `RESUME_EXTRACTION_PDF_INVALID` | 422 | 손상되었거나 읽을 수 없는 PDF |
+
+## v0.3.2 Resume AI Analysis
+
+| Code | Description |
+| --- | --- |
+| `RESUME_ANALYSIS_NOT_FOUND` | 이력서 분석 결과 없음 |
+| `RESUME_ANALYSIS_ALREADY_PROCESSING` | 분석 중복 실행 차단 |
+| `RESUME_ANALYSIS_EXTRACTION_REQUIRED` | 분석 전 텍스트 추출 필요 |
+| `RESUME_ANALYSIS_EXTRACTION_NOT_READY` | 완료되지 않았거나 OCR이 필요한 추출 결과 |
+| `RESUME_ANALYSIS_TEXT_EMPTY` | 분석 입력 텍스트 없음 |
+| `RESUME_ANALYSIS_PROVIDER_DISABLED` | 이력서 AI Provider 비활성화 |
+| `RESUME_ANALYSIS_PROVIDER_UNAVAILABLE` | 이력서 AI Provider 사용 불가 |
+| `RESUME_ANALYSIS_PROVIDER_TIMEOUT` | 이력서 AI Provider timeout |
+| `RESUME_ANALYSIS_INVALID_OUTPUT` | AI 응답 구조 검증 실패 |
+| `RESUME_ANALYSIS_EVIDENCE_INVALID` | evidence가 원문과 일치하지 않음 |
+| `RESUME_ANALYSIS_RUN_NOT_FOUND` | 분석 실행 이력 없음 |
