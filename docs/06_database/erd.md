@@ -1,6 +1,6 @@
 # ERD
 
-v0.1.3 기준 핵심 관계입니다.
+현재 v0.2.2 기준 주요 관계를 Mermaid ERD로 표현한다.
 
 ```mermaid
 erDiagram
@@ -8,207 +8,49 @@ erDiagram
   users ||--o{ oauth_accounts : links
   users ||--o{ oauth_states : creates
   users ||--o{ oauth_login_tickets : receives
-  users ||--o| career_profiles : owns
+  users ||--o{ email_verification_tokens : verifies
+  users ||--o{ password_reset_tokens : resets
+  users ||--o{ security_events : records
+
+  users ||--|| career_profiles : owns
   users ||--o{ user_skills : owns
+  skills ||--o{ user_skills : referenced_by
   users ||--o{ experiences : owns
   users ||--o{ projects : owns
-  users ||--o| job_preferences : owns
+  projects ||--o{ project_skills : has
+  skills ||--o{ project_skills : referenced_by
+  users ||--|| job_preferences : owns
   users ||--o{ excluded_conditions : owns
   users ||--o{ portfolio_links : owns
 
-  skills ||--o{ user_skills : referenced_by
-  projects ||--o{ project_skills : uses
-  skills ||--o{ project_skills : referenced_by
-
-  users {
-    bigint id PK
-    string email UK
-    string password_hash
-    string name
-    enum status
-    boolean email_verified
-    datetime last_login_at
-    datetime created_at
-    datetime updated_at
-  }
-
-  refresh_tokens {
-    bigint id PK
-    bigint user_id FK
-    string token_hash UK
-    string token_id UK
-    datetime expires_at
-    datetime revoked_at
-    datetime created_at
-  }
-
-  oauth_accounts {
-    bigint id PK
-    bigint user_id FK
-    enum provider
-    string provider_user_id
-    string provider_email
-    string provider_username
-    string provider_display_name
-    boolean email_verified
-    datetime last_login_at
-    datetime created_at
-    datetime updated_at
-  }
-
-  oauth_states {
-    bigint id PK
-    string state_hash UK
-    enum provider
-    enum purpose
-    bigint user_id FK
-    string redirect_path
-    datetime expires_at
-    datetime consumed_at
-  }
-
-  oauth_login_tickets {
-    bigint id PK
-    string ticket_hash UK
-    bigint user_id FK
-    enum provider
-    string redirect_path
-    datetime expires_at
-    datetime consumed_at
-  }
-
-  career_profiles {
-    bigint id PK
-    bigint user_id FK
-    string display_name
-    string headline
-    enum career_level
-    int years_of_experience
-    string desired_job_title
-  }
-
-  skills {
-    bigint id PK
-    string name
-    string normalized_name UK
-    enum category
-  }
-
-  user_skills {
-    bigint id PK
-    bigint user_id FK
-    bigint skill_id FK
-    enum proficiency_level
-    int years_of_experience
-    boolean is_primary
-  }
-
-  experiences {
-    bigint id PK
-    bigint user_id FK
-    string company_name
-    string position
-    enum employment_type
-    date start_date
-    date end_date
-    boolean is_current
-  }
-
-  projects {
-    bigint id PK
-    bigint user_id FK
-    string name
-    string summary
-    string role
-    date start_date
-    date end_date
-    boolean is_ongoing
-  }
-
-  project_skills {
-    bigint id PK
-    bigint project_id FK
-    bigint skill_id FK
-  }
-
-  job_preferences {
-    bigint id PK
-    bigint user_id FK
-    json preferred_employment_types
-    json preferred_locations
-    json preferred_company_sizes
-    enum remote_preference
-    int minimum_salary
-  }
-
-  excluded_conditions {
-    bigint id PK
-    bigint user_id FK
-    enum condition_type
-    string value
-    boolean is_active
-  }
-
-  portfolio_links {
-    bigint id PK
-    bigint user_id FK
-    enum link_type
-    string title
-    string url
-    boolean is_primary
-  }
-```
-
-## OAuth unique constraints
-
-- `oauth_accounts(provider, provider_user_id)`는 provider 계정의 전역 중복 연결을 방지합니다.
-- `oauth_accounts(user_id, provider)`는 사용자당 provider 1개만 연결하도록 제한합니다.
-- `oauth_states.state_hash`, `oauth_login_tickets.ticket_hash`는 1회용 값을 hash로만 저장합니다.
-# ApplyMate AI ERD
-
-## v0.2.0 채용공고
-
-```mermaid
-erDiagram
-  users ||--o{ job_postings : owns
   companies ||--o{ job_postings : has
+  users ||--o{ job_postings : owns
+  job_postings ||--|| job_analyses : current_analysis
+  job_postings ||--o{ job_analysis_runs : analysis_runs
+  job_analyses ||--o{ job_analysis_runs : run_result
 
-  companies {
-    bigint id PK
-    varchar name
-    varchar normalized_name UK
-    varchar website_url
-    varchar industry
-    enum company_size
-    text description
-    timestamptz created_at
-    timestamptz updated_at
-  }
-
-  job_postings {
-    bigint id PK
-    bigint user_id FK
-    bigint company_id FK
-    varchar title
-    varchar position
-    enum employment_type
-    varchar career_requirement
-    varchar education_requirement
-    varchar location
-    enum work_type
-    integer salary_min
-    integer salary_max
-    text description
-    enum source_type
-    varchar source_url
-    varchar content_hash
-    timestamptz deadline_at
-    enum deadline_type
-    enum status
-    boolean is_favorite
-    text notes
-    timestamptz collected_at
-    timestamptz created_at
-    timestamptz updated_at
-  }
+  job_postings ||--|| job_matches : current_match
+  job_analyses ||--o{ job_matches : basis
+  job_matches ||--o{ job_match_runs : match_runs
+  job_matches ||--o{ job_match_feedback : feedback
+  users ||--o{ job_matches : owns
+  users ||--o{ job_match_runs : owns
+  users ||--o{ job_match_feedback : owns
 ```
+
+## 관계 요약
+
+- `users`는 대부분의 개인 데이터의 소유자이다.
+- `companies`는 사용자 소유가 아니라 회사 master 성격이다.
+- `job_postings`는 사용자 소유 데이터이며 `companies`를 참조한다.
+- `job_analyses`는 공고별 현재 분석 결과 1개를 보장한다.
+- `job_analysis_runs`는 분석 실행 이력이다.
+- `job_matches`는 공고별 현재 적합도 결과 1개를 보장한다.
+- `job_match_runs`는 적합도 분석 실행 이력이다.
+- `job_match_feedback`은 적합도 결과에 대한 사용자 피드백이다.
+
+## 삭제 정책 요약
+
+- 사용자 삭제 시 사용자 소유 데이터는 cascade 삭제된다.
+- 채용공고 삭제 시 해당 공고의 분석/적합도 결과는 cascade 삭제된다.
+- 분석 실행 이력과 적합도 실행 이력은 현재 결과가 삭제되어도 가능한 범위에서 이력 보존을 고려한다.

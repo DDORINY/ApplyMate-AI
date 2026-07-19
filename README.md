@@ -2,40 +2,53 @@
 
 현재 버전: v0.2.2
 
-ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 기술, 경력, 프로젝트, 희망 조건을 기반으로 채용공고를 관리하고, 공고 분석과 사용자-공고 적합도 분석을 지원합니다.
+ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 기술, 경력, 프로젝트, 희망 조건을 기반으로 채용공고를 관리하고, AI 채용공고 분석과 사용자-공고 적합도 분석을 지원합니다.
 
-## 현재 구현 범위
+## 현재 완성된 사용자 흐름
 
-- 회원가입, 로그인, JWT 인증, refresh token rotation
-- 이메일 인증, 비밀번호 복구, 세션/보안 이벤트 관리
+```text
+회원가입
+  -> 이메일 인증
+  -> 로그인 또는 OAuth 로그인
+  -> 커리어 프로필 작성
+  -> 채용공고 등록
+  -> AI 채용공고 분석
+  -> 사용자-공고 적합도 분석
+  -> 결과 확인과 피드백
+```
+
+## 핵심 기능
+
+- 이메일 회원가입/로그인
+- JWT Access Token, Refresh Token rotation
 - Google/GitHub OAuth 로그인과 계정 연결
-- 커리어 프로필, 기술, 경력, 프로젝트, 희망 조건, 지원 제외 조건, 포트폴리오 링크 관리
-- 채용공고 직접 등록, URL 등록, 목록/상세/수정/삭제, 중복 감지
-- AI 채용공고 분석: 주요 업무, 조건, 기술, 경력, 마감, 키워드 추출
-- 사용자-공고 적합도 분석: 규칙 기반 점수, 등급, 추천 상태, 근거, 실행 이력, 피드백
-
-## v0.2.2 사용자-공고 적합도 분석
-
-- 완료된 최신 채용공고 분석과 사용자 커리어 프로필을 비교합니다.
-- 점수는 deterministic rule-based 방식으로 계산합니다.
-- AI는 숫자 점수를 변경하지 않으며, `AI_PROVIDER=disabled`여도 template 설명으로 동작합니다.
-- 점수 가중치:
-  - 직무 25%
-  - 기술 30%
-  - 경력 15%
-  - 프로젝트 15%
-  - 희망 조건 10%
-  - 위험/제외 조건 5%
-- 결과는 `job_matches`, 실행 이력은 `job_match_runs`, 사용자 피드백은 `job_match_feedback`에 저장합니다.
-- `/jobs/{jobId}` 상세 화면에서 적합도 분석과 피드백을 사용할 수 있습니다.
+- 이메일 인증, 비밀번호 복구, 세션 관리, 보안 이벤트
+- 커리어 프로필, 기술, 경력, 프로젝트, 희망 조건, 지원 제외 조건, 포트폴리오 링크
+- 채용공고 직접 등록, URL 등록, 목록/상세/수정/삭제
+- AI 채용공고 분석
+- 규칙 기반 사용자-공고 적합도 분석
+- 적합도 분석 피드백
 
 ## 기술 스택
 
-- Frontend: Next.js, TypeScript, Tailwind CSS, TanStack Query
-- Backend: Python, FastAPI, SQLAlchemy, Alembic, Pydantic
-- Database: PostgreSQL
-- Cache: Redis
-- Infrastructure: Docker, Docker Compose
+| 영역 | 기술 |
+| --- | --- |
+| Frontend | Next.js, TypeScript, Tailwind CSS, TanStack Query |
+| Backend | Python, FastAPI, SQLAlchemy, Alembic, Pydantic, JWT |
+| Database | PostgreSQL |
+| Cache | Redis |
+| Infra | Docker, Docker Compose |
+| AI | disabled/mock/openai Provider abstraction |
+
+## Architecture 요약
+
+```text
+Frontend(Next.js)
+  -> Backend(FastAPI /api/v1)
+    -> PostgreSQL
+    -> Redis
+    -> AI Provider
+```
 
 ## 실행
 
@@ -51,7 +64,27 @@ docker compose up --build
 - PostgreSQL: `5432`
 - Redis: `6379`
 
-## 주요 화면
+## 환경변수
+
+주요 환경변수:
+
+- `DATABASE_URL`
+- `REDIS_URL`
+- `JWT_SECRET_KEY`
+- `JWT_REFRESH_SECRET_KEY`
+- `AI_PROVIDER`
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GITHUB_CLIENT_ID`
+- `GITHUB_CLIENT_SECRET`
+- `EMAIL_PROVIDER`
+- `SMTP_*`
+
+전체 예시는 [.env.example](.env.example)를 참고합니다.
+
+## Frontend 경로
 
 ```text
 /
@@ -65,108 +98,51 @@ docker compose up --build
 /jobs/{jobId}
 /settings/accounts
 /settings/security
+/verify-email
+/forgot-password
+/reset-password
 ```
 
-## 주요 API
+## API 그룹
 
 Base URL: `/api/v1`
 
-### 인증/계정
+- Health
+- Auth
+- OAuth
+- Account Security
+- Career Profile
+- Jobs
+- AI Providers
+- Job Analysis
+- Job Matching
+- Job Match Feedback
 
-```text
-POST   /auth/signup
-POST   /auth/login
-POST   /auth/refresh
-POST   /auth/logout
-GET    /auth/me
-POST   /auth/email-verification/send
-POST   /auth/email-verification/verify
-POST   /auth/password/forgot
-POST   /auth/password/reset
-POST   /auth/password/change
-POST   /auth/password/set
-GET    /auth/sessions
-DELETE /auth/sessions/{sessionId}
-DELETE /auth/sessions/others
-DELETE /auth/sessions
-GET    /auth/security-events
-```
+상세 API는 [docs/04_api/api-specification.md](docs/04_api/api-specification.md)를 참고합니다.
 
-### 커리어 프로필
+## Database
 
-```text
-GET    /profiles/me
-POST   /profiles
-PATCH  /profiles/me
-GET    /profiles/me/skills
-POST   /profiles/me/skills
-GET    /profiles/me/experiences
-POST   /profiles/me/experiences
-GET    /profiles/me/projects
-POST   /profiles/me/projects
-GET    /profiles/me/preferences
-PUT    /profiles/me/preferences
-GET    /profiles/me/exclusions
-POST   /profiles/me/exclusions
-GET    /profiles/me/portfolio-links
-POST   /profiles/me/portfolio-links
-```
+현재 migration head: `20260719_1400`
 
-### 채용공고
+주요 테이블:
 
-```text
-POST   /jobs
-POST   /jobs/import-url
-GET    /jobs
-GET    /jobs/{jobId}
-PATCH  /jobs/{jobId}
-DELETE /jobs/{jobId}
-```
+- `users`, `refresh_tokens`
+- `oauth_accounts`, `oauth_states`, `oauth_login_tickets`
+- `career_profiles`, `skills`, `user_skills`, `experiences`, `projects`, `project_skills`, `job_preferences`, `excluded_conditions`, `portfolio_links`
+- `email_verification_tokens`, `password_reset_tokens`, `security_events`
+- `companies`, `job_postings`
+- `job_analyses`, `job_analysis_runs`
+- `job_matches`, `job_match_runs`, `job_match_feedback`
 
-### 채용공고 분석
+상세 DB 문서는 [docs/06_database/database-design.md](docs/06_database/database-design.md)를 참고합니다.
 
-```text
-GET    /ai/providers
-POST   /jobs/{jobId}/analysis
-GET    /jobs/{jobId}/analysis
-PATCH  /jobs/{jobId}/analysis
-DELETE /jobs/{jobId}/analysis
-GET    /jobs/{jobId}/analysis/runs
-```
+## AI Provider
 
-### 사용자-공고 적합도 분석
+- `disabled`: AI 분석 비활성. 적합도 분석은 template 설명으로 동작.
+- `mock`: 개발/테스트용 구조화 응답.
+- `openai`: OpenAI API 사용. 실제 호출은 API key와 model 설정 필요.
 
-```text
-POST   /jobs/{jobId}/match
-GET    /jobs/{jobId}/match
-DELETE /jobs/{jobId}/match
-GET    /jobs/{jobId}/match/runs
-POST   /jobs/{jobId}/match/feedback
-GET    /jobs/{jobId}/match/feedback
-PATCH  /jobs/{jobId}/match/feedback/{feedbackId}
-DELETE /jobs/{jobId}/match/feedback/{feedbackId}
-```
-
-## Migration
-
-```bash
-cd backend
-alembic upgrade head
-alembic downgrade -1
-alembic upgrade head
-```
-
-주요 migration:
-
-```text
-backend/alembic/versions/20260718_1501_create_auth_tables.py
-backend/alembic/versions/20260718_1900_create_career_profile_tables.py
-backend/alembic/versions/20260718_2100_add_social_auth.py
-backend/alembic/versions/20260719_1000_add_account_security.py
-backend/alembic/versions/20260719_1200_create_job_posting_tables.py
-backend/alembic/versions/20260719_1300_create_job_analysis_tables.py
-backend/alembic/versions/20260719_1400_create_job_match_tables.py
-```
+적합도 분석의 숫자 점수는 AI가 만들지 않습니다. v0.2.2 기준 점수는 deterministic rule-based 산식으로 계산합니다.
 
 ## 검증
 
@@ -192,12 +168,42 @@ Docker:
 ```bash
 docker compose config
 docker compose up --build -d
-docker compose ps
 docker compose down
 ```
 
-볼륨 삭제가 필요한 명령(`docker compose down -v`)은 기본 검증에서 사용하지 않습니다.
+Migration:
+
+```bash
+cd backend
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+```
+
+## 문서 구조
+
+문서 인덱스는 [docs/README.md](docs/README.md)를 참고합니다.
+
+특히 다음 문서를 먼저 확인하세요.
+
+- [현재 프로젝트 상태](docs/00_status/current-project-status.md)
+- [완료 기능 목록](docs/00_status/completed-features.md)
+- [기능 상태 매트릭스](docs/00_status/feature-status-matrix.md)
+- [버전별 상세 문서](docs/11_releases/v0.2.2-job-matching.md)
+- [미검증 항목](docs/00_status/unverified-items.md)
+
+## 미검증 항목
+
+- 실제 OpenAI API 호출
+- 실제 Google/GitHub OAuth 운영 로그인
+- 운영 SMTP 발송
+- 운영 HTTPS Cookie
+- 운영 배포
+- 브라우저 E2E 자동화
+- 부하 테스트
+
+자세한 내용은 [docs/00_status/unverified-items.md](docs/00_status/unverified-items.md)를 참고합니다.
 
 ## 다음 버전
 
-v0.3.x에서는 이력서 업로드/분석과 근거 기반 지원 문서 생성을 구현합니다.
+v0.3.x에서는 이력서 파일 업로드, 이력서 텍스트 추출, AI 이력서 구조화 분석, 맞춤 지원 문서 생성을 진행합니다.
