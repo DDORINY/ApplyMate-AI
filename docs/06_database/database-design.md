@@ -244,3 +244,53 @@ uq_resume_files_user_file_hash = (user_id, file_hash)
 - `result_snapshot`, `usage_metadata`, `raw_response_metadata`, `created_at`
 
 실행 이력은 재분석과 실패를 포함해 누적 보존한다.
+# v0.3.3 Application Document Tables
+
+Latest migration head: `20260719_1800`
+
+## application_documents
+
+Stores document metadata and the current version pointer by number.
+
+- `id`
+- `user_id`
+- `job_id`
+- `resume_id`
+- `resume_file_id`
+- `resume_analysis_id`
+- `job_analysis_id`
+- `job_match_id`
+- `document_type`
+- `title`
+- `question`
+- `instructions`
+- `tone`
+- `language`
+- `character_limit`
+- `minimum_character_count`
+- `target_character_count`
+- `maximum_character_count`
+- `focus_points`
+- `avoid_phrases`
+- `settings`
+- `status`
+- `current_version_number`
+- `is_archived`
+- `created_at`
+- `updated_at`
+
+## application_document_versions
+
+Stores immutable-ish content versions.
+
+- unique: `document_id + version_number`
+- count fields: `character_count`, `character_count_without_spaces`, `word_count`, `paragraph_count`, `limit_exceeded`
+- flags: `is_ai_generated`, `is_user_edited`
+
+## application_document_sources
+
+Stores source snapshots and evidence references used by generated blocks.
+
+## generation_runs
+
+Stores provider execution status, safe error metadata, usage metadata, and result summary.

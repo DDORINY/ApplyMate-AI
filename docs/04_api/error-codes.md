@@ -95,3 +95,20 @@
 | `RESUME_ANALYSIS_INVALID_OUTPUT` | AI 응답 구조 검증 실패 |
 | `RESUME_ANALYSIS_EVIDENCE_INVALID` | evidence가 원문과 일치하지 않음 |
 | `RESUME_ANALYSIS_RUN_NOT_FOUND` | 분석 실행 이력 없음 |
+# v0.3.3 Application Document Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| DOCUMENT_NOT_FOUND | 404 | 지원 문서를 찾을 수 없음 |
+| DOCUMENT_VERSION_NOT_FOUND | 404 | 문서 버전을 찾을 수 없음 |
+| DOCUMENT_GENERATION_RUN_NOT_FOUND | 404 | 문서 생성 실행 이력을 찾을 수 없음 |
+| JOB_NOT_FOUND | 404 | 연결할 채용공고를 찾을 수 없음 |
+| RESUME_NOT_FOUND | 404 | 연결할 이력서를 찾을 수 없음 |
+| RESUME_FILE_NOT_FOUND | 404 | 연결할 이력서 파일을 찾을 수 없음 |
+| RESUME_ANALYSIS_NOT_FOUND | 404 | 연결할 이력서 분석을 찾을 수 없음 |
+| JOB_ANALYSIS_NOT_FOUND | 404 | 연결할 채용공고 분석을 찾을 수 없음 |
+| JOB_MATCH_NOT_FOUND | 404 | 연결할 적합도 분석을 찾을 수 없음 |
+| AI_PROVIDER_DISABLED | 503 | AI Provider 비활성화 |
+| AI_PROVIDER_CONFIG_INVALID | 503 | OpenAI Provider 설정 누락 |
+| AI_PROVIDER_UNAVAILABLE | 502 | AI Provider 일시 장애 |
+| AI_PROVIDER_INVALID_RESPONSE | 502 | Provider 응답 schema 검증 실패 |
