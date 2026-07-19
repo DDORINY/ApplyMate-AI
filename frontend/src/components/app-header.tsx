@@ -7,6 +7,7 @@ const navItems = [
   { href: "/resumes", label: "이력서" },
   { href: "/documents", label: "지원 문서" },
   { href: "/applications", label: "지원 현황" },
+  { href: "/calendar", label: "일정" },
 ];
 
 const accountItems = [

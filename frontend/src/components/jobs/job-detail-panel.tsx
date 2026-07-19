@@ -169,6 +169,12 @@ export function JobDetailPanel({ jobId }: JobDetailPanelProps) {
         <Link className="button-primary" href={`/applications/new?jobId=${job.id}`}>
           지원 관리에 추가
         </Link>
+        <Link className="button-secondary" href={`/calendar/new?jobId=${job.id}`}>
+          마감/면접 일정 추가
+        </Link>
+        <Link className="button-secondary" href={`/calendar?jobId=${job.id}`}>
+          연결 일정 보기
+        </Link>
         <Link className="button-primary" href="/jobs/new">
           새 공고 등록
         </Link>

@@ -82,6 +82,18 @@ from app.models.resume import (
     ResumeFileExtraction,
     ResumeSourceType,
 )
+from app.models.schedule import (
+    ScheduleConfidence,
+    ScheduleEvent,
+    ScheduleEventHistory,
+    ScheduleEventStatus,
+    ScheduleEventType,
+    ScheduleHistoryAction,
+    ScheduleHistorySource,
+    ScheduleReminder,
+    ScheduleReminderStatus,
+    ScheduleReminderType,
+)
 from app.models.user import User, UserStatus
 
 __all__ = [
@@ -152,6 +164,16 @@ __all__ = [
     "RemotePreference",
     "SecurityEvent",
     "SecurityEventType",
+    "ScheduleConfidence",
+    "ScheduleEvent",
+    "ScheduleEventHistory",
+    "ScheduleEventStatus",
+    "ScheduleEventType",
+    "ScheduleHistoryAction",
+    "ScheduleHistorySource",
+    "ScheduleReminder",
+    "ScheduleReminderStatus",
+    "ScheduleReminderType",
     "Skill",
     "SkillCategory",
     "User",
