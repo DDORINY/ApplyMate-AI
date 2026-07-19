@@ -17,3 +17,12 @@ async def get_ai_providers(
     _ = current_user
     data = AIProviderStatusData.model_validate(provider_status(get_settings()))
     return ApiResponse(success=True, data=data, message="AI Provider 상태입니다.")
+
+
+@router.get("/resume-providers", response_model=ApiResponse[AIProviderStatusData])
+async def get_resume_ai_providers(
+    current_user: User = Depends(get_current_user),
+) -> ApiResponse[AIProviderStatusData]:
+    _ = current_user
+    data = AIProviderStatusData.model_validate(provider_status(get_settings()))
+    return ApiResponse(success=True, data=data, message="이력서 AI Provider 상태입니다.")

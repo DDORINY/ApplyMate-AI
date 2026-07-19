@@ -2,12 +2,17 @@ import { getAccessToken } from "@/lib/auth/token";
 import { apiBaseUrl } from "@/lib/env/client";
 import type { ApiErrorResponse, ApiResponse } from "@/types/auth";
 import type {
+  ResumeAnalysisPublic,
+  ResumeAnalysisRunsData,
+  ResumeAnalysisRunPublic,
+  ResumeAnalysisStructuredData,
   ResumeExtractionRunListData,
   ResumeExtractionRunPublic,
   ResumeFileExtractionPublic,
   ResumeFilePublic,
   ResumeListData,
   ResumePayload,
+  ResumeProfileCandidateData,
   ResumePublic,
 } from "@/types/resume";
 
@@ -151,4 +156,48 @@ export async function listResumeFileExtractionRuns(resumeId: number, fileId: num
 
 export async function getResumeFileExtractionRun(resumeId: number, fileId: number, runId: number) {
   return request<ResumeExtractionRunPublic>(`/resumes/${resumeId}/files/${fileId}/extraction/runs/${runId}`);
+}
+
+export async function analyzeResumeFile(resumeId: number, fileId: number, force = false) {
+  return request<ResumeAnalysisPublic>(`/resumes/${resumeId}/files/${fileId}/analysis`, {
+    method: "POST",
+    body: JSON.stringify({ force }),
+  });
+}
+
+export async function getResumeFileAnalysis(resumeId: number, fileId: number) {
+  return request<ResumeAnalysisPublic>(`/resumes/${resumeId}/files/${fileId}/analysis`);
+}
+
+export async function updateResumeFileAnalysis(
+  resumeId: number,
+  fileId: number,
+  editedResult: ResumeAnalysisStructuredData,
+) {
+  return request<ResumeAnalysisPublic>(`/resumes/${resumeId}/files/${fileId}/analysis`, {
+    method: "PATCH",
+    body: JSON.stringify({ edited_result: editedResult }),
+  });
+}
+
+export async function deleteResumeFileAnalysis(resumeId: number, fileId: number) {
+  return request<{ deleted: boolean }>(`/resumes/${resumeId}/files/${fileId}/analysis`, {
+    method: "DELETE",
+  });
+}
+
+export async function retryResumeFileAnalysis(resumeId: number, fileId: number) {
+  return analyzeResumeFile(resumeId, fileId, true);
+}
+
+export async function listResumeFileAnalysisRuns(resumeId: number, fileId: number) {
+  return request<ResumeAnalysisRunsData>(`/resumes/${resumeId}/files/${fileId}/analysis/runs`);
+}
+
+export async function getResumeFileAnalysisRun(resumeId: number, fileId: number, runId: number) {
+  return request<ResumeAnalysisRunPublic>(`/resumes/${resumeId}/files/${fileId}/analysis/runs/${runId}`);
+}
+
+export async function getResumeFileAnalysisProfileCandidates(resumeId: number, fileId: number) {
+  return request<ResumeProfileCandidateData>(`/resumes/${resumeId}/files/${fileId}/analysis/profile-candidates`);
 }

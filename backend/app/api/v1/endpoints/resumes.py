@@ -21,7 +21,17 @@ from app.schemas.resume import (
     ResumePublic,
     ResumeUpdate,
 )
+from app.schemas.resume_analysis import (
+    ResumeAnalysisDeletedData,
+    ResumeAnalysisPublic,
+    ResumeAnalysisRunRequest,
+    ResumeAnalysisRunsData,
+    ResumeAnalysisRunPublic,
+    ResumeAnalysisUpdate,
+    ResumeProfileCandidateData,
+)
 from app.services.resume import ResumeService
+from app.services.resume_analysis import ResumeAnalysisService
 
 router = APIRouter(prefix="/resumes", tags=["resumes"])
 
@@ -255,3 +265,125 @@ async def get_resume_file_extraction_run(
         data=ResumeExtractionRunPublic.model_validate(run),
         message="이력서 텍스트 추출 실행 이력 상세입니다.",
     )
+
+
+@router.post(
+    "/{resume_id}/files/{file_id}/analysis",
+    response_model=ApiResponse[ResumeAnalysisPublic],
+)
+async def analyze_resume_file(
+    resume_id: int,
+    file_id: int,
+    payload: ResumeAnalysisRunRequest | None = None,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeAnalysisPublic]:
+    data = await ResumeAnalysisService(session).analyze_resume(
+        current_user.id,
+        resume_id,
+        file_id,
+        force=payload.force if payload else False,
+    )
+    return ApiResponse(success=True, data=data, message="이력서 AI 분석이 완료되었습니다.")
+
+
+@router.get(
+    "/{resume_id}/files/{file_id}/analysis",
+    response_model=ApiResponse[ResumeAnalysisPublic],
+)
+async def get_resume_file_analysis(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeAnalysisPublic]:
+    data = await ResumeAnalysisService(session).get_analysis(current_user.id, resume_id, file_id)
+    return ApiResponse(success=True, data=data, message="이력서 AI 분석 결과입니다.")
+
+
+@router.patch(
+    "/{resume_id}/files/{file_id}/analysis",
+    response_model=ApiResponse[ResumeAnalysisPublic],
+)
+async def update_resume_file_analysis(
+    resume_id: int,
+    file_id: int,
+    payload: ResumeAnalysisUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeAnalysisPublic]:
+    data = await ResumeAnalysisService(session).update_analysis(current_user.id, resume_id, file_id, payload)
+    return ApiResponse(success=True, data=data, message="이력서 AI 분석 수정본이 저장되었습니다.")
+
+
+@router.delete(
+    "/{resume_id}/files/{file_id}/analysis",
+    response_model=ApiResponse[ResumeAnalysisDeletedData],
+)
+async def delete_resume_file_analysis(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeAnalysisDeletedData]:
+    data = await ResumeAnalysisService(session).delete_analysis(current_user.id, resume_id, file_id)
+    return ApiResponse(success=True, data=data, message="이력서 AI 분석 결과가 삭제되었습니다.")
+
+
+@router.post(
+    "/{resume_id}/files/{file_id}/analysis/retry",
+    response_model=ApiResponse[ResumeAnalysisPublic],
+)
+async def retry_resume_file_analysis(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeAnalysisPublic]:
+    data = await ResumeAnalysisService(session).analyze_resume(current_user.id, resume_id, file_id, force=True)
+    return ApiResponse(success=True, data=data, message="이력서 AI 분석이 재실행되었습니다.")
+
+
+@router.get(
+    "/{resume_id}/files/{file_id}/analysis/runs",
+    response_model=ApiResponse[ResumeAnalysisRunsData],
+)
+async def list_resume_file_analysis_runs(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+    page: int = Query(default=1, ge=1),
+    size: int = Query(default=20, ge=1, le=100),
+) -> ApiResponse[ResumeAnalysisRunsData]:
+    data = await ResumeAnalysisService(session).list_runs(current_user.id, resume_id, file_id, page, size)
+    return ApiResponse(success=True, data=data, message="이력서 AI 분석 실행 이력입니다.")
+
+
+@router.get(
+    "/{resume_id}/files/{file_id}/analysis/runs/{run_id}",
+    response_model=ApiResponse[ResumeAnalysisRunPublic],
+)
+async def get_resume_file_analysis_run(
+    resume_id: int,
+    file_id: int,
+    run_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeAnalysisRunPublic]:
+    data = await ResumeAnalysisService(session).get_run(current_user.id, resume_id, file_id, run_id)
+    return ApiResponse(success=True, data=data, message="이력서 AI 분석 실행 이력 상세입니다.")
+
+
+@router.get(
+    "/{resume_id}/files/{file_id}/analysis/profile-candidates",
+    response_model=ApiResponse[ResumeProfileCandidateData],
+)
+async def get_resume_file_analysis_profile_candidates(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeProfileCandidateData]:
+    data = await ResumeAnalysisService(session).get_profile_candidates(current_user.id, resume_id, file_id)
+    return ApiResponse(success=True, data=data, message="프로필 반영 후보입니다.")

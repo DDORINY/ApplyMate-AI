@@ -25,3 +25,7 @@
 - 실제 PostgreSQL 전체 migration chain
 - 파일 바이러스 스캔
 - OCR 기반 이미지 PDF 텍스트 추출
+
+## v0.3.2
+
+- OpenAI 이력서 분석 실제 API 호출: `NEEDS_VERIFICATION` (Mock Provider와 OpenAI interface는 검증 완료)

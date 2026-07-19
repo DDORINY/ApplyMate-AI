@@ -66,6 +66,12 @@ class ResumeFile(Base):
         cascade="all, delete-orphan",
         uselist=False,
     )
+    analysis = relationship(
+        "ResumeAnalysis",
+        back_populates="resume_file",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
 
 
 class ResumeExtractionStatus(str, enum.Enum):
@@ -75,6 +81,15 @@ class ResumeExtractionStatus(str, enum.Enum):
     FAILED = "FAILED"
     TEXT_NOT_FOUND = "TEXT_NOT_FOUND"
     OCR_REQUIRED = "OCR_REQUIRED"
+
+
+class ResumeAnalysisStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    INVALID_OUTPUT = "INVALID_OUTPUT"
+    PROVIDER_UNAVAILABLE = "PROVIDER_UNAVAILABLE"
 
 
 class ResumeFileExtraction(Base):
@@ -173,6 +188,111 @@ class ResumeExtractionRun(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     extraction = relationship("ResumeFileExtraction", back_populates="runs")
+
+
+class ResumeAnalysis(Base):
+    __tablename__ = "resume_analyses"
+    __table_args__ = (
+        Index("ix_resume_analyses_user_id", "user_id"),
+        Index("ix_resume_analyses_resume_id", "resume_id"),
+        Index("ix_resume_analyses_resume_file_id", "resume_file_id"),
+        Index("ix_resume_analyses_user_status", "user_id", "status"),
+        Index("ix_resume_analyses_input_hash", "input_hash"),
+        UniqueConstraint("resume_file_id", name="uq_resume_analyses_resume_file_id"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    resume_id: Mapped[int] = mapped_column(ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    resume_file_id: Mapped[int] = mapped_column(ForeignKey("resume_files.id", ondelete="CASCADE"), nullable=False)
+    extraction_id: Mapped[int] = mapped_column(
+        ForeignKey("resume_file_extractions.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status: Mapped[ResumeAnalysisStatus] = mapped_column(
+        Enum(ResumeAnalysisStatus, name="resume_analysis_status"),
+        nullable=False,
+        default=ResumeAnalysisStatus.PENDING,
+        server_default=ResumeAnalysisStatus.PENDING.value,
+    )
+    provider: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    model: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    prompt_version: Mapped[str] = mapped_column(String(30), nullable=False)
+    schema_version: Mapped[str] = mapped_column(String(30), nullable=False)
+    input_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    resume_file_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    extraction_run_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    input_source: Mapped[str] = mapped_column(String(20), nullable=False)
+    input_length: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    structured_result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    edited_result: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    profile_candidates: Mapped[list[dict[str, object]]] = mapped_column(JSON, nullable=False, default=list)
+    is_user_edited: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    is_outdated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    latest_run_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    analyzed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    resume_file = relationship("ResumeFile", back_populates="analysis")
+    runs = relationship("ResumeAnalysisRun", back_populates="analysis", cascade="all, delete-orphan")
+
+    @property
+    def result(self) -> dict | None:
+        return self.edited_result if self.is_user_edited and self.edited_result is not None else self.structured_result
+
+
+class ResumeAnalysisRun(Base):
+    __tablename__ = "resume_analysis_runs"
+    __table_args__ = (
+        Index("ix_resume_analysis_runs_analysis_id", "analysis_id"),
+        Index("ix_resume_analysis_runs_user_id", "user_id"),
+        Index("ix_resume_analysis_runs_resume_file_id", "resume_file_id"),
+        Index("ix_resume_analysis_runs_user_status", "user_id", "status"),
+        Index("ix_resume_analysis_runs_input_hash", "input_hash"),
+        Index("ix_resume_analysis_runs_created_at", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    analysis_id: Mapped[int | None] = mapped_column(
+        ForeignKey("resume_analyses.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    resume_id: Mapped[int] = mapped_column(ForeignKey("resumes.id", ondelete="CASCADE"), nullable=False)
+    resume_file_id: Mapped[int] = mapped_column(ForeignKey("resume_files.id", ondelete="CASCADE"), nullable=False)
+    extraction_id: Mapped[int] = mapped_column(
+        ForeignKey("resume_file_extractions.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status: Mapped[ResumeAnalysisStatus] = mapped_column(
+        Enum(ResumeAnalysisStatus, name="resume_analysis_status"),
+        nullable=False,
+        default=ResumeAnalysisStatus.PROCESSING,
+        server_default=ResumeAnalysisStatus.PROCESSING.value,
+    )
+    provider: Mapped[str] = mapped_column(String(30), nullable=False)
+    model: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    prompt_version: Mapped[str] = mapped_column(String(30), nullable=False)
+    schema_version: Mapped[str] = mapped_column(String(30), nullable=False)
+    input_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    input_source: Mapped[str] = mapped_column(String(20), nullable=False)
+    input_length: Mapped[int] = mapped_column(Integer, nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    result_snapshot: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    usage_metadata: Mapped[dict[str, object]] = mapped_column(JSON, nullable=False, default=dict)
+    raw_response_metadata: Mapped[dict[str, object]] = mapped_column(JSON, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    analysis = relationship("ResumeAnalysis", back_populates="runs")
 
 
 Index(

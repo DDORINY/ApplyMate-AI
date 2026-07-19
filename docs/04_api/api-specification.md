@@ -189,3 +189,26 @@
 - 텍스트 레이어가 없는 PDF는 `OCR_REQUIRED` 상태로 저장하며 시스템 실패 `FAILED`로 취급하지 않는다.
 - 텍스트가 비어 있는 DOCX/PDF는 `TEXT_NOT_FOUND` 상태로 저장한다.
 - 섹션 후보는 AI 분석 결과가 아니라 규칙 기반 힌트이며 `SUMMARY`, `SKILLS`, `EXPERIENCE`, `PROJECTS`, `EDUCATION`, `CERTIFICATIONS`, `AWARDS`, `CONTACT`, `PORTFOLIO`, `UNKNOWN` 중 하나로 표시한다.
+
+## v0.3.2 Resume AI Analysis
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| POST | `/resumes/{resumeId}/files/{fileId}/analysis` | Access Token | v0.3.2 | 이력서 구조화 AI 분석 실행 |
+| GET | `/resumes/{resumeId}/files/{fileId}/analysis` | Access Token | v0.3.2 | 최신 이력서 분석 결과 조회 |
+| PATCH | `/resumes/{resumeId}/files/{fileId}/analysis` | Access Token | v0.3.2 | 사용자 수정 분석 결과 저장 |
+| DELETE | `/resumes/{resumeId}/files/{fileId}/analysis` | Access Token | v0.3.2 | 최신 분석 결과 삭제 |
+| POST | `/resumes/{resumeId}/files/{fileId}/analysis/retry` | Access Token | v0.3.2 | 이력서 분석 재실행 |
+| GET | `/resumes/{resumeId}/files/{fileId}/analysis/runs` | Access Token | v0.3.2 | 분석 실행 이력 목록 |
+| GET | `/resumes/{resumeId}/files/{fileId}/analysis/runs/{runId}` | Access Token | v0.3.2 | 분석 실행 이력 상세 |
+| GET | `/resumes/{resumeId}/files/{fileId}/analysis/profile-candidates` | Access Token | v0.3.2 | 프로필 반영 후보 조회 |
+| GET | `/ai/resume-providers` | Access Token | v0.3.2 | 이력서 AI Provider 상태 조회 |
+
+Rules:
+
+- 분석 입력은 `edited_text`를 우선 사용하고, 없으면 `raw_text`를 사용한다.
+- `COMPLETED` 추출 결과만 분석할 수 있다.
+- `OCR_REQUIRED`, `TEXT_NOT_FOUND`, `PROCESSING` 추출 결과는 분석을 차단한다.
+- 핵심 구조화 항목은 원문에 존재하는 evidence를 가져야 한다.
+- `structured_result`는 AI 원본, `edited_result`는 사용자 수정본이다.
+- 분석 결과는 프로필에 자동 반영하지 않고 후보만 제공한다.
