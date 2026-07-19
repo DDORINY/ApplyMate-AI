@@ -294,3 +294,16 @@ Stores source snapshots and evidence references used by generated blocks.
 ## generation_runs
 
 Stores provider execution status, safe error metadata, usage metadata, and result summary.
+# v0.4.0 지원 현황 테이블
+
+## applications
+
+지원 항목의 현재 상태와 연결 리소스, 지원 경로, 담당자, 날짜, 스냅샷 정보를 저장한다.
+
+## application_status_history
+
+상태 변경의 이전 상태, 새 상태, 사유, 메모, 출처를 저장한다.
+
+## application_notes
+
+지원 항목별 사용자 메모를 저장한다.

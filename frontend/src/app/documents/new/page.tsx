@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 import { DocumentCreatePanel } from "@/components/documents/document-create-panel";
 
 export default function NewDocumentPage() {
@@ -10,7 +12,9 @@ export default function NewDocumentPage() {
           문항과 연결할 근거 ID를 입력하면 AI가 출처가 표시된 초안을 생성합니다.
         </p>
       </div>
-      <DocumentCreatePanel />
+      <Suspense fallback={<div className="panel">문서 생성 화면을 준비하는 중입니다.</div>}>
+        <DocumentCreatePanel />
+      </Suspense>
     </main>
   );
 }

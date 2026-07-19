@@ -29,3 +29,8 @@
 ## v0.3.2
 
 - OpenAI 이력서 분석 실제 API 호출: `NEEDS_VERIFICATION` (Mock Provider와 OpenAI interface는 검증 완료)
+# v0.4.0 미검증 후보
+
+- 실제 외부 채용 사이트 지원 제출: v0.4.0 범위 제외
+- Google Calendar 실제 일정 생성: v0.4.1 이후 범위
+- 이메일 기반 자동 상태 변경: v0.4.1 이후 범위

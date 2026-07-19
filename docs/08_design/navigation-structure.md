@@ -91,3 +91,10 @@ Account navigation stays on the right side:
 - 보안 `/settings/security`
 
 The `지원 문서` item belongs to the main product navigation, not the auth/account group.
+# v0.4.0 Navigation Update
+
+- 주요 네비게이션: 홈, 프로필, 채용공고, 이력서, 지원 문서, 지원 현황
+- 회원/계정 관리 네비게이션은 오른쪽 그룹에 유지한다.
+- 채용공고 상세: `지원 관리에 추가`
+- 지원 문서 상세: `이 문서로 지원 항목 생성`
+- 이력서 상세: `이 이력서로 지원 준비`

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -109,6 +110,9 @@ export function DocumentDetailPanel({ documentId }: { documentId: number }) {
               {documentTypeLabels[document.document_type]} · {documentStatusLabels[document.status]}
             </p>
             <h1 className="mt-1 text-2xl font-bold text-slate-950">{document.title}</h1>
+            <Link className="button-primary mt-3 inline-flex" href={`/applications/new?documentId=${document.id}`}>
+              이 문서로 지원 항목 생성
+            </Link>
             <p className="mt-2 text-sm text-slate-600">
               현재 버전 {document.current_version_number ?? "-"} · 제한 {document.character_limit ?? "없음"}자
             </p>
