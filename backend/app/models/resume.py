@@ -60,3 +60,12 @@ class ResumeFile(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     resume = relationship("Resume", back_populates="files")
+
+
+Index(
+    "uq_resumes_one_default_per_user",
+    Resume.user_id,
+    unique=True,
+    postgresql_where=Resume.is_default.is_(True),
+    sqlite_where=Resume.is_default.is_(True),
+)

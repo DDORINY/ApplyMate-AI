@@ -1,7 +1,7 @@
-import hashlib
 from math import ceil
 
 from fastapi import UploadFile
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AppError
@@ -23,7 +23,11 @@ class ResumeService:
             await self.repository.clear_default(user_id)
         resume = Resume(user_id=user_id, **payload.model_dump())
         self.session.add(resume)
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError as exc:
+            await self.session.rollback()
+            raise AppError("RESUME_DEFAULT_CONFLICT", "기본 이력서 설정이 충돌했습니다.", 409) from exc
         return await self.get_resume(user_id, resume.id)
 
     async def list_resumes(self, user_id: int, page: int, size: int) -> ResumeListData:
@@ -49,14 +53,22 @@ class ResumeService:
             await self.repository.clear_default(user_id)
         for key, value in data.items():
             setattr(resume, key, value)
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError as exc:
+            await self.session.rollback()
+            raise AppError("RESUME_DEFAULT_CONFLICT", "기본 이력서 설정이 충돌했습니다.", 409) from exc
         return await self.get_resume(user_id, resume_id)
 
     async def set_default(self, user_id: int, resume_id: int) -> Resume:
         resume = await self.get_resume(user_id, resume_id)
         await self.repository.clear_default(user_id)
         resume.is_default = True
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError as exc:
+            await self.session.rollback()
+            raise AppError("RESUME_DEFAULT_CONFLICT", "기본 이력서 설정이 충돌했습니다.", 409) from exc
         return await self.get_resume(user_id, resume_id)
 
     async def delete_resume(self, user_id: int, resume_id: int) -> None:
@@ -70,8 +82,7 @@ class ResumeService:
     async def upload_file(self, user_id: int, resume_id: int, upload: UploadFile) -> ResumeFile:
         await self.get_resume(user_id, resume_id)
         stored = await self.storage.validate_and_read(upload)
-        file_hash = hashlib.sha256(stored.content).hexdigest()
-        duplicate = await self.repository.get_duplicate_file_hash(user_id, file_hash)
+        duplicate = await self.repository.get_duplicate_file_hash(user_id, stored.file_hash)
         if duplicate:
             raise AppError("RESUME_FILE_ALREADY_EXISTS", "이미 업로드한 이력서 파일입니다.", 409)
 
@@ -85,13 +96,18 @@ class ResumeService:
             content_type=stored.content_type,
             file_extension=stored.file_extension,
             file_size=stored.file_size,
-            file_hash=file_hash,
+            file_hash=stored.file_hash,
             uploaded_at=utc_now(),
         )
         self.session.add(resume_file)
         try:
             await self.session.commit()
+        except IntegrityError as exc:
+            await self.session.rollback()
+            self.storage.delete(stored.storage_path)
+            raise AppError("RESUME_FILE_ALREADY_EXISTS", "이미 업로드한 이력서 파일입니다.", 409) from exc
         except Exception:
+            await self.session.rollback()
             self.storage.delete(stored.storage_path)
             raise
         await self.session.refresh(resume_file)
@@ -106,6 +122,6 @@ class ResumeService:
     async def delete_file(self, user_id: int, resume_id: int, file_id: int) -> None:
         resume_file = await self.get_file(user_id, resume_id, file_id)
         storage_path = resume_file.storage_path
+        self.storage.delete(storage_path, missing_ok=True)
         await self.session.delete(resume_file)
         await self.session.commit()
-        self.storage.delete(storage_path)

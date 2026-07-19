@@ -147,3 +147,21 @@ resume_files
 | `20260719_1300` | job analysis |
 | `20260719_1400` | job matching |
 | `20260719_1500` | resume upload |
+
+## v0.3.0 보완 DB 제약
+
+사용자당 기본 이력서는 PostgreSQL partial unique index로 최대 하나만 허용한다.
+
+```sql
+CREATE UNIQUE INDEX uq_resumes_one_default_per_user
+ON resumes (user_id)
+WHERE is_default = true;
+```
+
+`resume_files`는 사용자별 파일 hash 중복을 방지한다.
+
+```text
+uq_resume_files_user_file_hash = (user_id, file_hash)
+```
+
+원본 파일명은 표시용이며 저장 경로에는 사용하지 않는다. 실제 저장 파일명은 UUID 기반이다.

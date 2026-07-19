@@ -158,3 +158,13 @@
 | DELETE | `/resumes/{resumeId}/files/{fileId}` | Access Token | v0.3.0 | 파일 삭제 |
 
 `POST /resumes/{resumeId}/files` 요청은 `multipart/form-data`이며 필드명은 `file`이다.
+
+## v0.3.0 Resume Upload 보안 검증
+
+- PDF는 확장자 `.pdf`, MIME `application/pdf`, magic bytes `%PDF-`를 모두 검증한다.
+- DOCX는 확장자 `.docx`, MIME `application/vnd.openxmlformats-officedocument.wordprocessingml.document`, ZIP 구조, `[Content_Types].xml`, `word/document.xml`을 모두 검증한다.
+- 파일 크기는 64KB chunk 단위로 읽으며 `RESUME_MAX_FILE_SIZE_BYTES` 초과 즉시 거부한다.
+- 원본 파일명에 경로 구분자, NULL byte, 제어 문자가 있으면 거부한다.
+- 내부 저장명은 UUID 기반이며 원본 파일명을 저장 경로에 사용하지 않는다.
+- 다운로드는 storage base directory 내부 경로인지 재검증한다.
+- 다운로드 응답은 `Content-Disposition: attachment`, `filename*`, `X-Content-Type-Options: nosniff`를 사용한다.

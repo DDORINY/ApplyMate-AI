@@ -117,13 +117,18 @@ async def download_resume_file(
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> FileResponse:
-    resume_file = await ResumeService(session).get_file(current_user.id, resume_id, file_id)
+    service = ResumeService(session)
+    resume_file = await service.get_file(current_user.id, resume_id, file_id)
+    storage_path = service.storage.existing_file_path(resume_file.storage_path)
     quoted = quote(resume_file.original_filename)
     return FileResponse(
-        resume_file.storage_path,
+        storage_path,
         media_type=resume_file.content_type,
         filename=resume_file.original_filename,
-        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{quoted}"},
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{quoted}",
+            "X-Content-Type-Options": "nosniff",
+        },
     )
 
 

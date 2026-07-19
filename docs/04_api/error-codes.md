@@ -50,3 +50,16 @@
 | `RESUME_FILE_TOO_LARGE` | 413 | 업로드 파일 크기 제한 초과 |
 | `RESUME_FILE_ALREADY_EXISTS` | 409 | 동일 해시 파일 중복 |
 | `RESUME_FILE_STORAGE_FAILED` | 500 | 파일 저장 실패 |
+
+## v0.3.0 보완 오류 코드
+
+| Code | HTTP Status | 설명 |
+| --- | ---: | --- |
+| `RESUME_FILE_SIGNATURE_INVALID` | 422 | PDF signature 불일치 |
+| `RESUME_FILE_STRUCTURE_INVALID` | 422 | DOCX ZIP 구조 또는 필수 내부 파일 누락 |
+| `RESUME_FILE_DOUBLE_EXTENSION_NOT_ALLOWED` | 422 | 허용하지 않는 다중 확장자 |
+| `RESUME_FILE_NAME_INVALID` | 422 | 경로 구분자, NULL byte, 제어 문자가 포함된 파일명 |
+| `RESUME_FILE_STORAGE_PATH_INVALID` | 500 | 저장 경로가 허용 base directory 밖에 있음 |
+| `RESUME_FILE_MISSING_ON_STORAGE` | 404 | DB에는 파일 메타데이터가 있으나 저장소에 실제 파일이 없음 |
+| `RESUME_FILE_DELETE_FAILED` | 500 | 저장소 파일 삭제 실패 |
+| `RESUME_DEFAULT_CONFLICT` | 409 | 기본 이력서 DB 제약 충돌 |

@@ -3,10 +3,14 @@ from __future__ import annotations
 # ruff: noqa: F811
 
 import shutil
-from uuid import uuid4
+from io import BytesIO
 from pathlib import Path
+from uuid import uuid4
+from zipfile import ZipFile
 
 import pytest
+
+from app.services.storage import LocalFileStorage
 
 from test_auth import client, login, signup  # noqa: F401
 from app.services.storage import LocalFileStorage
@@ -45,6 +49,24 @@ def create_resume(client, headers, **overrides):
 
 def pdf_file(name: str = "resume.pdf", content: bytes = b"%PDF-1.4\nresume"):
     return {"file": (name, content, "application/pdf")}
+
+
+def docx_bytes() -> bytes:
+    output = BytesIO()
+    with ZipFile(output, "w") as archive:
+        archive.writestr("[Content_Types].xml", "<Types />")
+        archive.writestr("word/document.xml", "<document />")
+    return output.getvalue()
+
+
+def docx_file(name: str = "resume.docx", content: bytes | None = None):
+    return {
+        "file": (
+            name,
+            content if content is not None else docx_bytes(),
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
+    }
 
 
 def test_resume_requires_auth(client):
@@ -118,6 +140,20 @@ def test_upload_download_and_delete_resume_file(client, resume_storage):
     assert not stored_files[0].exists()
 
 
+def test_upload_accepts_valid_docx(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+
+    response = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=docx_file(),
+        headers=headers,
+    )
+
+    assert response.status_code == 201
+    assert response.json()["data"]["file_extension"] == ".docx"
+
+
 def test_upload_rejects_duplicate_file_hash(client, resume_storage):
     headers = auth_headers(client)
     resume = create_resume(client, headers)
@@ -134,6 +170,30 @@ def test_upload_rejects_duplicate_file_hash(client, resume_storage):
 
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "RESUME_FILE_ALREADY_EXISTS"
+
+
+def test_same_file_hash_is_allowed_for_other_user(client, resume_storage):
+    first_headers = auth_headers(client, email="hash-owner@example.com")
+    first_resume = create_resume(client, first_headers)
+    assert (
+        client.post(
+            f"/api/v1/resumes/{first_resume['id']}/files",
+            files=pdf_file(),
+            headers=first_headers,
+        ).status_code
+        == 201
+    )
+    client.cookies.clear()
+    other_headers = auth_headers(client, email="hash-other@example.com")
+    other_resume = create_resume(client, other_headers)
+
+    response = client.post(
+        f"/api/v1/resumes/{other_resume['id']}/files",
+        files=pdf_file(),
+        headers=other_headers,
+    )
+
+    assert response.status_code == 201
 
 
 def test_upload_rejects_invalid_extension_and_content_type(client, resume_storage):
@@ -157,6 +217,68 @@ def test_upload_rejects_invalid_extension_and_content_type(client, resume_storag
     assert bad_content_type.json()["error"]["code"] == "RESUME_FILE_CONTENT_TYPE_NOT_ALLOWED"
 
 
+def test_upload_rejects_signature_and_structure_mismatch(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+
+    fake_pdf = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(content=b"not a pdf"),
+        headers=headers,
+    )
+    fake_docx = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=docx_file(content=b"not a zip"),
+        headers=headers,
+    )
+    zip_not_docx = BytesIO()
+    with ZipFile(zip_not_docx, "w") as archive:
+        archive.writestr("hello.txt", "not docx")
+    generic_zip = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=docx_file(name="zip.docx", content=zip_not_docx.getvalue()),
+        headers=headers,
+    )
+
+    assert fake_pdf.status_code == 422
+    assert fake_pdf.json()["error"]["code"] == "RESUME_FILE_SIGNATURE_INVALID"
+    assert fake_docx.status_code == 422
+    assert fake_docx.json()["error"]["code"] == "RESUME_FILE_STRUCTURE_INVALID"
+    assert generic_zip.status_code == 422
+    assert generic_zip.json()["error"]["code"] == "RESUME_FILE_STRUCTURE_INVALID"
+
+
+def test_upload_rejects_double_extension_and_path_filename(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+
+    double_extension = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(name="resume.pdf.exe"),
+        headers=headers,
+    )
+    path_filename = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(name="../resume.pdf"),
+        headers=headers,
+    )
+
+    assert double_extension.status_code == 422
+    assert double_extension.json()["error"]["code"] == "RESUME_FILE_DOUBLE_EXTENSION_NOT_ALLOWED"
+    assert path_filename.status_code == 422
+    assert path_filename.json()["error"]["code"] == "RESUME_FILE_NAME_INVALID"
+
+
+@pytest.mark.parametrize("filename", ["resume\x00.pdf", "resume\x1f.pdf"])
+def test_storage_rejects_null_or_control_character_filename(resume_storage, filename):
+    storage = LocalFileStorage(resume_storage)
+
+    with pytest.raises(Exception) as exc_info:
+        storage.validate_filename(filename)
+
+    assert getattr(exc_info.value, "code", None) == "RESUME_FILE_NAME_INVALID"
+
+
 def test_upload_rejects_large_file(client, resume_storage):
     headers = auth_headers(client)
     resume = create_resume(client, headers)
@@ -169,3 +291,24 @@ def test_upload_rejects_large_file(client, resume_storage):
 
     assert response.status_code == 413
     assert response.json()["error"]["code"] == "RESUME_FILE_TOO_LARGE"
+
+
+def test_download_returns_error_when_storage_file_is_missing(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(),
+        headers=headers,
+    )
+    file_data = upload.json()["data"]
+    for stored_file in Path(resume_storage).iterdir():
+        stored_file.unlink()
+
+    response = client.get(
+        f"/api/v1/resumes/{resume['id']}/files/{file_data['id']}/download",
+        headers=headers,
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "RESUME_FILE_MISSING_ON_STORAGE"

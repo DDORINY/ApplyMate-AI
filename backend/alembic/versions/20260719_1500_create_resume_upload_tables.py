@@ -37,6 +37,13 @@ def upgrade() -> None:
     )
     op.create_index("ix_resumes_user_id", "resumes", ["user_id"])
     op.create_index("ix_resumes_user_default", "resumes", ["user_id", "is_default"])
+    op.create_index(
+        "uq_resumes_one_default_per_user",
+        "resumes",
+        ["user_id"],
+        unique=True,
+        postgresql_where=sa.text("is_default = true"),
+    )
 
     op.create_table(
         "resume_files",
@@ -65,6 +72,7 @@ def downgrade() -> None:
     op.drop_index("ix_resume_files_user_id", table_name="resume_files")
     op.drop_index("ix_resume_files_resume_id", table_name="resume_files")
     op.drop_table("resume_files")
+    op.drop_index("uq_resumes_one_default_per_user", table_name="resumes")
     op.drop_index("ix_resumes_user_default", table_name="resumes")
     op.drop_index("ix_resumes_user_id", table_name="resumes")
     op.drop_table("resumes")
