@@ -117,3 +117,8 @@
 - [v0.3.3 Application Documents Release](11_releases/v0.3.3-application-documents.md)
 - [Application Document Prompt](10_ai/application-document-prompt.md)
 - [Application Document Schema](10_ai/application-document-schema.md)
+# v0.4.0 문서 업데이트
+
+- `docs/05_development-plan/releases/v0.4.0-plan.md`
+- `docs/11_releases/v0.4.0-application-tracking.md`
+- 지원 현황 API/DB/요구사항/네비게이션 문서 반영

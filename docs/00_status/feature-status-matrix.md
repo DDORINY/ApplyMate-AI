@@ -30,3 +30,9 @@
 | Duplicate/archive | Complete | Backend API tests |
 | Documents frontend | Complete | lint, type-check, build |
 | Real OpenAI document generation | Needs verification | Requires real API key/model |
+| Version | Feature | Status |
+| --- | --- | --- |
+| v0.4.0 | Application tracking | Implemented |
+| v0.4.0 | Application status history | Implemented |
+| v0.4.0 | Application notes | Implemented |
+| v0.4.0 | Document source selectors | Implemented |

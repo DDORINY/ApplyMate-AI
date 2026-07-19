@@ -245,3 +245,19 @@ Rules:
 - AI 생성 버전은 이전 버전을 덮어쓰지 않는다.
 - 사용자 편집, 재생성, 복원은 모두 새 version number를 만든다.
 - 생성 block은 최소 하나 이상의 source reference를 가져야 한다.
+# v0.4.0 Applications API
+
+Base path: `/api/v1/applications`
+
+- `POST /applications`: 지원 항목 생성
+- `GET /applications`: 지원 항목 목록 조회
+- `GET /applications/{applicationId}`: 지원 항목 상세 조회
+- `PATCH /applications/{applicationId}`: 지원 항목 정보 수정
+- `DELETE /applications/{applicationId}`: 지원 항목 보관
+- `POST /applications/{applicationId}/status`: 지원 상태 변경
+- `GET /applications/{applicationId}/status-history`: 상태 변경 이력 조회
+- `POST /applications/{applicationId}/notes`: 메모 생성
+- `GET /applications/{applicationId}/notes`: 메모 목록 조회
+- `PATCH /applications/{applicationId}/notes/{noteId}`: 메모 수정
+- `DELETE /applications/{applicationId}/notes/{noteId}`: 메모 삭제
+- `GET /applications/options`: 지원 항목 생성용 사용자 소유 선택 옵션 조회

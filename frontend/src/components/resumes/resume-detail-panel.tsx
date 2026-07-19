@@ -111,6 +111,9 @@ export function ResumeDetailPanel({ resumeId }: { resumeId: number }) {
         <Link className="button-secondary" href="/resumes">
           목록으로
         </Link>
+        <Link className="button-primary" href={`/applications/new?resumeId=${resume.id}`}>
+          이 이력서로 지원 준비
+        </Link>
         <button
           className="button-primary"
           type="button"

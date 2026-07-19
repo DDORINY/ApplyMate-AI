@@ -6,6 +6,7 @@ const navItems = [
   { href: "/jobs", label: "채용공고" },
   { href: "/resumes", label: "이력서" },
   { href: "/documents", label: "지원 문서" },
+  { href: "/applications", label: "지원 현황" },
 ];
 
 const accountItems = [

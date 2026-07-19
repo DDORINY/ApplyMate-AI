@@ -64,3 +64,15 @@ users 1 ─ N resume_analysis_runs
 ```
 
 `resume_analyses`는 파일별 최신 분석 결과 1건을 나타내며, 모든 분석 시도는 `resume_analysis_runs`에 누적한다.
+# v0.4.0 ERD 추가
+
+```text
+users 1 ── N applications
+job_postings 1 ── N applications
+resumes 1 ── N applications
+resume_files 1 ── N applications
+application_documents 1 ── N applications
+application_document_versions 1 ── N applications
+applications 1 ── N application_status_history
+applications 1 ── N application_notes
+```

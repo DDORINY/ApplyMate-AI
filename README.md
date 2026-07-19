@@ -1,17 +1,19 @@
 # ApplyMate AI
 
-현재 버전: `v0.3.3`
+현재 버전: `v0.4.0`
 
-ApplyMate AI는 개인용 AI 취업 매니저입니다. 회원/인증, 커리어 프로필, 채용공고 관리, AI 채용공고 분석, 사용자-공고 적합도 분석, 이력서 업로드/텍스트 추출/AI 구조화 분석, 맞춤 지원 문서 생성을 제공합니다.
+ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 이력서, 채용공고, AI 분석 결과를 기반으로 지원 문서를 만들고 실제 지원 현황까지 관리합니다.
 
-## v0.3.3 주요 기능
+## v0.4.0 주요 기능
 
-- 근거 기반 맞춤 지원 문서 생성
-- 지원동기, 직무 역량, 자기소개, 프로젝트/경력 경험, 입사 후 포부, 자유 문항, 사용자 문항 지원
-- 문단별 source reference 저장
-- 사용자 편집, AI 재생성, 버전 복원
-- 생성 실행 이력과 provider 상태 조회
-- `/documents`, `/documents/new`, `/documents/{documentId}` 프론트 화면
+- 회원가입, 로그인, JWT/Refresh Token 인증
+- 커리어 프로필 관리
+- 채용공고 등록/관리 및 AI 채용공고 분석
+- 사용자-공고 적합도 분석
+- 이력서 업로드, 텍스트 추출, AI 구조화 분석
+- 근거 기반 지원 문서 생성, 버전 관리, 출처 조회
+- 지원 현황 관리, 상태 변경 이력, 지원 메모
+- 제출 문서 버전 고정
 
 ## 기술 스택
 
@@ -46,10 +48,17 @@ docker compose up --build
 - `/me`
 - `/profile`
 - `/jobs`
+- `/jobs/new`
+- `/jobs/{jobId}`
 - `/resumes`
+- `/resumes/new`
+- `/resumes/{resumeId}`
 - `/documents`
 - `/documents/new`
 - `/documents/{documentId}`
+- `/applications`
+- `/applications/new`
+- `/applications/{applicationId}`
 - `/settings/accounts`
 - `/settings/security`
 
@@ -79,14 +88,14 @@ npm run build
 - [버전 로드맵](docs/05_development-plan/version-roadmap.md)
 - [API 명세](docs/04_api/api-specification.md)
 - [DB 설계](docs/06_database/database-design.md)
-- [v0.3.3 릴리스 노트](docs/11_releases/v0.3.3-application-documents.md)
+- [v0.4.0 릴리스 노트](docs/11_releases/v0.4.0-application-tracking.md)
 
 ## 현재 migration head
 
-`20260719_1800`
+`20260719_1900`
 
 ## 미검증/주의
 
 - 실제 OpenAI 호출은 별도 API key/model 환경에서 검증 필요
 - 운영 SMTP/OAuth/HTTPS Cookie 검증 필요
-- 브라우저 E2E 자동화는 아직 별도 구축 전
+- 브라우저 E2E 자동화는 별도 구축 대상

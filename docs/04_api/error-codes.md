@@ -112,3 +112,9 @@
 | AI_PROVIDER_CONFIG_INVALID | 503 | OpenAI Provider 설정 누락 |
 | AI_PROVIDER_UNAVAILABLE | 502 | AI Provider 일시 장애 |
 | AI_PROVIDER_INVALID_RESPONSE | 502 | Provider 응답 schema 검증 실패 |
+# v0.4.0 Application Error Codes
+
+- `APPLICATION_NOT_FOUND`: 지원 항목을 찾을 수 없음
+- `APPLICATION_NOTE_NOT_FOUND`: 지원 메모를 찾을 수 없음
+- `APPLICATION_INVALID_RELATION`: 선택한 공고/이력서/문서/버전 연결 관계가 유효하지 않음
+- `DOCUMENT_VERSION_NOT_FOUND`: 제출 문서 버전을 찾을 수 없음
