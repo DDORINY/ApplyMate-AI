@@ -113,3 +113,20 @@ API 오류 응답은 다음 공통 구조를 사용합니다.
 | `JOB_INVALID_SALARY_RANGE` | 422 | 최대 급여가 최소 급여보다 작습니다. |
 | `JOB_INVALID_DEADLINE` | 422 | 마감일이 게시일보다 빠릅니다. |
 | `JOB_DEADLINE_REQUIRED` | 422 | 고정 마감 공고에 마감일이 없습니다. |
+# v0.2.1 AI 채용공고 분석 오류 코드
+
+| Code | HTTP Status | 설명 |
+| --- | ---: | --- |
+| `AI_PROVIDER_DISABLED` | 503 | AI Provider가 비활성화되어 있습니다. |
+| `AI_PROVIDER_INVALID` | 503 | 지원하지 않는 AI Provider 설정입니다. |
+| `AI_PROVIDER_CONFIG_INVALID` | 503 | OpenAI Provider 필수 환경변수가 없습니다. |
+| `AI_PROVIDER_TIMEOUT` | 504 | AI Provider 요청 시간이 초과되었습니다. |
+| `AI_PROVIDER_REQUEST_FAILED` | 502 | AI Provider 요청에 실패했습니다. |
+| `AI_PROVIDER_RATE_LIMITED` | 429 | AI Provider 요청 한도를 초과했습니다. |
+| `AI_PROVIDER_UNAVAILABLE` | 502 | AI Provider가 일시적으로 응답하지 않습니다. |
+| `AI_PROVIDER_INVALID_RESPONSE` | 502 | AI Provider 응답이 분석 Schema와 맞지 않습니다. |
+| `AI_DAILY_ANALYSIS_LIMIT_EXCEEDED` | 429 | 사용자 일일 분석 한도를 초과했습니다. |
+| `AI_ANALYSIS_COOLDOWN` | 429 | 분석 요청 cooldown이 적용 중입니다. |
+| `JOB_ANALYSIS_ALREADY_RUNNING` | 409 | 같은 공고 분석이 이미 진행 중입니다. |
+| `JOB_ANALYSIS_INPUT_EMPTY` | 422 | 분석할 채용공고 내용이 없습니다. |
+| `JOB_ANALYSIS_NOT_FOUND` | 404 | 저장된 분석 결과가 없습니다. |

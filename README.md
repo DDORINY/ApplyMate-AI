@@ -1,6 +1,34 @@
 # ApplyMate AI
 
-현재 버전: v0.2.0
+현재 버전: v0.2.1
+
+## v0.2.1 AI 채용공고 분석
+
+- 저장된 채용공고 본문 전처리와 분석 입력 hash 생성
+- AI Provider 추상화: `disabled`, `mock`, `openai`
+- 주요 업무, 필수/우대 조건, 기술 스택, 경력/학력, 채용 절차, 마감 정보, 키워드 추출
+- `job_analyses`, `job_analysis_runs` 기반 구조화 결과와 실행 이력 저장
+- 분석 실패, 재분석, 중복 실행 방지, 일일 한도와 cooldown 처리
+- 공고 내용 변경 시 `is_outdated` 표시
+- 사용자 검토/수정/삭제 API
+- `/jobs/{jobId}` 상세 화면의 AI 분석 패널
+
+### v0.2.1 API
+
+```text
+GET    /ai/providers
+POST   /jobs/{jobId}/analysis
+GET    /jobs/{jobId}/analysis
+PATCH  /jobs/{jobId}/analysis
+DELETE /jobs/{jobId}/analysis
+GET    /jobs/{jobId}/analysis/runs
+```
+
+개발 환경에서 실제 API 호출 없이 확인하려면 `.env`에 `AI_PROVIDER=mock`을 설정합니다. OpenAI Provider는 `AI_PROVIDER=openai`, `OPENAI_API_KEY`, `OPENAI_MODEL` 설정이 필요합니다.
+
+다음 버전 v0.2.2에서는 사용자 커리어 프로필과 채용공고 분석 결과를 비교하는 적합도 분석을 구현합니다.
+
+이전 릴리스: v0.2.0
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 계정, 커리어 프로필, 기술 스택, 경력, 프로젝트, 희망 조건을 기반으로 채용공고 관리, 적합도 분석, 지원 문서 생성, 지원 현황 관리를 단계적으로 구현합니다.
 

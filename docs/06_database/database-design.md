@@ -276,3 +276,34 @@ v0.1.2에서 구현된 커리어 프로필 도메인입니다.
 ```text
 backend/alembic/versions/20260719_1200_create_job_posting_tables.py
 ```
+# v0.2.1 AI 채용공고 분석
+
+## job_analyses
+
+채용공고별 현재 AI 분석 결과를 저장합니다.
+
+- `id`: PK
+- `job_posting_id`: `job_postings.id`, unique, cascade delete
+- `user_id`: `users.id`, cascade delete
+- `status`: `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`
+- `schema_version`, `prompt_version`
+- `input_hash`, `input_length`
+- `summary`
+- `position_data`, `responsibilities`, `required_qualifications`, `preferred_qualifications`
+- `technical_skills`, `experience_data`, `education_data`, `work_conditions`
+- `recruitment_process`, `deadline_data`, `company_values`, `keywords`, `warnings`, `confidence`
+- `is_user_edited`, `analyzed_at`, `created_at`, `updated_at`
+
+## job_analysis_runs
+
+분석 실행 이력을 저장합니다.
+
+- `id`: PK
+- `job_posting_id`, `job_analysis_id`, `user_id`
+- `status`, `provider`, `model`
+- `schema_version`, `prompt_version`, `input_hash`, `input_length`
+- `request_id`, token 사용량, latency
+- `error_code`, `error_message`, 선택적 `raw_response`
+- `started_at`, `completed_at`, `created_at`
+
+Migration: `backend/alembic/versions/20260719_1300_create_job_analysis_tables.py`
