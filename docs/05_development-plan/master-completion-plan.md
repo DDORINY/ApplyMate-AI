@@ -47,3 +47,9 @@
 - mock provider 기준 Calendar 목록, Calendar 선택, 내부 일정 동기화, mapping/run/error 기록, 연결 해제를 완료한다.
 - 실제 Google Calendar API 호출은 운영 credentials 준비 후 `NEEDS_VERIFICATION`으로 남긴다.
 - v0.5.0 완료 후 다음 개발 브랜치는 `feature/v0.5.1-gmail-analysis`이다.
+
+# v0.5.1 Completion Update
+
+- Gmail OAuth, 읽기 전용 scope, mock Gmail Provider, 메일 후보 생성, 사용자 승인 기반 지원 상태/일정 반영을 구현한다.
+- 실제 Gmail API token exchange/search/fetch와 실제 OpenAI 메일 분석은 `NEEDS_VERIFICATION`으로 남긴다.
+- v0.5.1 완료 후 다음 개발 브랜치는 `feature/v0.6.0-job-recommendations`이다.

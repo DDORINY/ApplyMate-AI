@@ -20,6 +20,7 @@
 | v0.4.1 | 일정 CRUD, 상태/신뢰도, 알림 저장, 충돌 표시, 예정 일정, 변경 이력 |
 | v0.4.2 | 지원/일정/마감/AI 분석/문서/활동을 모으는 읽기 전용 대시보드 |
 | v0.5.0 | Google Calendar 전용 OAuth, token 암호화, Calendar 선택, mock 동기화, mapping/run/error 기록 |
+| v0.5.1 | Gmail 전용 OAuth, 읽기 전용 메일 조회, 후보 생성, 사용자 승인 기반 상태/일정 반영 |
 
 ## v0.4.2 완료 상세
 
@@ -48,3 +49,13 @@
 - `GET /api/v1/calendar/events/{eventId}/sync-status`
 - `/settings/integrations` 프론트 화면
 - 신규 migration `20260719_2100`
+
+## v0.5.1 완료 상세
+
+- Gmail OAuth와 로그인/Calendar OAuth 분리
+- `gmail.readonly` scope만 사용
+- Mock Gmail Provider로 지원 접수, 면접, 불합격, 일정 변경 메일 검증
+- 동일 메일 중복 저장 차단
+- 후보 evidence 저장
+- 후보 승인 transaction으로 지원 상태 변경과 일정 생성 처리
+- 신규 migration `20260719_2200`

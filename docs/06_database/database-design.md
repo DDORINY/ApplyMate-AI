@@ -1,5 +1,22 @@
 # Database Design
 
+## v0.5.1 Gmail Recruitment Email Analysis Database
+
+v0.5.1은 Gmail 채용 메일 분석 후보 생성을 위해 다음 테이블을 추가한다.
+
+- `gmail_oauth_states`: Gmail OAuth state hash, redirect path, expiry, consumed timestamp
+- `gmail_connections`: Gmail 연결 상태, search query, lookback days, sync enabled, last sync timestamp
+- `email_sync_runs`: scanned, matched, candidate, ignored, error count를 가진 Gmail 동기화 실행 이력
+- `email_messages`: 메일 metadata, snippet, 제한된 sanitized text/hash. `connection_id + provider_message_id` unique
+- `email_analysis_runs`: 분석 provider/model/prompt/schema/input hash/result snapshot
+- `email_candidates`: candidate type, status, company/job, event/status payload, evidence, confidence, review flag
+- `email_candidate_actions`: 승인, 거절, 지원 항목 연결, 상태 변경, 일정 생성 action 이력
+
+Migration:
+
+- 신규 revision: `20260719_2200`
+- 이전 revision: `20260719_2100`
+
 ## Base policy
 
 - Datetime values are stored in UTC.

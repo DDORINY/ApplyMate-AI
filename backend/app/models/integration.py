@@ -13,6 +13,7 @@ class ExternalProvider(str, enum.Enum):
 
 class ExternalAccountPurpose(str, enum.Enum):
     CALENDAR = "CALENDAR"
+    GMAIL = "GMAIL"
 
 
 class CalendarSyncDirection(str, enum.Enum):
@@ -115,6 +116,7 @@ class ExternalAccount(Base):
     )
 
     calendar_connections = relationship("CalendarConnection", back_populates="external_account")
+    gmail_connections = relationship("GmailConnection", back_populates="external_account")
 
 
 class CalendarConnection(Base):

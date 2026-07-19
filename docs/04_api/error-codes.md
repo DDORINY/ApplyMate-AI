@@ -39,6 +39,30 @@
 | `CALENDAR_SYNC_TOKEN_EXPIRED` | 409 | Provider incremental sync token expired |
 | `CALENDAR_CONNECTION_FORBIDDEN` | 403 | Calendar connection access is forbidden |
 
+## v0.5.1 Gmail Integration Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| `GMAIL_CONNECTION_NOT_FOUND` | 404 | Gmail connection does not exist |
+| `GMAIL_PROVIDER_DISABLED` | 503/409 | Gmail provider or sync is disabled |
+| `GMAIL_PROVIDER_UNAVAILABLE` | 503 | Gmail provider call failed or needs verification |
+| `GMAIL_OAUTH_STATE_INVALID` | 400 | Gmail OAuth state is invalid or already consumed |
+| `GMAIL_OAUTH_STATE_EXPIRED` | 400 | Gmail OAuth state expired |
+| `GMAIL_TOKEN_REFRESH_FAILED` | 503 | Gmail token refresh failed |
+| `GMAIL_REAUTH_REQUIRED` | 409 | Gmail account must be reauthorized |
+| `GMAIL_SYNC_FAILED` | 503 | Gmail sync failed |
+| `GMAIL_MESSAGE_NOT_FOUND` | 404 | Gmail message was not found |
+| `GMAIL_MESSAGE_ALREADY_PROCESSED` | 409 | Gmail message was already processed |
+| `GMAIL_ANALYSIS_FAILED` | 502 | Gmail analysis failed |
+| `GMAIL_ANALYSIS_INVALID_OUTPUT` | 502 | Gmail analysis output is invalid |
+| `EMAIL_CANDIDATE_NOT_FOUND` | 404 | Email candidate was not found |
+| `EMAIL_CANDIDATE_ALREADY_APPLIED` | 409 | Email candidate was already applied |
+| `EMAIL_CANDIDATE_EXPIRED` | 409 | Email candidate expired |
+| `EMAIL_CANDIDATE_APPLICATION_REQUIRED` | 400 | Application id is required |
+| `EMAIL_CANDIDATE_APPLICATION_MISMATCH` | 404 | Application does not belong to user |
+| `EMAIL_CANDIDATE_SCHEDULE_CONFLICT` | 400/409 | Candidate schedule payload is invalid or conflicts |
+| `EMAIL_CANDIDATE_FORBIDDEN` | 403 | Candidate access is forbidden |
+
 ## v0.4.1 Calendar Error Codes
 
 | Code | HTTP | Description |
