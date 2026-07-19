@@ -19,6 +19,7 @@
 | v0.4.0 | 지원 현황 CRUD, 상태 변경 이력, 지원 메모, 제출 문서 버전 고정 |
 | v0.4.1 | 일정 CRUD, 상태/신뢰도, 알림 저장, 충돌 표시, 예정 일정, 변경 이력 |
 | v0.4.2 | 지원/일정/마감/AI 분석/문서/활동을 모으는 읽기 전용 대시보드 |
+| v0.5.0 | Google Calendar 전용 OAuth, token 암호화, Calendar 선택, mock 동기화, mapping/run/error 기록 |
 
 ## v0.4.2 완료 상세
 
@@ -31,3 +32,19 @@
 - 최근 활동 피드 구성
 - `/dashboard` 프론트 화면 추가
 - 헤더 주요 네비게이션에 대시보드 추가, 로그인/회원가입/계정 관리는 오른쪽 계정 네비게이션 유지
+
+## v0.5.0 완료 상세
+
+- `GET /api/v1/integrations/calendar/status`
+- `POST /api/v1/integrations/calendar/connect`
+- `GET /api/v1/integrations/calendar/callback`
+- `GET /api/v1/integrations/calendar/calendars`
+- `PATCH /api/v1/integrations/calendar/settings`
+- `DELETE /api/v1/integrations/calendar/connection`
+- `POST /api/v1/integrations/calendar/sync`
+- `GET /api/v1/integrations/calendar/sync-runs`
+- `GET /api/v1/integrations/calendar/errors`
+- `POST /api/v1/calendar/events/{eventId}/sync`
+- `GET /api/v1/calendar/events/{eventId}/sync-status`
+- `/settings/integrations` 프론트 화면
+- 신규 migration `20260719_2100`

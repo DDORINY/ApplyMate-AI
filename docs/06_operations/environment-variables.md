@@ -1,62 +1,73 @@
-# 환경변수
+# Environment Variables
 
-실제 secret 값은 `.env` 또는 배포 환경의 secret manager에만 저장합니다. `.env.example`에는 이름과 형식만 기록합니다.
+실제 secret 값은 `.env` 또는 운영 secret manager에만 저장한다. `.env.example`과 문서에는 변수명과 예시 형식만 기록한다.
 
-## 공통
+## Common
 
 | 변수 | 설명 | 예시 |
 | --- | --- | --- |
 | `APP_ENV` | 실행 환경 | `development` |
-| `FRONTEND_URL` | 프론트엔드 origin | `http://localhost:3000` |
-| `BACKEND_URL` | 백엔드 origin | `http://localhost:8000` |
-| `NEXT_PUBLIC_API_BASE_URL` | 브라우저에서 호출할 API base URL | `http://localhost:8000/api/v1` |
+| `FRONTEND_URL` | Frontend origin | `http://localhost:3000` |
+| `BACKEND_URL` | Backend origin | `http://localhost:8000` |
+| `NEXT_PUBLIC_API_BASE_URL` | Browser API base URL | `http://localhost:8000/api/v1` |
 
-## 데이터 저장소
-
-| 변수 | 설명 | 예시 |
-| --- | --- | --- |
-| `POSTGRES_DB` | PostgreSQL DB 이름 | `applymate` |
-| `POSTGRES_USER` | PostgreSQL 사용자 | `applymate` |
-| `POSTGRES_PASSWORD` | PostgreSQL 비밀번호 | `change_me` |
-| `DATABASE_URL` | SQLAlchemy DB 연결 문자열 | `postgresql+psycopg://applymate:change_me@postgres:5432/applymate` |
-| `REDIS_URL` | Redis 연결 문자열 | `redis://redis:6379/0` |
-
-## 인증
+## Database / Cache
 
 | 변수 | 설명 | 예시 |
 | --- | --- | --- |
-| `JWT_SECRET_KEY` | Access Token 서명 Secret | 실제 값은 `.env`에만 저장 |
-| `JWT_REFRESH_SECRET_KEY` | Refresh Token 서명 Secret | 실제 값은 `.env`에만 저장 |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Access Token 만료 시간 | `30` |
-| `REFRESH_TOKEN_EXPIRE_DAYS` | Refresh Token 만료 일수 | `14` |
-| `COOKIE_SECURE` | HTTPS 환경 Cookie Secure 여부 | 개발 `false`, 운영 `true` |
-| `COOKIE_SAMESITE` | Cookie SameSite 정책 | `lax` |
+| `DATABASE_URL` | SQLAlchemy DB URL | `postgresql+psycopg://applymate:change_me@postgres:5432/applymate` |
+| `REDIS_URL` | Redis URL | `redis://redis:6379/0` |
 
-## OAuth v0.1.3
-
-| 변수 | 설명 | 개발 기본값 |
-| --- | --- | --- |
-| `GOOGLE_CLIENT_ID` | Google OAuth Client ID | 빈 값이면 Google 비활성 |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth Client Secret | 빈 값이면 Google 비활성 |
-| `GOOGLE_REDIRECT_URI` | Google provider callback URI | `http://localhost:8000/api/v1/auth/oauth/google/callback` |
-| `GITHUB_CLIENT_ID` | GitHub OAuth Client ID | 빈 값이면 GitHub 비활성 |
-| `GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret | 빈 값이면 GitHub 비활성 |
-| `GITHUB_REDIRECT_URI` | GitHub provider callback URI | `http://localhost:8000/api/v1/auth/oauth/github/callback` |
-| `OAUTH_FRONTEND_CALLBACK_URL` | 서비스 프론트 callback URL | `http://localhost:3000/auth/callback` |
-| `OAUTH_ALLOWED_REDIRECT_PATHS` | 로그인 완료 후 이동 가능한 내부 경로 CSV | `/me,/profile,/settings/accounts` |
-| `OAUTH_STATE_EXPIRE_SECONDS` | OAuth state 만료 초 | `300` |
-| `OAUTH_TICKET_EXPIRE_SECONDS` | Login ticket 만료 초 | `60` |
-
-## 외부 AI
+## Auth
 
 | 변수 | 설명 | 예시 |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | 향후 AI 기능용 API key | 실제 값은 `.env`에만 저장 |
-# v0.3.0 Resume Upload
+| `JWT_SECRET_KEY` | Access Token signing secret | 실제 값은 commit 금지 |
+| `JWT_REFRESH_SECRET_KEY` | Refresh Token signing secret | 실제 값은 commit 금지 |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Access Token 만료 분 | `30` |
+| `REFRESH_TOKEN_EXPIRE_DAYS` | Refresh Token 만료 일 | `14` |
+| `COOKIE_SECURE` | HTTPS cookie secure 여부 | `false` |
+| `COOKIE_SAMESITE` | Cookie SameSite | `lax` |
 
-| 변수 | 예시 | 설명 |
+## Login OAuth
+
+| 변수 | 설명 | 예시 |
 | --- | --- | --- |
-| `RESUME_STORAGE_DIR` | `storage/resumes` | 이력서 파일 로컬 저장 경로 |
-| `RESUME_MAX_FILE_SIZE_BYTES` | `5242880` | 이력서 파일 최대 크기 |
-| `RESUME_ALLOWED_EXTENSIONS` | `.pdf,.docx` | 허용 확장자 |
-| `RESUME_ALLOWED_CONTENT_TYPES` | `application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document` | 허용 MIME |
+| `GOOGLE_CLIENT_ID` | 로그인용 Google OAuth client id | 실제 값은 commit 금지 |
+| `GOOGLE_CLIENT_SECRET` | 로그인용 Google OAuth secret | 실제 값은 commit 금지 |
+| `GOOGLE_REDIRECT_URI` | 로그인용 Google OAuth callback | `http://localhost:8000/api/v1/auth/oauth/google/callback` |
+| `GITHUB_CLIENT_ID` | GitHub OAuth client id | 실제 값은 commit 금지 |
+| `GITHUB_CLIENT_SECRET` | GitHub OAuth secret | 실제 값은 commit 금지 |
+| `GITHUB_REDIRECT_URI` | GitHub OAuth callback | `http://localhost:8000/api/v1/auth/oauth/github/callback` |
+| `OAUTH_FRONTEND_CALLBACK_URL` | OAuth 완료 후 frontend callback | `http://localhost:3000/auth/callback` |
+| `OAUTH_ALLOWED_REDIRECT_PATHS` | 허용 redirect path CSV | `/me,/profile,/settings/accounts` |
+
+## Google Calendar Integration
+
+| 변수 | 설명 | 예시 |
+| --- | --- | --- |
+| `CALENDAR_PROVIDER` | Calendar provider | `disabled`, `mock`, `google` |
+| `GOOGLE_CALENDAR_CLIENT_ID` | Calendar 전용 Google OAuth client id | 실제 값은 commit 금지 |
+| `GOOGLE_CALENDAR_CLIENT_SECRET` | Calendar 전용 Google OAuth secret | 실제 값은 commit 금지 |
+| `GOOGLE_CALENDAR_REDIRECT_URI` | Calendar OAuth callback | `http://localhost:8000/api/v1/integrations/calendar/callback` |
+| `GOOGLE_CALENDAR_SCOPES` | Calendar OAuth scopes CSV | `openid,email,profile,https://www.googleapis.com/auth/calendar.calendarlist.readonly,https://www.googleapis.com/auth/calendar.events` |
+| `EXTERNAL_TOKEN_ENCRYPTION_KEY` | 외부 token 암호화 key | 실제 값은 commit 금지 |
+| `EXTERNAL_TOKEN_ENCRYPTION_KEY_VERSION` | 암호화 key version | `v1` |
+| `CALENDAR_OAUTH_STATE_EXPIRE_SECONDS` | Calendar OAuth state 만료 초 | `300` |
+
+## AI
+
+| 변수 | 설명 | 예시 |
+| --- | --- | --- |
+| `AI_PROVIDER` | AI provider | `disabled`, `mock`, `openai` |
+| `OPENAI_API_KEY` | OpenAI API key | 실제 값은 commit 금지 |
+| `OPENAI_MODEL` | OpenAI model | 운영 설정 필요 |
+
+## Resume Upload
+
+| 변수 | 설명 | 예시 |
+| --- | --- | --- |
+| `RESUME_STORAGE_DIR` | 이력서 파일 저장 경로 | `storage/resumes` |
+| `RESUME_MAX_FILE_SIZE_BYTES` | 최대 파일 크기 | `5242880` |
+| `RESUME_ALLOWED_EXTENSIONS` | 허용 확장자 | `.pdf,.docx` |
+| `RESUME_ALLOWED_CONTENT_TYPES` | 허용 MIME | `application/pdf,...` |

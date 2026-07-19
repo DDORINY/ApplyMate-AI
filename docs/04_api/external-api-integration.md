@@ -16,7 +16,14 @@
 | 서비스 | 목적 | 예정 버전 |
 | --- | --- | --- |
 | OpenAI API | 채용공고 분석, 지원 문서 생성, 면접 질문 생성 | v0.2.x 이후 |
-| Google Calendar API | 지원 일정 캘린더 등록 및 동기화 | v0.5.x |
+| Google Calendar API | 지원 일정 캘린더 등록 및 동기화 | v0.5.0 구조 구현, 실제 호출 NEEDS_VERIFICATION |
+
+## Google Calendar v0.5.0 원칙
+
+- 로그인 OAuth와 Calendar OAuth를 분리합니다.
+- Calendar token은 `external_accounts`에 암호화된 값으로만 저장합니다.
+- mock provider로 로컬 검증을 수행합니다.
+- 실제 Google Calendar event 생성/수정/삭제는 운영 credentials 준비 후 별도 검증합니다.
 | Gmail API | 채용 관련 메일 분석 및 일정 추출 | v0.5.x |
 | 채용공고 공개 API | 공고 수집 | v0.6.x |
 | GitHub API | 사용자 프로젝트 참고 자료 수집 | v1.0 이후 검토 |

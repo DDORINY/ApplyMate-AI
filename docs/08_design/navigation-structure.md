@@ -21,7 +21,12 @@
 - Signup: `/signup`
 - My account: `/me`
 - Connected accounts: `/settings/accounts`
+- External integrations: `/settings/integrations`
 - Security: `/settings/security`
+
+## v0.5.0 integration screens
+
+- `/settings/integrations`: Google Calendar 연결 상태, Calendar 선택, 동기화 방향, 전체 동기화, 연결 해제, sync run/error 확인
 
 ## v0.4.2 dashboard screen
 

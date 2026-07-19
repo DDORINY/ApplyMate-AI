@@ -16,6 +16,7 @@ const accountItems = [
   { href: "/signup", label: "회원가입" },
   { href: "/me", label: "내 계정" },
   { href: "/settings/accounts", label: "계정 연결" },
+  { href: "/settings/integrations", label: "외부 연동" },
   { href: "/settings/security", label: "보안" },
 ];
 

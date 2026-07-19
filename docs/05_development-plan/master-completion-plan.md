@@ -39,3 +39,11 @@
 - v0.4.2는 신규 DB migration 없이 기존 지원/일정/공고/AI/문서 데이터를 읽기 전용으로 집계한다.
 - v0.4.2 완료 후 다음 개발 브랜치는 `feature/v0.5.0-google-calendar`이다.
 - v0.5.0은 Google Calendar OAuth 계정 연결과 내부 일정 동기화 기반을 목표로 한다.
+
+# v0.5.0 Completion Update
+
+- Google Calendar 전용 OAuth state와 token 저장 구조를 추가한다.
+- 로그인 OAuth와 Calendar OAuth를 분리한다.
+- mock provider 기준 Calendar 목록, Calendar 선택, 내부 일정 동기화, mapping/run/error 기록, 연결 해제를 완료한다.
+- 실제 Google Calendar API 호출은 운영 credentials 준비 후 `NEEDS_VERIFICATION`으로 남긴다.
+- v0.5.0 완료 후 다음 개발 브랜치는 `feature/v0.5.1-gmail-analysis`이다.

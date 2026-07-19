@@ -56,6 +56,14 @@ class Settings:
     resume_max_file_size_bytes: int
     resume_allowed_extensions: tuple[str, ...]
     resume_allowed_content_types: tuple[str, ...]
+    calendar_provider: str
+    google_calendar_client_id: str
+    google_calendar_client_secret: str
+    google_calendar_redirect_uri: str
+    google_calendar_scopes: tuple[str, ...]
+    external_token_encryption_key: str
+    external_token_encryption_key_version: str
+    calendar_oauth_state_expire_seconds: int
 
 
 @lru_cache
@@ -145,6 +153,25 @@ def get_settings() -> Settings:
             ).split(",")
             if item.strip()
         ),
+        calendar_provider=os.getenv("CALENDAR_PROVIDER", "disabled").strip().lower(),
+        google_calendar_client_id=os.getenv("GOOGLE_CALENDAR_CLIENT_ID", ""),
+        google_calendar_client_secret=os.getenv("GOOGLE_CALENDAR_CLIENT_SECRET", ""),
+        google_calendar_redirect_uri=os.getenv(
+            "GOOGLE_CALENDAR_REDIRECT_URI",
+            "http://localhost:8000/api/v1/integrations/calendar/callback",
+        ),
+        google_calendar_scopes=tuple(
+            item.strip()
+            for item in os.getenv(
+                "GOOGLE_CALENDAR_SCOPES",
+                "openid,email,profile,https://www.googleapis.com/auth/calendar.calendarlist.readonly,"
+                "https://www.googleapis.com/auth/calendar.events",
+            ).split(",")
+            if item.strip()
+        ),
+        external_token_encryption_key=os.getenv("EXTERNAL_TOKEN_ENCRYPTION_KEY", ""),
+        external_token_encryption_key_version=os.getenv("EXTERNAL_TOKEN_ENCRYPTION_KEY_VERSION", "v1"),
+        calendar_oauth_state_expire_seconds=int(os.getenv("CALENDAR_OAUTH_STATE_EXPIRE_SECONDS", "300")),
     )
 
 

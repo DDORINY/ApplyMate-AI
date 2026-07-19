@@ -39,6 +39,32 @@ Error response:
 | Applications | `/applications` | v0.4.0 | Application tracking |
 | Calendar | `/calendar` | v0.4.1 | Schedule management |
 | Dashboard | `/dashboard` | v0.4.2 | Read-only application dashboard |
+| Calendar Integration | `/integrations/calendar` | v0.5.0 | Google Calendar connection and sync |
+
+## v0.5.0 Calendar Integration API
+
+Base path: `/api/v1`
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| GET | `/integrations/calendar/status` | Access Token | v0.5.0 | Get current Calendar connection status |
+| POST | `/integrations/calendar/connect` | Access Token | v0.5.0 | Create Calendar OAuth authorization URL |
+| GET | `/integrations/calendar/callback` | OAuth state | v0.5.0 | Complete Calendar OAuth callback |
+| GET | `/integrations/calendar/calendars` | Access Token | v0.5.0 | List provider calendars |
+| PATCH | `/integrations/calendar/settings` | Access Token | v0.5.0 | Select calendar and sync direction |
+| DELETE | `/integrations/calendar/connection` | Access Token | v0.5.0 | Disconnect Calendar integration |
+| POST | `/integrations/calendar/sync` | Access Token | v0.5.0 | Sync internal schedules to selected Calendar |
+| GET | `/integrations/calendar/sync-runs` | Access Token | v0.5.0 | List sync runs |
+| GET | `/integrations/calendar/errors` | Access Token | v0.5.0 | List safe sync errors |
+| POST | `/calendar/events/{eventId}/sync` | Access Token | v0.5.0 | Sync one internal schedule event |
+| GET | `/calendar/events/{eventId}/sync-status` | Access Token | v0.5.0 | Get one event sync mapping/status |
+
+Security rules:
+
+- Login OAuth and Calendar OAuth are separate flows.
+- Calendar token values are never returned by API.
+- All connection, mapping, run, and error data is scoped by `current_user.id`.
+- Actual Google Calendar API calls require operational credentials and remain `NEEDS_VERIFICATION`.
 
 ## v0.4.2 Dashboard API
 

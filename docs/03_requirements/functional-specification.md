@@ -77,3 +77,32 @@ Current implemented version: `v0.4.1`
 - 최근 이력서 분석
 - 최근 지원 문서
 - 최근 활동
+
+# v0.5.0 Google Calendar Integration Functional Specification
+
+## 목적
+
+사용자가 명시적으로 연결한 Google Calendar 계정에 ApplyMate AI 내부 일정을 동기화할 수 있는 기반을 제공한다.
+
+## 기능 요구사항
+
+- 로그인 OAuth와 Calendar OAuth를 분리해야 한다.
+- Calendar 연결은 사용자가 명시적으로 시작해야 한다.
+- Calendar OAuth state는 hash 저장, 만료, 1회 사용을 적용해야 한다.
+- Calendar token은 암호화해 저장해야 하며 API 응답에 노출하면 안 된다.
+- 사용자는 연결 상태를 조회할 수 있어야 한다.
+- 사용자는 provider Calendar 목록을 조회할 수 있어야 한다.
+- 사용자는 writable Calendar만 동기화 대상으로 선택할 수 있어야 한다.
+- 사용자는 동기화 방향을 선택할 수 있어야 한다.
+- 사용자는 전체 내부 일정 또는 단일 내부 일정을 동기화할 수 있어야 한다.
+- 동일 내부 일정은 동일 connection에서 중복 external event를 만들면 안 된다.
+- 동기화 실행 이력과 안전한 오류 이력을 저장해야 한다.
+- 연결 해제 시 내부 일정은 보존해야 한다.
+- 실제 Google API 호출은 운영 credentials가 있을 때 별도 검증해야 한다.
+
+## 금지사항
+
+- 사용자 승인 없는 외부 Calendar 일정 생성/수정/삭제
+- 사용자 승인 없는 내부 일정 자동 생성
+- 로그인 OAuth token을 Calendar API에 재사용
+- token 평문 저장/응답/로그 출력

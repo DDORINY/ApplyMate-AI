@@ -1,0 +1,13 @@
+import { AppHeader } from "@/components/app-header";
+import { CalendarIntegrationPanel } from "@/components/integrations/calendar-integration-panel";
+
+export default function SettingsIntegrationsPage() {
+  return (
+    <>
+      <AppHeader />
+      <main className="min-h-screen px-5 py-8 sm:px-8">
+        <CalendarIntegrationPanel />
+      </main>
+    </>
+  );
+}
