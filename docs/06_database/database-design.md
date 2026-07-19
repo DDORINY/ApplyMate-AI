@@ -207,3 +207,72 @@ v0.1.2에서 구현된 커리어 프로필 도메인입니다.
 - v0.3.x: `resumes`, `generated_documents`, `document_evidence`
 - v0.4.x: `applications`, `calendar_events`
 - v0.5.x: `external_accounts`, `calendar_sync_logs`
+# v0.2.0 채용공고 데이터베이스
+
+## companies
+
+기업 기본 정보를 저장한다. 여러 사용자가 같은 기업의 공고를 등록할 수 있으므로 사용자 소유 테이블이 아니다.
+
+| 컬럼 | 타입 | 설명 |
+| --- | --- | --- |
+| `id` | bigint pk | 기업 ID |
+| `name` | varchar(160) | 표시 기업명 |
+| `normalized_name` | varchar(160), unique | 중복 재사용을 위한 정규화 기업명 |
+| `website_url` | varchar(500), nullable | 기업 홈페이지 |
+| `industry` | varchar(120), nullable | 산업 |
+| `company_size` | enum | 기업 규모 |
+| `description` | text, nullable | 기업 설명 |
+| `created_at` | timestamptz | 생성일 |
+| `updated_at` | timestamptz | 수정일 |
+
+## job_postings
+
+사용자별 채용공고 보관함이다. 모든 조회/수정/삭제는 `user_id` 소유권 검사를 수행한다.
+
+| 컬럼 | 타입 | 설명 |
+| --- | --- | --- |
+| `id` | bigint pk | 채용공고 ID |
+| `user_id` | bigint fk users.id | 소유 사용자 |
+| `company_id` | bigint fk companies.id | 기업 |
+| `title` | varchar(200) | 공고 제목 |
+| `position` | varchar(160), nullable | 직무 |
+| `employment_type` | enum | 고용 형태 |
+| `career_requirement` | varchar(255), nullable | 경력 조건 |
+| `education_requirement` | varchar(255), nullable | 학력 조건 |
+| `location` | varchar(200), nullable | 근무 지역 |
+| `work_type` | enum | 근무 형태 |
+| `salary_min`, `salary_max` | integer, nullable | 급여 범위 |
+| `salary_text` | varchar(200), nullable | 급여 설명 |
+| `description` | text, nullable | 주요 업무/본문 |
+| `requirements` | text, nullable | 필수 조건 |
+| `preferred_qualifications` | text, nullable | 우대 조건 |
+| `benefits` | text, nullable | 복지 |
+| `recruitment_process` | text, nullable | 채용 절차 |
+| `source_type` | enum | `MANUAL`, `URL` |
+| `source_url` | varchar(1000), nullable | 원문 URL |
+| `source_site` | varchar(120), nullable | 원문 host |
+| `original_content` | text, nullable | URL에서 추출한 원문 텍스트 |
+| `content_hash` | varchar(128) | 중복 감지용 hash |
+| `published_at` | timestamptz, nullable | 게시일 |
+| `deadline_at` | timestamptz, nullable | 마감일 |
+| `deadline_type` | enum | 마감 유형 |
+| `status` | enum | 관리 상태 |
+| `is_favorite` | boolean | 관심 여부 |
+| `notes` | text, nullable | 사용자 메모 |
+| `collected_at` | timestamptz, nullable | URL 수집 시각 |
+| `created_at` | timestamptz | 생성일 |
+| `updated_at` | timestamptz | 수정일 |
+
+## 중복 감지
+
+- `user_id + source_url`
+- `user_id + content_hash`
+- `user_id + company_id + title + deadline_at`
+
+다른 사용자는 같은 원문 URL의 공고를 각자 저장할 수 있다.
+
+## Migration
+
+```text
+backend/alembic/versions/20260719_1200_create_job_posting_tables.py
+```

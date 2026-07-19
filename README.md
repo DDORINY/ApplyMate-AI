@@ -1,6 +1,6 @@
 # ApplyMate AI
 
-현재 버전: v0.1.4
+현재 버전: v0.2.0
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 계정, 커리어 프로필, 기술 스택, 경력, 프로젝트, 희망 조건을 기반으로 채용공고 관리, 적합도 분석, 지원 문서 생성, 지원 현황 관리를 단계적으로 구현합니다.
 
@@ -30,8 +30,38 @@ docker compose up --build
 /auth/callback
 /me
 /profile
+/jobs
+/jobs/new
+/jobs/{jobId}
 /settings/accounts
 ```
+
+## v0.2.0 구현 범위
+
+- 채용공고 직접 등록
+- URL 기반 채용공고 등록
+  - `http`, `https`만 허용
+  - 사설망, loopback, link-local, multicast, reserved IP 차단
+  - redirect 대상 재검증
+  - HTML 응답과 최대 수집 크기 제한
+  - 제목, meta description, 본문 텍스트의 제한적 추출
+- 기업 정보 저장 및 재사용
+- 채용공고 목록/상세 조회
+- 검색, 상태/고용형태/근무형태/관심 필터, 정렬, 페이지네이션
+- 채용공고 수정, 삭제
+- 공고 상태와 관심 공고 관리
+- 사용자별 소유권 검증
+- URL, 내용 hash, 기업-제목-마감일 기준 중복 감지
+- `/jobs`, `/jobs/new`, `/jobs/{jobId}` 프론트 화면
+- Alembic migration과 Backend 테스트
+
+## v0.2.0 제외 범위
+
+- AI 공고 분석
+- 사용자-공고 적합도 분석
+- 지원 현황 관리
+- 일정/Google Calendar 연동
+- 사이트별 scraper와 대규모 crawling
 
 ## v0.1.4 구현 범위
 
@@ -138,6 +168,17 @@ PATCH  /profiles/me/portfolio-links/{linkId}
 DELETE /profiles/me/portfolio-links/{linkId}
 ```
 
+### 채용공고
+
+```text
+POST   /jobs
+POST   /jobs/import-url
+GET    /jobs
+GET    /jobs/{jobId}
+PATCH  /jobs/{jobId}
+DELETE /jobs/{jobId}
+```
+
 ## Migration
 
 ```bash
@@ -157,6 +198,12 @@ v0.1.4 migration:
 
 ```text
 backend/alembic/versions/20260719_1000_add_account_security.py
+```
+
+v0.2.0 migration:
+
+```text
+backend/alembic/versions/20260719_1200_create_job_posting_tables.py
 ```
 
 ## 검증
@@ -191,4 +238,4 @@ docker compose down
 
 ## 다음 버전
 
-v0.2.0에서는 채용공고 관리 기능을 구현합니다.
+v0.2.1에서는 AI 채용공고 분석 기능을 구현합니다.

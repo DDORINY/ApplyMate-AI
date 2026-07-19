@@ -213,3 +213,135 @@ Authorization: Bearer {access_token}
 | POST | `/profiles/me/portfolio-links` | 포트폴리오 링크 생성 |
 | PATCH | `/profiles/me/portfolio-links/{linkId}` | 포트폴리오 링크 수정 |
 | DELETE | `/profiles/me/portfolio-links/{linkId}` | 포트폴리오 링크 삭제 |
+# v0.2.0 채용공고 API
+
+Base URL: `/api/v1`
+
+모든 채용공고 API는 `Authorization: Bearer {accessToken}` 헤더가 필요하다.
+
+## POST /jobs
+
+채용공고를 직접 등록한다.
+
+요청:
+
+```json
+{
+  "company_name": "ApplyMate Labs",
+  "company_website_url": "https://example.com",
+  "company_size": "STARTUP",
+  "title": "Backend Engineer",
+  "position": "Backend",
+  "employment_type": "FULL_TIME",
+  "career_requirement": "3년 이상",
+  "education_requirement": "학력 무관",
+  "location": "Seoul",
+  "work_type": "HYBRID",
+  "salary_min": 50000000,
+  "salary_max": 80000000,
+  "description": "FastAPI 기반 서비스 개발",
+  "requirements": "Python, SQLAlchemy",
+  "preferred_qualifications": "Docker 운영 경험",
+  "benefits": "자율 출퇴근",
+  "recruitment_process": "서류-기술면접-최종면접",
+  "deadline_at": "2026-08-31T14:59:00Z",
+  "deadline_type": "FIXED",
+  "status": "SAVED",
+  "is_favorite": true,
+  "source_type": "MANUAL",
+  "source_url": null,
+  "notes": "우선 검토"
+}
+```
+
+응답: `201 Created`
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "company": {
+      "id": 1,
+      "name": "ApplyMate Labs",
+      "normalized_name": "applymate labs",
+      "website_url": "https://example.com",
+      "industry": null,
+      "company_size": "STARTUP",
+      "description": null,
+      "created_at": "2026-07-19T00:00:00Z",
+      "updated_at": "2026-07-19T00:00:00Z"
+    },
+    "title": "Backend Engineer",
+    "status": "SAVED",
+    "is_favorite": true
+  },
+  "message": "채용공고가 등록되었습니다."
+}
+```
+
+## POST /jobs/import-url
+
+URL에서 제한적으로 HTML 정보를 추출해 채용공고를 등록한다.
+
+요청:
+
+```json
+{
+  "url": "https://example.com/jobs/123",
+  "company_name": "ApplyMate Labs",
+  "title": "Backend Engineer",
+  "description": "사용자 확인 본문"
+}
+```
+
+응답: `201 Created`
+
+```json
+{
+  "success": true,
+  "data": {
+    "job": {
+      "id": 1,
+      "title": "Backend Engineer",
+      "source_type": "URL",
+      "source_url": "https://example.com/jobs/123"
+    },
+    "import_status": "PARTIAL",
+    "extracted_fields": ["title", "description", "body"],
+    "warnings": ["기업명은 URL 또는 사용자 입력으로 보완이 필요할 수 있습니다."]
+  },
+  "message": "URL 채용공고가 등록되었습니다."
+}
+```
+
+## GET /jobs
+
+채용공고 목록을 조회한다.
+
+Query:
+
+| 이름 | 설명 |
+| --- | --- |
+| `page` | 1부터 시작하는 페이지 번호 |
+| `size` | 페이지 크기, 최대 100 |
+| `query` | 제목, 기업명, 직무, 지역, 메모 검색 |
+| `status` | `SAVED`, `REVIEWING`, `INTERESTED`, `EXCLUDED`, `CLOSED` |
+| `employment_type` | 고용 형태 |
+| `work_type` | 근무 형태 |
+| `is_favorite` | 관심 공고 여부 |
+| `source_type` | `MANUAL`, `URL` |
+| `sort` | `created_at`, `updated_at`, `deadline_at`, `title` |
+| `order` | `asc`, `desc` |
+
+## GET /jobs/{jobId}
+
+채용공고 상세를 조회한다. 본인 소유가 아니면 `JOB_POSTING_NOT_FOUND`를 반환한다.
+
+## PATCH /jobs/{jobId}
+
+채용공고를 수정한다. 요청 body는 `POST /jobs`의 일부 필드를 사용할 수 있다.
+
+## DELETE /jobs/{jobId}
+
+채용공고를 삭제한다.
