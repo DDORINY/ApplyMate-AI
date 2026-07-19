@@ -9,11 +9,17 @@ from pydantic import BaseModel, ValidationError
 from app.core.config import Settings
 from app.core.exceptions import AppError
 from app.schemas.job_analysis import JobAnalysisStructuredData
+from app.schemas.resume_analysis import (
+    ResumeAnalysisEvidence,
+    ResumeAnalysisSkill,
+    ResumeAnalysisStructuredData,
+    ResumeAnalysisWarning,
+)
 
 
 @dataclass(frozen=True)
 class AIProviderResult:
-    parsed_data: JobAnalysisStructuredData
+    parsed_data: BaseModel
     provider: str
     model: str | None
     request_id: str | None = None
@@ -37,12 +43,31 @@ class AIProvider(Protocol):
     ) -> AIProviderResult:
         ...
 
+    async def analyze_resume(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        response_schema: type[BaseModel],
+    ) -> AIProviderResult:
+        ...
+
 
 class DisabledAIProvider:
     provider = "disabled"
     model = None
 
     async def analyze_job(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        response_schema: type[BaseModel],
+    ) -> AIProviderResult:
+        raise AppError("AI_PROVIDER_DISABLED", "AI 분석 Provider가 비활성화되어 있습니다.", 503)
+
+
+    async def analyze_resume(
         self,
         *,
         system_prompt: str,
@@ -163,6 +188,57 @@ class MockAIProvider:
         )
 
 
+    async def analyze_resume(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        response_schema: type[BaseModel],
+    ) -> AIProviderResult:
+        _ = system_prompt
+        started = time.perf_counter()
+        skill_names = _resume_skill_candidates(user_prompt)
+        evidence_text = _first_non_empty_line(user_prompt) or "이력서 텍스트"
+        evidence = ResumeAnalysisEvidence(source="RAW_TEXT", text=evidence_text[:1000], page=None)
+        data = ResumeAnalysisStructuredData(
+            summary="업로드된 이력서 텍스트를 기반으로 주요 기술과 경력 후보를 구조화했습니다.",
+            headline=_first_non_empty_line(user_prompt),
+            skills=[
+                ResumeAnalysisSkill(name=skill, category="TECHNICAL", evidence=[evidence])
+                for skill in skill_names
+            ],
+            experiences=[],
+            projects=[],
+            education=[],
+            keywords=skill_names,
+            warnings=[
+                ResumeAnalysisWarning(
+                    code="MOCK_PROVIDER",
+                    message="Mock Provider 결과이며 실제 AI 호출 없이 생성되었습니다.",
+                )
+            ],
+            confidence={
+                "overall": 0.65 if skill_names else 0.35,
+                "skills": 0.7 if skill_names else 0.2,
+                "experiences": 0.3,
+                "projects": 0.3,
+                "education": 0.3,
+            },
+        )
+        parsed = response_schema.model_validate(data.model_dump())
+        return AIProviderResult(
+            parsed_data=parsed,
+            provider=self.provider,
+            model="mock-resume-analyzer",
+            request_id="mock-resume-analysis",
+            prompt_tokens=max(len(user_prompt) // 4, 1),
+            completion_tokens=160,
+            total_tokens=max(len(user_prompt) // 4, 1) + 160,
+            latency_ms=int((time.perf_counter() - started) * 1000),
+            raw_response=parsed.model_dump_json(),
+        )
+
+
 class OpenAIProvider:
     provider = "openai"
 
@@ -171,6 +247,61 @@ class OpenAIProvider:
         self.model = settings.openai_model
 
     async def analyze_job(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        response_schema: type[BaseModel],
+    ) -> AIProviderResult:
+        started = time.perf_counter()
+        payload = {
+            "model": self.settings.openai_model,
+            "input": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            "text": {"format": {"type": "json_object"}},
+        }
+        try:
+            async with httpx.AsyncClient(timeout=self.settings.ai_request_timeout_seconds) as client:
+                response = await client.post(
+                    "https://api.openai.com/v1/responses",
+                    headers={"Authorization": f"Bearer {self.settings.openai_api_key}"},
+                    json=payload,
+                )
+        except httpx.TimeoutException as exc:
+            raise AppError("AI_PROVIDER_TIMEOUT", "AI 분석 요청 시간이 초과되었습니다.", 504) from exc
+        except httpx.HTTPError as exc:
+            raise AppError("AI_PROVIDER_REQUEST_FAILED", "AI Provider 요청에 실패했습니다.", 502) from exc
+        if response.status_code == 429:
+            raise AppError("AI_PROVIDER_RATE_LIMITED", "AI Provider 요청 한도를 초과했습니다.", 429)
+        if response.status_code >= 500:
+            raise AppError("AI_PROVIDER_UNAVAILABLE", "AI Provider가 일시적으로 응답하지 않습니다.", 502)
+        if response.status_code >= 400:
+            raise AppError("AI_PROVIDER_REQUEST_FAILED", "AI Provider 요청에 실패했습니다.", 502)
+
+        body = response.json()
+        output_text = body.get("output_text") or _extract_output_text(body)
+        try:
+            parsed = response_schema.model_validate_json(output_text)
+        except (ValidationError, ValueError) as exc:
+            raise AppError("AI_PROVIDER_INVALID_RESPONSE", "AI Provider 응답 구조가 올바르지 않습니다.", 502) from exc
+
+        usage = body.get("usage") or {}
+        return AIProviderResult(
+            parsed_data=parsed,
+            provider=self.provider,
+            model=self.model,
+            request_id=response.headers.get("x-request-id") or body.get("id"),
+            prompt_tokens=usage.get("input_tokens"),
+            completion_tokens=usage.get("output_tokens"),
+            total_tokens=usage.get("total_tokens"),
+            latency_ms=int((time.perf_counter() - started) * 1000),
+            raw_response=json.dumps(body, ensure_ascii=False),
+        )
+
+
+    async def analyze_resume(
         self,
         *,
         system_prompt: str,
@@ -276,3 +407,34 @@ def _line_after(text: str, label: str) -> str:
         if line.startswith(prefix):
             return line.split(":", 1)[1].strip()
     return ""
+
+
+def _resume_skill_candidates(text: str) -> list[str]:
+    known_skills = [
+        "Python",
+        "FastAPI",
+        "Django",
+        "JavaScript",
+        "TypeScript",
+        "React",
+        "Next.js",
+        "SQL",
+        "PostgreSQL",
+        "Docker",
+        "AWS",
+        "Kubernetes",
+        "Git",
+        "Pandas",
+        "TensorFlow",
+        "PyTorch",
+    ]
+    lowered = text.lower()
+    return [skill for skill in known_skills if skill.lower() in lowered]
+
+
+def _first_non_empty_line(text: str) -> str | None:
+    for line in text.splitlines():
+        cleaned = line.strip()
+        if cleaned and not cleaned.startswith("---") and ":" not in cleaned[:30]:
+            return cleaned[:200]
+    return None
