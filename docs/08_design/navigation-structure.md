@@ -1,100 +1,98 @@
 # Frontend Navigation Structure
 
-## 기준
+문서 기준 버전: `v0.4.0`
 
-이 문서는 실제 `frontend/src/app` App Router 기준으로 작성한다.
+## 1. Header Navigation Policy
 
-## 현재 경로
+상단 네비게이션은 두 그룹으로 분리한다.
 
-| 경로 | 인증 | 구현 버전 | 화면/컴포넌트 | 설명 |
+- 주요 서비스 메뉴: 왼쪽/중앙 영역
+- 회원 및 계정 관리 메뉴: 오른쪽 계정 영역
+
+회원가입과 로그인은 주요 서비스 메뉴 앞쪽에 배치하지 않는다.
+
+## 2. 현재 Header 메뉴
+
+### 주요 서비스 메뉴
+
+| Label | Path | 구현 버전 | 설명 |
+| --- | --- | --- | --- |
+| 홈 | `/` | v0.1.0 | 서비스 상태/랜딩 |
+| 프로필 | `/profile` | v0.1.2 | 커리어 프로필 관리 |
+| 채용공고 | `/jobs` | v0.2.0 | 채용공고 목록/등록/분석/적합도 |
+| 이력서 | `/resumes` | v0.3.0 | 이력서 목록/업로드/분석 |
+| 지원 문서 | `/documents` | v0.3.3 | 지원 문서 생성/버전/출처 |
+| 지원 현황 | `/applications` | v0.4.0 | 지원 상태/이력/메모 관리 |
+
+### 회원 및 계정 관리 메뉴
+
+| Label | Path | 구현 버전 | 설명 |
+| --- | --- | --- | --- |
+| 로그인 | `/login` | v0.1.1 | 이메일/OAuth 로그인 |
+| 회원가입 | `/signup` | v0.1.1 | 이메일 회원가입 |
+| 내 계정 | `/me` | v0.1.1 | 현재 사용자 정보 |
+| 계정 연결 | `/settings/accounts` | v0.1.3 | OAuth 계정 연결 관리 |
+| 보안 | `/settings/security` | v0.1.4 | 비밀번호/세션/보안 관리 |
+
+## 3. 현재 구현된 주요 경로
+
+| Path | 인증 | 구현 버전 | 주요 컴포넌트 | 설명 |
 | --- | --- | --- | --- | --- |
-| `/` | 불필요 | v0.1.0 | `service-status-panel` | 랜딩/서비스 상태 |
+| `/` | 불필요 | v0.1.0 | `service-status-panel` | 랜딩/상태 |
 | `/signup` | 불필요 | v0.1.1 | `signup-form` | 회원가입 |
 | `/login` | 불필요 | v0.1.1 | `login-form`, `oauth-buttons` | 로그인 |
 | `/auth/callback` | 불필요 | v0.1.3 | `oauth-callback-panel` | OAuth ticket 교환 |
-| `/me` | 필요 | v0.1.1 | `protected-user-panel` | 현재 사용자 |
-| `/profile` | 필요 | v0.1.2 | `profile-manager` | 커리어 프로필 관리 |
-| `/jobs` | 필요 | v0.2.0 | `job-list-panel` | 채용공고 목록 |
-| `/jobs/new` | 필요 | v0.2.0 | `job-create-panel` | 채용공고 등록 |
-| `/jobs/{jobId}` | 필요 | v0.2.0~v0.2.2 | `job-detail-panel`, `job-analysis-panel`, `job-match-panel` | 공고 상세/분석/적합도 |
-| `/resumes` | 필요 | v0.3.0 | `resume-list-panel` | 이력서 목록 |
-| `/resumes/new` | 필요 | v0.3.0 | `resume-create-panel` | 이력서 업로드 |
-| `/resumes/{resumeId}` | 필요 | v0.3.0 | `resume-detail-panel` | 이력서 상세/파일 관리 |
-| `/settings/accounts` | 필요 | v0.1.3 | `oauth-accounts-manager` | 소셜 계정 관리 |
-| `/settings/security` | 필요 | v0.1.4 | `account-security-panel` | 계정 보안/세션 |
 | `/verify-email` | 불필요 | v0.1.4 | `verify-email-panel` | 이메일 인증 |
 | `/forgot-password` | 불필요 | v0.1.4 | `forgot-password-form` | 비밀번호 찾기 |
 | `/reset-password` | 불필요 | v0.1.4 | `reset-password-form` | 비밀번호 재설정 |
+| `/me` | 필요 | v0.1.1 | `protected-user-panel` | 내 계정 |
+| `/profile` | 필요 | v0.1.2 | `profile-manager` | 커리어 프로필 |
+| `/settings/accounts` | 필요 | v0.1.3 | `oauth-accounts-manager` | 계정 연결 |
+| `/settings/security` | 필요 | v0.1.4 | `account-security-panel` | 계정 보안 |
+| `/jobs` | 필요 | v0.2.0 | `job-list-panel` | 채용공고 목록 |
+| `/jobs/new` | 필요 | v0.2.0 | `job-create-panel` | 채용공고 등록 |
+| `/jobs/{jobId}` | 필요 | v0.2.0~v0.2.2, v0.4.0 | `job-detail-panel`, `job-analysis-panel`, `job-match-panel` | 공고 상세/분석/적합도/지원 추가 |
+| `/resumes` | 필요 | v0.3.0 | `resume-list-panel` | 이력서 목록 |
+| `/resumes/new` | 필요 | v0.3.0 | `resume-create-panel` | 이력서 업로드 |
+| `/resumes/{resumeId}` | 필요 | v0.3.0~v0.3.2, v0.4.0 | `resume-detail-panel` | 이력서 상세/파일/분석/지원 준비 |
+| `/documents` | 필요 | v0.3.3 | `document-list-panel` | 지원 문서 목록 |
+| `/documents/new` | 필요 | v0.3.3, v0.4.0 | `document-create-panel` | 선택 UI 기반 지원 문서 생성 |
+| `/documents/{documentId}` | 필요 | v0.3.3, v0.4.0 | `document-detail-panel` | 문서 상세/버전/지원 항목 생성 |
+| `/applications` | 필요 | v0.4.0 | `application-list-panel` | 지원 현황 목록 |
+| `/applications/new` | 필요 | v0.4.0 | `application-create-panel` | 지원 항목 생성 |
+| `/applications/{applicationId}` | 필요 | v0.4.0 | `application-detail-panel` | 지원 항목 상세/상태/메모 |
 
-## 주요 사용자 흐름
+## 4. 주요 사용자 흐름
 
 ```text
-signup
-  -> verify-email
-  -> login
+signup/login
   -> profile
-  -> resumes
   -> resumes/new
   -> resumes/{resumeId}
-  -> jobs
   -> jobs/new
   -> jobs/{jobId}
-  -> AI job analysis
+  -> job analysis
   -> job matching
-  -> feedback
+  -> documents/new
+  -> documents/{documentId}
+  -> applications/new
+  -> applications/{applicationId}
 ```
 
-## 보호 화면
+## 5. v0.4.0 연결 버튼
 
-- `/me`
-- `/profile`
-- `/jobs`
-- `/jobs/new`
-- `/jobs/{jobId}`
-- `/resumes`
-- `/resumes/new`
-- `/resumes/{resumeId}`
-- `/settings/accounts`
-- `/settings/security`
+| 위치 | 버튼 | 이동 |
+| --- | --- | --- |
+| 채용공고 상세 | 지원 관리에 추가 | `/applications/new?jobId={jobId}` |
+| 지원 문서 상세 | 이 문서로 지원 항목 생성 | `/applications/new?documentId={documentId}` |
+| 이력서 상세 | 이 이력서로 지원 준비 | `/applications/new?resumeId={resumeId}` |
 
-## 아직 없는 경로
+## 6. 아직 없는 경로
 
-- `/documents`
-- `/applications`
-- `/calendar`
-- `/dashboard`
-- `/recommendations`
-
-## Header Navigation Policy
-
-- 주요 서비스 메뉴는 왼쪽/중앙 영역에 배치한다.
-- 회원/계정 관련 메뉴는 오른쪽 계정 영역에 배치한다.
-- 현재 헤더의 주요 서비스 메뉴는 `홈`, `프로필`, `채용공고`, `이력서`다.
-- 계정 영역은 `로그인`, `회원가입`, `내 계정`, `계정 연결`, `보안`으로 구성한다.
-- 회원가입은 서비스 주요 네비게이션의 첫 번째 항목으로 배치하지 않는다.
-# v0.3.3 Navigation Update
-
-Main navigation:
-
-- 홈 `/`
-- 프로필 `/profile`
-- 채용공고 `/jobs`
-- 이력서 `/resumes`
-- 지원 문서 `/documents`
-
-Account navigation stays on the right side:
-
-- 로그인 `/login`
-- 회원가입 `/signup`
-- 내 계정 `/me`
-- 계정 연결 `/settings/accounts`
-- 보안 `/settings/security`
-
-The `지원 문서` item belongs to the main product navigation, not the auth/account group.
-# v0.4.0 Navigation Update
-
-- 주요 네비게이션: 홈, 프로필, 채용공고, 이력서, 지원 문서, 지원 현황
-- 회원/계정 관리 네비게이션은 오른쪽 그룹에 유지한다.
-- 채용공고 상세: `지원 관리에 추가`
-- 지원 문서 상세: `이 문서로 지원 항목 생성`
-- 이력서 상세: `이 이력서로 지원 준비`
+| Path | 예정 버전 | 설명 |
+| --- | --- | --- |
+| `/schedules` | v0.4.1 | 일정 월/주/목록 |
+| `/schedules/new` | v0.4.1 | 일정 생성 |
+| `/schedules/{eventId}` | v0.4.1 | 일정 상세 |
+| `/dashboard` | v0.4.2 | 지원/일정/분석 요약 |
+| `/recommendations` | v0.6.0 | 맞춤 공고 추천 |
