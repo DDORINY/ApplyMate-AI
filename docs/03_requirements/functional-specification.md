@@ -1,263 +1,37 @@
-# 기능 명세
-
-## 현재 구현 버전
-
-- v0.1.0: 프로젝트 기반
-- v0.1.1: 회원 및 인증
-- v0.1.2: 커리어 프로필
-- v0.1.3: 소셜 로그인
-- v0.1.4: 계정 보안·복구
-
-## 1. 회원 및 인증
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| AUTH-001 | 이메일 회원가입 | 완료 |
-| AUTH-002 | 이메일 로그인 및 Access Token 발급 | 완료 |
-| AUTH-003 | Refresh Token HttpOnly Cookie 발급, rotation, 폐기 | 완료 |
-| AUTH-004 | 현재 사용자 조회 | 완료 |
-| AUTH-005 | 로그아웃 | 완료 |
-| AUTH-006 | Google OAuth 로그인 | 완료 |
-| AUTH-007 | GitHub OAuth 로그인 | 완료 |
-| AUTH-008 | 소셜 계정 연결/목록/해제 | 완료 |
-| AUTH-011 | 이메일 인증 | 완료 |
-| AUTH-012 | 이메일 인증 재발송 | 완료 |
-| AUTH-013 | 비밀번호 찾기 | 완료 |
-| AUTH-014 | 비밀번호 재설정 | 완료 |
-| AUTH-015 | 비밀번호 변경 | 완료 |
-| AUTH-016 | 소셜 사용자 비밀번호 설정 | 완료 |
-| AUTH-017 | 세션 목록 조회 | 완료 |
-| AUTH-018 | 개별 세션 로그아웃 | 완료 |
-| AUTH-019 | 전체 세션 로그아웃 | 완료 |
-| AUTH-020 | 로그인 실패 제한 | 완료 |
-
-정책:
-
-- Access Token은 응답 본문으로 전달합니다.
-- Refresh Token은 HttpOnly Cookie로 전달합니다.
-- 비밀번호가 없는 social-only 계정은 이메일 로그인할 수 없습니다.
-- 마지막 로그인 수단은 해제할 수 없습니다.
-
-## 2. OAuth 소셜 로그인
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| OAUTH-001 | Provider 활성화 상태 조회 | 완료 |
-| OAUTH-002 | 로그인 목적 authorize URL 생성 | 완료 |
-| OAUTH-003 | 계정 연결 목적 authorize URL 생성 | 완료 |
-| OAUTH-004 | Provider callback 처리 | 완료 |
-| OAUTH-005 | State 검증과 1회 사용 처리 | 완료 |
-| OAUTH-006 | Login ticket 생성/교환 | 완료 |
-| OAUTH-007 | Provider token 미저장 | 완료 |
-| OAUTH-008 | 동일 이메일 기존 계정 자동 병합 방지 | 완료 |
-
-## 3. 커리어 프로필
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| PROFILE-001 | 기본 커리어 프로필 생성 | 완료 |
-| PROFILE-002 | 내 커리어 프로필 조회 | 완료 |
-| PROFILE-003 | 내 커리어 프로필 수정 | 완료 |
-| PROFILE-004 | 사용자별 프로필 1개 제한 | 완료 |
-| PROFILE-005 | 타 사용자 프로필 접근 차단 | 완료 |
-
-## 4. 기술 스택
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| SKILL-001 | 기술명 기반 기술 마스터 생성/재사용 | 완료 |
-| SKILL-002 | 사용자 기술 목록 조회 | 완료 |
-| SKILL-003 | 사용자 기술 추가 | 완료 |
-| SKILL-004 | 사용자 기술 수정 | 완료 |
-| SKILL-005 | 사용자 기술 삭제 | 완료 |
-| SKILL-006 | 대소문자/공백 차이 중복 방지 | 완료 |
-
-## 5. 경력
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| EXP-001 | 경력 생성 | 완료 |
-| EXP-002 | 경력 목록/상세 조회 | 완료 |
-| EXP-003 | 경력 수정 | 완료 |
-| EXP-004 | 경력 삭제 | 완료 |
-| EXP-005 | 시작일/종료일 검증 | 완료 |
-| EXP-006 | 재직 중 종료일 null 정책 | 완료 |
-
-## 6. 프로젝트
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| PROJECT-001 | 프로젝트 생성 | 완료 |
-| PROJECT-002 | 프로젝트 목록/상세 조회 | 완료 |
-| PROJECT-003 | 프로젝트 수정 | 완료 |
-| PROJECT-004 | 프로젝트 삭제 | 완료 |
-| PROJECT-005 | 프로젝트 기술 연결 | 완료 |
-| PROJECT-006 | URL 및 날짜 검증 | 완료 |
-
-## 7. 희망 조건
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| PREF-001 | 희망 조건 조회 | 완료 |
-| PREF-002 | 희망 조건 최초 저장 및 전체 갱신 | 완료 |
-| PREF-003 | 희망 조건 일부 수정 | 완료 |
-| PREF-004 | 근무 형태, 지역, 기업 규모, 원격 선호 관리 | 완료 |
-
-## 8. 지원 제외 조건
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| EXCLUSION-001 | 제외 조건 생성 | 완료 |
-| EXCLUSION-002 | 제외 조건 목록 조회 | 완료 |
-| EXCLUSION-003 | 제외 조건 수정 및 활성/비활성 관리 | 완료 |
-| EXCLUSION-004 | 제외 조건 삭제 | 완료 |
-| EXCLUSION-005 | 동일 조건 중복 방지 | 완료 |
-
-## 9. 포트폴리오 링크
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| PORTFOLIO-001 | 포트폴리오 링크 생성 | 완료 |
-| PORTFOLIO-002 | 링크 목록 조회 | 완료 |
-| PORTFOLIO-003 | 링크 수정 | 완료 |
-| PORTFOLIO-004 | 링크 삭제 | 완료 |
-| PORTFOLIO-005 | 대표 링크 설정 | 완료 |
-| PORTFOLIO-006 | 동일 URL 중복 방지 및 위험 URL 차단 | 완료 |
-
-허용 URL scheme은 `http`, `https`만 사용합니다.
-
-## 향후 버전 후보
-
-- v0.2.0: 채용공고 관리
-- v0.2.1: AI 채용공고 분석
-- v0.2.2: 사용자-공고 적합도 분석
-- v0.3.x: 이력서 분석과 AI 문서 생성
-
-## v0.3.1 이력서 텍스트 추출
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| RESUME-EXTRACT-001 | PDF/DOCX 이력서 텍스트 추출 | 완료 |
-| RESUME-EXTRACT-002 | 최신 추출 결과 저장 | 완료 |
-| RESUME-EXTRACT-003 | 추출 실행 이력 저장 | 완료 |
-| RESUME-EXTRACT-004 | 사용자 수정 텍스트 저장 | 완료 |
-| RESUME-EXTRACT-005 | 재추출 실행 | 완료 |
-| RESUME-EXTRACT-006 | OCR 필요 PDF 상태 표시 | 완료 |
-| RESUME-EXTRACT-007 | 사용자 소유권 검사 | 완료 |
-
-제약:
-
-- OCR은 v0.3.1에서 실행하지 않는다.
-- DOCX는 실제 렌더링 페이지 경계를 제공하지 않고 단일 logical page로 저장한다.
-- 섹션 후보는 규칙 기반 힌트이며 AI 분석 결과가 아니다.
-# v0.2.0 채용공고 관리 요구사항
-
-## JOB-001 채용공고 직접 등록
-
-사용자는 로그인 후 기업명, 공고 제목, 직무, 고용 형태, 근무 형태, 급여, 주요 업무, 자격 요건, 복지, 채용 절차, 마감 정보를 직접 입력해 채용공고를 저장할 수 있다.
-
-## JOB-002 URL 기반 등록
-
-사용자는 채용공고 URL을 입력해 공고를 등록할 수 있다. 시스템은 URL 안전성을 검증하고 HTML에서 제목, 설명, 본문 텍스트를 제한적으로 추출한다. 사용자가 직접 입력한 기업명, 제목, 본문은 자동 추출값보다 우선한다.
-
-## JOB-003 URL 수집 보안
-
-URL 등록은 `http`, `https` scheme만 허용하며 사설망, loopback, link-local, multicast, reserved IP를 차단한다. redirect 대상도 동일하게 재검증하며 응답 content type과 최대 수집 크기를 제한한다.
-
-## JOB-004 목록 조회
-
-사용자는 본인이 등록한 채용공고만 목록으로 조회할 수 있다. 목록은 검색, 상태, 고용 형태, 근무 형태, 관심 공고 여부, source type 필터와 페이지네이션을 지원한다.
-
-## JOB-005 상세 조회
-
-사용자는 본인이 등록한 채용공고 상세 정보만 조회할 수 있다. 다른 사용자의 채용공고는 조회할 수 없다.
-
-## JOB-006 수정
-
-사용자는 본인이 등록한 채용공고의 기업 정보, 공고 내용, 상태, 관심 여부, 메모를 수정할 수 있다.
-
-## JOB-007 삭제
-
-사용자는 본인이 등록한 채용공고를 삭제할 수 있다. 삭제는 현재 v0.2.0에서 hard delete로 처리한다.
-
-## JOB-008 상태 관리
-
-채용공고 상태는 `SAVED`, `REVIEWING`, `INTERESTED`, `EXCLUDED`, `CLOSED` 중 하나로 관리한다.
-
-## JOB-009 중복 감지
-
-동일 사용자 기준으로 원문 URL, 내용 hash, 기업-제목-마감일 조합을 사용해 중복 등록을 방지한다. 다른 사용자는 같은 공고를 각자 저장할 수 있다.
-
-## JOB-010 기업 정보
-
-기업 정보는 `companies` 테이블에 저장하며 정규화된 기업명으로 재사용한다. 기업 규모는 정의된 enum 값으로 관리한다.
-
-## JOB-011 프론트 화면
-
-프론트엔드는 `/jobs`, `/jobs/new`, `/jobs/{jobId}` 화면을 제공한다. 각 화면은 로딩, 빈 상태, 오류 상태를 표시한다.
-
-## JOB-012 제외 범위
-
-v0.2.0에는 AI 공고 분석, 사용자-공고 적합도 분석, 지원 현황 전환, 일정 연동, 사이트별 scraper, 대규모 crawling을 포함하지 않는다.
-# v0.2.1 AI 채용공고 분석 요구사항
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| AI-JOB-001 | 저장된 채용공고 분석 입력 전처리 | 완료 |
-| AI-JOB-002 | 주요 업무 추출 | 완료 |
-| AI-JOB-003 | 필수/우대 조건 추출 | 완료 |
-| AI-JOB-004 | 기술 스택 추출 | 완료 |
-| AI-JOB-005 | 경력/학력 조건 추출 | 완료 |
-| AI-JOB-006 | 채용 절차와 마감 정보 추출 | 완료 |
-| AI-JOB-007 | 분석 결과 저장과 조회 | 완료 |
-| AI-JOB-008 | 분석 결과 사용자 수정/삭제/재분석 | 완료 |
-| AI-JOB-009 | 실행 이력과 실패 사유 저장 | 완료 |
-| AI-JOB-010 | AI Provider disabled/mock/openai 지원 | 완료 |
-| AI-JOB-011 | 공고 변경 시 outdated 표시 | 완료 |
-
-v0.2.1은 사용자 커리어 프로필과 공고의 적합도 계산을 수행하지 않습니다. 해당 기능은 v0.2.2 범위입니다.
-## v0.2.2 사용자-공고 적합도 분석
-
-### 기능 요구사항
-
-- 사용자는 완료된 채용공고 분석 결과를 기반으로 자신의 커리어 프로필과 공고의 적합도를 분석할 수 있다.
-- 시스템은 커리어 프로필, 사용자 기술, 경력, 프로젝트, 희망 조건, 지원 제외 조건을 비교 근거로 사용한다.
-- 시스템은 직무, 기술, 경력, 프로젝트, 희망 조건, 위험/제외 조건별 점수와 종합 점수를 제공한다.
-- 시스템은 종합 점수에 따라 등급과 추천 상태를 제공한다.
-- 시스템은 일치 기술, 부족 기술, 연결 프로젝트, 강점, 보완점, 위험 요소를 구조화된 근거로 제공한다.
-- 시스템은 프로필 또는 공고 분석이 변경된 경우 기존 적합도 결과를 오래된 결과로 표시한다.
-- 사용자는 적합도 분석 결과에 피드백을 남길 수 있다.
-
-### 제약
-
-- 완료된 최신 채용공고 분석이 없으면 적합도 분석을 실행하지 않는다.
-- 점수는 규칙 기반으로 계산하며 AI는 점수를 변경하지 않는다.
-- 사용자 프로필에 없는 경험, 기술, 성과를 생성하지 않는다.
-
-## v0.3.2 AI 이력서 구조화 분석
-
-| ID | 기능 | 상태 |
-| --- | --- | --- |
-| RESUME-AI-001 | 추출 완료 텍스트 기반 AI 이력서 분석 | 완료 |
-| RESUME-AI-002 | edited_text 우선 분석 입력 사용 | 완료 |
-| RESUME-AI-003 | 기술/경력/프로젝트/학력/자격증/성과 구조화 | 완료 |
-| RESUME-AI-004 | Evidence 기반 결과 검증 | 완료 |
-| RESUME-AI-005 | AI 원본과 사용자 수정본 분리 저장 | 완료 |
-| RESUME-AI-006 | 재분석 및 실행 이력 보존 | 완료 |
-| RESUME-AI-007 | 프로필 반영 후보 제공 | 완료 |
-| RESUME-AI-008 | OCR_REQUIRED 및 미완료 추출 결과 분석 차단 | 완료 |
-
-제약:
-
-- 원문에 없는 경험, 기술, 성과, 기간을 생성하지 않는다.
-- 분석 결과는 프로필에 자동 반영하지 않는다.
-- 실제 OpenAI 호출은 운영 키 설정 후 별도 검증한다.
-# v0.4.0 지원 현황 관리 요구사항
-
-- 사용자는 지원 항목을 생성, 조회, 수정, 보관할 수 있다.
-- 지원 항목은 채용공고, 이력서, 이력서 파일, 지원 문서, 지원 문서 버전을 연결할 수 있다.
-- 지원 문서 버전은 제출 당시 버전으로 고정되어야 한다.
-- 사용자는 지원 상태를 변경할 수 있으며 모든 변경 이력은 저장되어야 한다.
-- 사용자는 지원 항목별 메모를 생성, 수정, 삭제할 수 있다.
-- 목록은 검색, 상태/회사/우선순위/지원경로 필터, 정렬, 페이지네이션을 지원해야 한다.
-- 모든 조회와 연결은 현재 사용자 소유 데이터로 제한한다.
+# Functional Specification
+
+Current implemented version: `v0.4.1`
+
+## Completed features
+
+| ID | Feature | Status | Version |
+| --- | --- | --- | --- |
+| AUTH-001 | Signup, login, token refresh, logout, current user | Done | v0.1.1 |
+| AUTH-002 | Google/GitHub OAuth login and account linking | Done | v0.1.3 |
+| SECURITY-001 | Email verification, password recovery, sessions, security events | Done | v0.1.4 |
+| PROFILE-001 | Career profile, experiences, projects, skills, preferences | Done | v0.1.2 |
+| JOB-001 | Job posting CRUD and URL import | Done | v0.2.0 |
+| AI-JOB-001 | AI job posting analysis | Done | v0.2.1 |
+| MATCH-001 | User-job matching analysis | Done | v0.2.2 |
+| RESUME-001 | Resume metadata and PDF/DOCX file management | Done | v0.3.0 |
+| RESUME-EXTRACT-001 | Resume text extraction and user editing | Done | v0.3.1 |
+| RESUME-AI-001 | AI resume structured analysis | Done | v0.3.2 |
+| DOCUMENT-001 | Application document generation, versions, sources | Done | v0.3.3 |
+| APPLICATION-001 | Application tracking, status history, notes, fixed submitted document version | Done | v0.4.0 |
+| SCHEDULE-001 | Schedule create, list, detail, update, archive | Done | v0.4.1 |
+| SCHEDULE-002 | Link schedules to applications and job postings | Done | v0.4.1 |
+| SCHEDULE-003 | Schedule event type, status, confidence | Done | v0.4.1 |
+| SCHEDULE-004 | Reminder create, list, update, delete | Done | v0.4.1 |
+| SCHEDULE-005 | Month, week, and list views | Done | v0.4.1 |
+| SCHEDULE-006 | Due-soon and overdue calculations | Done | v0.4.1 |
+| SCHEDULE-007 | Time conflict detection and warning | Done | v0.4.1 |
+| SCHEDULE-008 | Schedule change history | Done | v0.4.1 |
+| SCHEDULE-009 | Ownership checks for all schedule resources | Done | v0.4.1 |
+
+## v0.4.1 exclusions
+
+- Recurring schedules
+- Real Google Calendar event creation
+- Gmail schedule auto extraction
+- Real email/push reminder delivery
+- Automatic application status changes from schedule creation

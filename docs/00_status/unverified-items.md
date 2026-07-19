@@ -1,36 +1,23 @@
 # Unverified Items
 
-## 외부 서비스
+## 운영 환경 검증 필요
 
-- OpenAI 실제 호출: `NEEDS_VERIFICATION`
-- Google OAuth 운영 인증 정보: `NEEDS_VERIFICATION`
-- GitHub OAuth 운영 인증 정보: `NEEDS_VERIFICATION`
-- Google Calendar 실제 동기화: `NEEDS_VERIFICATION`
-- Gmail 실제 메일 분석: `NEEDS_VERIFICATION`
-- 운영 SMTP: `NEEDS_VERIFICATION`
+| 항목 | 상태 | 이유 |
+| --- | --- | --- |
+| 실제 OpenAI 호출 | NEEDS_VERIFICATION | 운영 API key/model 설정과 비용 확인 필요 |
+| 운영 Google/GitHub OAuth | NEEDS_VERIFICATION | 운영 client/secret/redirect URI 필요 |
+| 운영 SMTP | NEEDS_VERIFICATION | 실제 메일 발송 계정과 도메인 검증 필요 |
+| HTTPS Cookie/SameSite | NEEDS_VERIFICATION | 운영 도메인과 HTTPS 환경에서 검증 필요 |
+| 운영 배포 | NEEDS_VERIFICATION | 서버/도메인/DB/Redis 환경 필요 |
+| 브라우저 E2E 자동화 | PLANNED | v0.9.0 안정화 단계에서 강화 예정 |
 
-## 운영 환경
+## v0.4.1 제외 또는 후속 범위
 
-- HTTPS Cookie 설정
-- 운영 배포
-- 운영 DB migration
-- 운영 파일 스토리지
-- 백업/복구
-- 모니터링
-
-## 테스트
-
-- 브라우저 E2E
-- 부하 테스트
-- 실제 PostgreSQL 전체 migration chain
-- 파일 바이러스 스캔
-- OCR 기반 이미지 PDF 텍스트 추출
-
-## v0.3.2
-
-- OpenAI 이력서 분석 실제 API 호출: `NEEDS_VERIFICATION` (Mock Provider와 OpenAI interface는 검증 완료)
-# v0.4.0 미검증 후보
-
-- 실제 외부 채용 사이트 지원 제출: v0.4.0 범위 제외
-- Google Calendar 실제 일정 생성: v0.4.1 이후 범위
-- 이메일 기반 자동 상태 변경: v0.4.1 이후 범위
+| 항목 | 상태 | 후속 버전 |
+| --- | --- | --- |
+| 이메일/푸시 알림 실제 발송 | PLANNED | 미정 |
+| 백그라운드 알림 워커 | PLANNED | 미정 |
+| Google Calendar 실제 일정 생성 | PLANNED | v0.5.0 |
+| Gmail 일정 자동 추출 | PLANNED | v0.5.1 |
+| 반복 일정 | DEFERRED | 미정 |
+| 일정 생성에 따른 지원 상태 자동 변경 | DEFERRED | 사용자 승인 흐름 설계 후 |

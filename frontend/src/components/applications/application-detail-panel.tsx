@@ -92,7 +92,28 @@ export function ApplicationDetailPanel({ applicationId }: { applicationId: numbe
           {application.job_id ? <Link className="button-secondary" href={`/jobs/${application.job_id}`}>채용공고 보기</Link> : null}
           {application.resume_id ? <Link className="button-secondary" href={`/resumes/${application.resume_id}`}>이력서 보기</Link> : null}
           {application.application_document_id ? <Link className="button-secondary" href={`/documents/${application.application_document_id}`}>지원 문서 보기</Link> : null}
+          <Link className="button-primary" href={`/calendar/new?applicationId=${application.id}${application.job_id ? `&jobId=${application.job_id}` : ""}`}>
+            일정 추가
+          </Link>
+          <Link className="button-secondary" href={`/calendar?applicationId=${application.id}`}>
+            연결 일정 보기
+          </Link>
           {application.application_url ? <a className="button-secondary" href={application.application_url} rel="noreferrer" target="_blank">지원 링크 열기</a> : null}
+        </div>
+      </section>
+
+      <section className="panel max-w-none">
+        <h2 className="text-lg font-semibold text-slate-950">연결 일정</h2>
+        <p className="mt-2 text-sm text-slate-600">
+          지원 마감, 면접, 결과 발표 같은 일정을 이 지원 항목에 연결해 관리합니다. 일정 목록에서는 임박 일정과 충돌 여부를 함께 확인할 수 있습니다.
+        </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link className="button-primary" href={`/calendar/new?applicationId=${application.id}${application.job_id ? `&jobId=${application.job_id}` : ""}`}>
+            이 지원 항목에 일정 추가
+          </Link>
+          <Link className="button-secondary" href={`/calendar?applicationId=${application.id}`}>
+            캘린더에서 보기
+          </Link>
         </div>
       </section>
 
