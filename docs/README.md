@@ -1,6 +1,6 @@
 # ApplyMate AI Documentation
 
-현재 문서 기준 버전: `v0.4.1`
+현재 문서 기준 버전: `v0.4.2`
 
 ## 문서 구조
 
@@ -14,23 +14,23 @@
 - `06_database`: DB 설계와 ERD
 - `06_operations`: 배포, 환경변수, 테스트 체크리스트
 - `07_policies`: 보안, AI, 채용공고, 지원 현황, 일정 정책
-- `08_design`: 네비게이션 구조
+- `08_design`: 내비게이션 구조
 - `09_guides`: 운영/외부 서비스 설정 가이드
 - `10_ai`: AI 프롬프트와 출력 스키마
 - `11_releases`: 버전별 릴리스 노트
 
-## v0.4.1에서 최신화된 주요 문서
+## v0.4.2에서 최신화된 주요 문서
 
 - [현재 프로젝트 상태](00_status/current-project-status.md)
 - [완료 기능 목록](00_status/completed-features.md)
 - [Feature Status Matrix](00_status/feature-status-matrix.md)
 - [미검증 항목](00_status/unverified-items.md)
+- [기능 명세](03_requirements/functional-specification.md)
 - [API 명세](04_api/api-specification.md)
 - [오류 코드](04_api/error-codes.md)
+- [마스터 완료 계획](05_development-plan/master-completion-plan.md)
 - [버전 로드맵](05_development-plan/version-roadmap.md)
-- [v0.4.1 일정 관리 계획](05_development-plan/releases/v0.4.1-plan.md)
+- [v0.4.2 대시보드 계획](05_development-plan/releases/v0.4.2-plan.md)
 - [DB 설계](06_database/database-design.md)
-- [ERD](06_database/erd.md)
-- [일정 관리 정책](07_policies/schedule-management-policy.md)
-- [네비게이션 구조](08_design/navigation-structure.md)
-- [v0.4.1 릴리스 노트](11_releases/v0.4.1-schedule-management.md)
+- [내비게이션 구조](08_design/navigation-structure.md)
+- [v0.4.2 릴리스 노트](11_releases/v0.4.2-dashboard.md)

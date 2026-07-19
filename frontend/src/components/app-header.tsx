@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const navItems = [
   { href: "/", label: "홈" },
+  { href: "/dashboard", label: "대시보드" },
   { href: "/profile", label: "프로필" },
   { href: "/jobs", label: "채용공고" },
   { href: "/resumes", label: "이력서" },

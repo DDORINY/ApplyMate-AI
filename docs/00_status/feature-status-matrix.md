@@ -1,12 +1,11 @@
 # Feature Status Matrix
 
-문서 기준일: 2026-07-19
-현재 릴리스: `v0.4.1`
-현재 작업 브랜치: `feature/v0.4.1-schedule-management`
+문서 기준일: 2026-07-20
+현재 릴리스: `v0.4.2`
 
 ## 버전별 기능 상태
 
-| 영역 | 기능 | 상태 | 버전 | 검증 비고 |
+| 영역 | 기능 | 상태 | 버전 | 검증/비고 |
 | --- | --- | --- | --- | --- |
 | Foundation | 프로젝트 기반, Docker Compose, Health API | 완료 | v0.1.0 | 기본 구조 |
 | 인증 | 이메일 회원가입, 로그인, JWT, Refresh Token | 완료 | v0.1.1 | backend tests |
@@ -21,39 +20,37 @@
 | AI | AI 이력서 구조화 분석, 후보 데이터, 실행 이력 | 완료 | v0.3.2 | mock provider 검증 |
 | 지원 문서 | 근거 기반 지원 문서 생성, 버전, 출처, 실행 이력 | 완료 | v0.3.3 | backend tests, frontend build |
 | 지원 현황 | 지원 항목 CRUD, 상태 이력, 메모, 문서 버전 고정 | 완료 | v0.4.0 | backend tests, frontend build |
-| 일정 | 일정 CRUD, 상태, 신뢰도, 알림 저장, 충돌, 임박 일정, 변경 이력 | 완료 | v0.4.1 | backend tests, frontend lint/type-check/build |
-| 대시보드 | 지원·일정·분석 요약 화면 | 예정 | v0.4.2 | v0.4.1 이후 |
-| 연동 | Google Calendar 연동 기반 | 예정 | v0.5.0 | 사용자 명시 승인 필요 |
+| 일정 | 일정 CRUD, 알림 저장, 충돌 표시, 예정 일정, 변경 이력 | 완료 | v0.4.1 | backend tests, frontend lint/type-check/build |
+| 대시보드 | 지원/일정/마감/AI/문서/활동 요약 화면 | 완료 | v0.4.2 | backend tests, frontend type-check |
+| 연동 | Google Calendar 연동 기반 | 예정 | v0.5.0 | 실제 Google credentials 필요 |
 | 연동 | Gmail 채용 메일 분석 기반 | 예정 | v0.5.1 | 실제 메일 변경/발송 금지 |
 | 추천 | 일일 맞춤 채용공고 추천 | 예정 | v0.6.0 | 추천 규칙/피드백 기반 |
 | Release | MVP 안정화, E2E, 운영 문서, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
 
-## v0.4.1 내부 상태
+## v0.4.2 세부 상태
 
 | 기능 | 상태 | 검증 |
 | --- | --- | --- |
-| 일정 이벤트 API | 완료 | `backend/tests/test_schedule.py` |
-| 일정 생성/목록/상세/수정/보관 | 완료 | backend tests |
-| 지원 항목·채용공고 연결 검증 | 완료 | backend tests |
-| 일정 상태 변경과 중복 완료/취소 방지 | 완료 | backend tests |
-| 일정 신뢰도 저장 | 완료 | backend tests |
-| 알림 생성/수정/삭제와 중복 방지 | 완료 | backend tests |
-| 충돌 감지 | 완료 | backend tests |
-| 임박 일정과 지난 일정 계산 | 완료 | backend tests |
-| 소유권 검증 | 완료 | backend tests |
-| `/calendar` 목록/월간/주간 화면 | 완료 | frontend lint/type-check/build |
-| `/calendar/new` 생성 화면 | 완료 | frontend lint/type-check/build |
-| `/calendar/events/{eventId}` 상세 화면 | 완료 | frontend lint/type-check/build |
-| 지원/공고 상세 일정 진입점 | 완료 | frontend lint/type-check/build |
+| `GET /api/v1/dashboard` | 완료 | `backend/tests/test_dashboard.py` |
+| 지원 상태 그룹 집계 | 완료 | 상태 그룹/아카이브 제외 테스트 |
+| 기간 필터 `7d/30d/90d/all` | 완료 | 기본/전체/사용자 지정 날짜 테스트 |
+| 사용자 지정 날짜 `start_date/end_date` | 완료 | 날짜 범위 오류 테스트 |
+| 시간대 처리 | 완료 | `Asia/Seoul`, invalid timezone 테스트 |
+| 오늘/이번 주 일정 | 완료 | 일정 조회 테스트 |
+| 취소/아카이브 일정 제외 | 완료 | 취소 일정 제외 테스트 |
+| 일정 마감/공고 마감 | 완료 | 7일 이내 마감 테스트 |
+| 최근 AI 분석/적합도/문서/활동 | 완료 | recent limit/소유권 테스트 |
+| `/dashboard` 화면 | 완료 | frontend type-check |
+| 헤더 네비게이션 | 완료 | 주요 네비와 계정 네비 분리 |
 
-## 미검증·제외 상태
+## 미검증 또는 운영 확인 필요
 
 | 항목 | 상태 | 이유 |
 | --- | --- | --- |
 | 실제 OpenAI 호출 | NEEDS_VERIFICATION | API key/model 필요, 비용 발생 가능 |
 | 운영 Google/GitHub OAuth | NEEDS_VERIFICATION | 운영 client/secret/redirect URI 필요 |
-| Google Calendar 실제 일정 생성 | 예정 | v0.5.0 이후 |
-| Gmail 실제 메일 분석 | 예정 | v0.5.1 이후 |
-| 이메일/푸시 알림 실제 발송 | 예정 | v0.4.1은 알림 저장·표시만 구현 |
+| Google Calendar 실제 일정 생성 | 예정 | v0.5.0 범위 |
+| Gmail 실제 메일 분석 | 예정 | v0.5.1 범위 |
+| 이메일/푸시 알림 실제 발송 | 예정 | 현재는 알림 저장 중심 |
 | 운영 SMTP | NEEDS_VERIFICATION | 운영 SMTP 계정 필요 |
-| 브라우저 E2E 자동화 | 예정 | v0.9.0 안정화 단계에서 강화 |
+| 브라우저 E2E 자동화 | 예정 | v0.9.0 이후 강화 |

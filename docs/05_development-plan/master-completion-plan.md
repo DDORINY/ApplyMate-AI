@@ -33,3 +33,9 @@
 - 준비 중인 지원 항목
 - 최근 AI 분석, 적합도 분석, 지원 문서
 - 최근 활동 로그
+# v0.4.2 Completion Update
+
+- 대시보드 API와 `/dashboard` 화면을 v0.4.2 범위로 완료한다.
+- v0.4.2는 신규 DB migration 없이 기존 지원/일정/공고/AI/문서 데이터를 읽기 전용으로 집계한다.
+- v0.4.2 완료 후 다음 개발 브랜치는 `feature/v0.5.0-google-calendar`이다.
+- v0.5.0은 Google Calendar OAuth 계정 연결과 내부 일정 동기화 기반을 목표로 한다.

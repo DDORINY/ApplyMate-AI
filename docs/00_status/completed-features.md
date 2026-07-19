@@ -17,16 +17,17 @@
 | v0.3.2 | AI 이력서 구조화 분석, 후보 데이터, 실행 이력 |
 | v0.3.3 | 맞춤 지원 문서 생성, 버전 관리, 출처 조회, 실행 이력 |
 | v0.4.0 | 지원 현황 CRUD, 상태 변경 이력, 지원 메모, 제출 문서 버전 고정 |
-| v0.4.1 | 일정 CRUD, 상태/신뢰도, 알림 저장, 충돌 표시, 임박 일정, 변경 이력 |
+| v0.4.1 | 일정 CRUD, 상태/신뢰도, 알림 저장, 충돌 표시, 예정 일정, 변경 이력 |
+| v0.4.2 | 지원/일정/마감/AI 분석/문서/활동을 모으는 읽기 전용 대시보드 |
 
-## v0.4.1 완료 상세
+## v0.4.2 완료 상세
 
-- `/api/v1/calendar/events` 일정 생성/목록/상세/수정/보관
-- `/api/v1/calendar/events/{eventId}/status` 상태 변경
-- `/api/v1/calendar/events/{eventId}/history` 변경 이력 조회
-- `/api/v1/calendar/events/{eventId}/reminders` 알림 생성/조회/수정/삭제
-- `/api/v1/calendar/conflicts` 시간 충돌 조회
-- `/api/v1/calendar/upcoming` 임박 일정 조회
-- `/api/v1/calendar/options` 일정 생성 선택 옵션 조회
-- `/calendar`, `/calendar/new`, `/calendar/events/{eventId}` 프론트 화면
-- 지원 상세와 채용공고 상세의 일정 연결 진입점
+- `GET /api/v1/dashboard` 추가
+- 지원 상태를 백엔드 그룹 기준으로 집계
+- 기본 기간 `30d`, 기간 옵션 `7d|30d|90d|all`, 사용자 지정 `start_date/end_date` 지원
+- 시간대 기본값 `Asia/Seoul`
+- 오늘 일정, 이번 주 일정, 다가오는 일정 마감, 마감 임박 공고 조회
+- 준비 중인 지원 항목, 최근 공고 분석, 최근 적합도 분석, 최근 이력서 분석, 최근 지원 문서 조회
+- 최근 활동 피드 구성
+- `/dashboard` 프론트 화면 추가
+- 헤더 주요 네비게이션에 대시보드 추가, 로그인/회원가입/계정 관리는 오른쪽 계정 네비게이션 유지
