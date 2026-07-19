@@ -130,3 +130,15 @@ API 오류 응답은 다음 공통 구조를 사용합니다.
 | `JOB_ANALYSIS_ALREADY_RUNNING` | 409 | 같은 공고 분석이 이미 진행 중입니다. |
 | `JOB_ANALYSIS_INPUT_EMPTY` | 422 | 분석할 채용공고 내용이 없습니다. |
 | `JOB_ANALYSIS_NOT_FOUND` | 404 | 저장된 분석 결과가 없습니다. |
+## v0.2.2 사용자-공고 적합도 분석 오류 코드
+
+| Code | HTTP Status | 설명 |
+| --- | ---: | --- |
+| `JOB_MATCH_PROFILE_REQUIRED` | 409 | 적합도 분석에 필요한 커리어 프로필이 없습니다. |
+| `JOB_MATCH_PROFILE_INCOMPLETE` | 409 | 적합도 분석에 필요한 사용자 기술 또는 희망 조건이 부족합니다. |
+| `JOB_ANALYSIS_REQUIRED` | 409 | 완료된 채용공고 분석이 먼저 필요합니다. |
+| `JOB_ANALYSIS_OUTDATED` | 409 | 채용공고가 변경되어 공고 재분석이 필요합니다. |
+| `JOB_MATCH_ALREADY_RUNNING` | 409 | 같은 공고의 적합도 분석이 이미 진행 중입니다. |
+| `JOB_MATCH_FAILED` | 500 | 적합도 분석 처리 중 오류가 발생했습니다. |
+| `JOB_MATCH_NOT_FOUND` | 404 | 저장된 적합도 분석 결과가 없습니다. |
+| `JOB_MATCH_FEEDBACK_NOT_FOUND` | 404 | 적합도 분석 피드백을 찾을 수 없습니다. |
