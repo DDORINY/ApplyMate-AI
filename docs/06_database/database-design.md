@@ -171,18 +171,24 @@ uq_resume_files_user_file_hash = (user_id, file_hash)
 
 ### `resume_file_extractions`
 
-업로드된 이력서 파일의 텍스트 추출 결과를 저장한다.
+업로드된 이력서 파일의 최신 텍스트 추출 결과와 사용자 수정본을 저장한다.
 
 | 컬럼 | 설명 |
 | --- | --- |
 | `id` | Primary Key |
 | `resume_file_id` | 대상 이력서 파일 ID, 파일 삭제 시 cascade |
 | `user_id` | 소유 사용자 ID |
-| `status` | `COMPLETED`, `FAILED` |
-| `extracted_text` | 추출된 텍스트 |
-| `text_length` | 추출 텍스트 길이 |
-| `parser_version` | 추출기 버전 |
-| `source_file_hash` | 추출 당시 원본 파일 hash |
+| `extraction_status` | `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`, `TEXT_NOT_FOUND`, `OCR_REQUIRED` |
+| `raw_text` | 시스템이 원본 파일에서 추출한 텍스트 |
+| `edited_text` | 사용자가 수정한 텍스트 |
+| `page_texts` | 페이지별 텍스트 JSON. DOCX는 단일 logical page |
+| `section_candidates` | 규칙 기반 섹션 후보 JSON |
+| `page_count` | 페이지 수 또는 logical page 수 |
+| `character_count` | 현재 추출/수정 텍스트 길이 |
+| `input_hash` | 추출 당시 원본 파일 hash |
+| `is_outdated` | 현재 파일 hash와 `input_hash`가 다른지 여부 |
+| `is_user_edited` | 사용자 수정본 존재 여부 |
+| `current_run_id` | 최신 실행 이력 ID |
 | `error_code`, `error_message` | 실패 시 오류 정보 |
 | `extracted_at` | 추출 실행 시각 |
 
@@ -190,3 +196,27 @@ uq_resume_files_user_file_hash = (user_id, file_hash)
 
 - `resume_file_id`는 unique로 관리하여 파일당 최신 추출 결과 1개만 유지한다.
 - 모든 조회는 `user_id` 소유권 조건을 함께 사용한다.
+
+### `resume_extraction_runs`
+
+이력서 텍스트 추출 실행 이력을 보존한다. 재추출 시 기존 이력을 덮어쓰지 않고 새 run을 추가한다.
+
+| 컬럼 | 설명 |
+| --- | --- |
+| `id` | Primary Key |
+| `extraction_id` | 연결된 최신 추출 결과 ID |
+| `resume_file_id` | 대상 파일 ID |
+| `user_id` | 소유 사용자 ID |
+| `status` | 실행 최종 상태 |
+| `input_hash` | 실행 당시 파일 hash |
+| `extractor`, `extractor_version` | 추출기 식별자와 버전 |
+| `started_at`, `completed_at` | 실행 시작/종료 시각 |
+| `error_code`, `error_message` | 실패 또는 특수 상태 사유 |
+| `page_count`, `character_count` | 실행 결과 메타데이터 |
+| `metadata_json` | page_texts, section_candidates 등 실행 메타데이터 |
+
+설계 정책:
+
+- `raw_text`는 재추출 결과로 갱신될 수 있지만 `edited_text`는 사용자가 수정한 값으로 별도 보존한다.
+- 재추출은 실행 이력을 보존하며 최신 결과만 `resume_file_extractions`에 반영한다.
+- OCR은 v0.3.1에서 실행하지 않으며 텍스트 레이어가 없는 PDF는 `OCR_REQUIRED`로 기록한다.

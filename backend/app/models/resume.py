@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Index, Integer, String, Text, UniqueConstraint, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Index, Integer, JSON, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -69,8 +69,12 @@ class ResumeFile(Base):
 
 
 class ResumeExtractionStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
     COMPLETED = "COMPLETED"
     FAILED = "FAILED"
+    TEXT_NOT_FOUND = "TEXT_NOT_FOUND"
+    OCR_REQUIRED = "OCR_REQUIRED"
 
 
 class ResumeFileExtraction(Base):
@@ -86,14 +90,22 @@ class ResumeFileExtraction(Base):
         nullable=False,
     )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
-    status: Mapped[ResumeExtractionStatus] = mapped_column(
+    extraction_status: Mapped[ResumeExtractionStatus] = mapped_column(
         Enum(ResumeExtractionStatus, name="resume_extraction_status"),
         nullable=False,
+        default=ResumeExtractionStatus.PENDING,
+        server_default=ResumeExtractionStatus.PENDING.value,
     )
-    extracted_text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    text_length: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
-    parser_version: Mapped[str] = mapped_column(String(40), nullable=False)
-    source_file_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    raw_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    edited_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    page_texts: Mapped[list[dict[str, object]]] = mapped_column(JSON, nullable=False, default=list)
+    section_candidates: Mapped[list[dict[str, object]]] = mapped_column(JSON, nullable=False, default=list)
+    page_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    character_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    input_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    is_outdated: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    is_user_edited: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="false")
+    current_run_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
     error_code: Mapped[str | None] = mapped_column(String(80), nullable=True)
     error_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
     extracted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -103,6 +115,64 @@ class ResumeFileExtraction(Base):
     )
 
     resume_file = relationship("ResumeFile", back_populates="extraction")
+    runs = relationship("ResumeExtractionRun", back_populates="extraction", cascade="all, delete-orphan")
+
+    @property
+    def status(self) -> ResumeExtractionStatus:
+        return self.extraction_status
+
+    @property
+    def extracted_text(self) -> str | None:
+        return self.edited_text if self.is_user_edited and self.edited_text is not None else self.raw_text
+
+    @property
+    def text_length(self) -> int:
+        return self.character_count
+
+    @property
+    def parser_version(self) -> str:
+        return "v0.3.1-basic"
+
+    @property
+    def source_file_hash(self) -> str:
+        return self.input_hash
+
+
+class ResumeExtractionRun(Base):
+    __tablename__ = "resume_extraction_runs"
+    __table_args__ = (
+        Index("ix_resume_extraction_runs_extraction_id", "extraction_id"),
+        Index("ix_resume_extraction_runs_user_id", "user_id"),
+        Index("ix_resume_extraction_runs_resume_file_id", "resume_file_id"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    extraction_id: Mapped[int | None] = mapped_column(
+        ForeignKey("resume_file_extractions.id", ondelete="CASCADE"),
+        nullable=True,
+    )
+    resume_file_id: Mapped[int] = mapped_column(
+        ForeignKey("resume_files.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status: Mapped[ResumeExtractionStatus] = mapped_column(
+        Enum(ResumeExtractionStatus, name="resume_extraction_status"),
+        nullable=False,
+    )
+    input_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    extractor: Mapped[str] = mapped_column(String(80), nullable=False)
+    extractor_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    page_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    character_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    metadata_json: Mapped[dict[str, object]] = mapped_column(JSON, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    extraction = relationship("ResumeFileExtraction", back_populates="runs")
 
 
 Index(

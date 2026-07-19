@@ -10,13 +10,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AppError
 from app.core.security import utc_now
-from app.models.resume import Resume, ResumeExtractionStatus, ResumeFile, ResumeFileExtraction
+from app.models.resume import Resume, ResumeExtractionRun, ResumeExtractionStatus, ResumeFile, ResumeFileExtraction
 from app.repositories.resume import ResumeRepository
-from app.schemas.resume import ResumeCreate, ResumeListData, ResumePublic, ResumeUpdate
+from app.schemas.resume import ResumeCreate, ResumeExtractionUpdate, ResumeListData, ResumePublic, ResumeUpdate
 from app.services.storage import LocalFileStorage
 
 RESUME_EXTRACTION_PARSER_VERSION = "v0.3.1-basic"
+RESUME_EXTRACTION_EXTRACTOR = "applymate-basic-parser"
 PDF_TEXT_PATTERN = re.compile(r"\((.*?)\)\s*Tj", re.DOTALL)
+PDF_PAGE_SPLIT_PATTERN = re.compile(r"/Type\s*/Page\b")
+SECTION_KEYWORDS = {
+    "SUMMARY": ("summary", "소개", "요약", "profile"),
+    "SKILLS": ("skills", "기술", "스킬", "tech"),
+    "EXPERIENCE": ("experience", "경력", "work"),
+    "PROJECTS": ("projects", "프로젝트"),
+    "EDUCATION": ("education", "학력", "교육"),
+    "CERTIFICATIONS": ("certification", "certificate", "자격증"),
+    "AWARDS": ("awards", "수상"),
+    "CONTACT": ("contact", "email", "phone", "연락처"),
+    "PORTFOLIO": ("portfolio", "github", "blog", "포트폴리오"),
+}
 
 
 class ResumeService:
@@ -135,80 +148,175 @@ class ResumeService:
 
     async def extract_file(self, user_id: int, resume_id: int, file_id: int) -> ResumeFileExtraction:
         resume_file = await self.get_file(user_id, resume_id, file_id)
+        extraction = await self.prepare_extraction(user_id, resume_file)
+        run = await self.start_extraction_run(user_id, resume_file, extraction)
+
         path = self.storage.existing_file_path(resume_file.storage_path)
         content = path.read_bytes()
         try:
-            extracted_text = self.extract_text(resume_file.file_extension, content)
-            if not extracted_text:
-                raise AppError("RESUME_EXTRACTION_TEXT_EMPTY", "추출된 이력서 텍스트가 없습니다.", 422)
-            return await self.upsert_extraction(
-                user_id=user_id,
-                resume_file=resume_file,
+            result = self.extract_text(resume_file.file_extension, content)
+            return await self.complete_extraction(
+                extraction=extraction,
+                run=run,
                 status=ResumeExtractionStatus.COMPLETED,
-                extracted_text=extracted_text,
+                raw_text=str(result["raw_text"]),
+                page_texts=list(result["page_texts"]),
+                section_candidates=self.detect_sections(str(result["raw_text"])),
                 error_code=None,
                 error_message=None,
             )
         except AppError as exc:
             if exc.code == "RESUME_FILE_MISSING_ON_STORAGE":
                 raise
-            return await self.upsert_extraction(
-                user_id=user_id,
-                resume_file=resume_file,
-                status=ResumeExtractionStatus.FAILED,
-                extracted_text=None,
+            return await self.complete_extraction(
+                extraction=extraction,
+                run=run,
+                status=self.status_for_extraction_error(exc.code),
+                raw_text=None,
+                page_texts=[],
+                section_candidates=[],
                 error_code=exc.code,
                 error_message=exc.message,
             )
+
+    async def prepare_extraction(self, user_id: int, resume_file: ResumeFile) -> ResumeFileExtraction:
+        extraction = await self.repository.get_extraction(user_id, resume_file.id)
+        if extraction and extraction.extraction_status == ResumeExtractionStatus.PROCESSING:
+            raise AppError("RESUME_EXTRACTION_ALREADY_PROCESSING", "이력서 텍스트 추출이 이미 진행 중입니다.", 409)
+        if extraction is None:
+            extraction = ResumeFileExtraction(
+                resume_file_id=resume_file.id,
+                user_id=user_id,
+                extraction_status=ResumeExtractionStatus.PENDING,
+                page_texts=[],
+                section_candidates=[],
+                input_hash=resume_file.file_hash,
+                extracted_at=utc_now(),
+            )
+            self.session.add(extraction)
+            await self.session.flush()
+        return extraction
+
+    async def start_extraction_run(
+        self,
+        user_id: int,
+        resume_file: ResumeFile,
+        extraction: ResumeFileExtraction,
+    ) -> ResumeExtractionRun:
+        run = ResumeExtractionRun(
+            extraction_id=extraction.id,
+            resume_file_id=resume_file.id,
+            user_id=user_id,
+            status=ResumeExtractionStatus.PROCESSING,
+            input_hash=resume_file.file_hash,
+            extractor=RESUME_EXTRACTION_EXTRACTOR,
+            extractor_version=RESUME_EXTRACTION_PARSER_VERSION,
+            started_at=utc_now(),
+            metadata_json={},
+        )
+        self.session.add(run)
+        await self.session.flush()
+        extraction.extraction_status = ResumeExtractionStatus.PROCESSING
+        extraction.current_run_id = run.id
+        extraction.input_hash = resume_file.file_hash
+        extraction.is_outdated = False
+        await self.session.commit()
+        await self.session.refresh(run)
+        await self.session.refresh(extraction)
+        return run
 
     async def get_extraction(self, user_id: int, resume_id: int, file_id: int) -> ResumeFileExtraction:
         resume_file = await self.get_file(user_id, resume_id, file_id)
         extraction = await self.repository.get_extraction(user_id, resume_file.id)
         if not extraction:
             raise AppError("RESUME_EXTRACTION_NOT_FOUND", "이력서 텍스트 추출 결과를 찾을 수 없습니다.", 404)
+        extraction.is_outdated = extraction.input_hash != resume_file.file_hash
         return extraction
 
-    async def upsert_extraction(
+    async def update_extraction(
         self,
-        *,
         user_id: int,
-        resume_file: ResumeFile,
-        status: ResumeExtractionStatus,
-        extracted_text: str | None,
-        error_code: str | None,
-        error_message: str | None,
+        resume_id: int,
+        file_id: int,
+        payload: ResumeExtractionUpdate,
     ) -> ResumeFileExtraction:
+        resume_file = await self.get_file(user_id, resume_id, file_id)
         extraction = await self.repository.get_extraction(user_id, resume_file.id)
-        if extraction is None:
-            extraction = ResumeFileExtraction(
-                resume_file_id=resume_file.id,
-                user_id=user_id,
-                status=status,
-                parser_version=RESUME_EXTRACTION_PARSER_VERSION,
-                source_file_hash=resume_file.file_hash,
-                extracted_at=utc_now(),
-            )
-            self.session.add(extraction)
-        extraction.status = status
-        extraction.extracted_text = extracted_text
-        extraction.text_length = len(extracted_text or "")
-        extraction.parser_version = RESUME_EXTRACTION_PARSER_VERSION
-        extraction.source_file_hash = resume_file.file_hash
-        extraction.error_code = error_code
-        extraction.error_message = error_message
-        extraction.extracted_at = utc_now()
+        if not extraction:
+            raise AppError("RESUME_EXTRACTION_NOT_FOUND", "이력서 텍스트 추출 결과를 찾을 수 없습니다.", 404)
+        if extraction.extraction_status not in {ResumeExtractionStatus.COMPLETED, ResumeExtractionStatus.TEXT_NOT_FOUND}:
+            raise AppError("RESUME_EXTRACTION_NOT_EDITABLE", "수정할 수 없는 이력서 추출 상태입니다.", 409)
+        extraction.edited_text = payload.edited_text
+        extraction.character_count = len(payload.edited_text)
+        extraction.is_user_edited = True
+        extraction.is_outdated = extraction.input_hash != resume_file.file_hash
         await self.session.commit()
         await self.session.refresh(extraction)
         return extraction
 
-    def extract_text(self, extension: str, content: bytes) -> str:
+    async def list_extraction_runs(self, user_id: int, resume_id: int, file_id: int) -> list[ResumeExtractionRun]:
+        resume_file = await self.get_file(user_id, resume_id, file_id)
+        return await self.repository.list_extraction_runs(user_id, resume_file.id)
+
+    async def get_extraction_run(
+        self,
+        user_id: int,
+        resume_id: int,
+        file_id: int,
+        run_id: int,
+    ) -> ResumeExtractionRun:
+        resume_file = await self.get_file(user_id, resume_id, file_id)
+        run = await self.repository.get_extraction_run(user_id, resume_file.id, run_id)
+        if not run:
+            raise AppError("RESUME_EXTRACTION_RUN_NOT_FOUND", "이력서 텍스트 추출 실행 이력을 찾을 수 없습니다.", 404)
+        return run
+
+    async def complete_extraction(
+        self,
+        *,
+        extraction: ResumeFileExtraction,
+        run: ResumeExtractionRun,
+        status: ResumeExtractionStatus,
+        raw_text: str | None,
+        page_texts: list[dict[str, object]],
+        section_candidates: list[dict[str, object]],
+        error_code: str | None,
+        error_message: str | None,
+    ) -> ResumeFileExtraction:
+        now = utc_now()
+        extraction.extraction_status = status
+        extraction.raw_text = raw_text
+        extraction.page_texts = page_texts
+        extraction.section_candidates = section_candidates
+        extraction.page_count = len(page_texts)
+        extraction.character_count = len(raw_text or "")
+        extraction.error_code = error_code
+        extraction.error_message = error_message
+        extraction.extracted_at = now
+        extraction.current_run_id = run.id
+        run.status = status
+        run.completed_at = now
+        run.error_code = error_code
+        run.error_message = error_message
+        run.page_count = extraction.page_count
+        run.character_count = extraction.character_count
+        run.metadata_json = {
+            "page_texts": page_texts,
+            "section_candidates": section_candidates,
+            "ocr_excluded": True,
+        }
+        await self.session.commit()
+        await self.session.refresh(extraction)
+        return extraction
+
+    def extract_text(self, extension: str, content: bytes) -> dict[str, object]:
         if extension == ".docx":
             return self.extract_docx_text(content)
         if extension == ".pdf":
             return self.extract_pdf_text(content)
         raise AppError("RESUME_EXTRACTION_UNSUPPORTED_FILE_TYPE", "지원하지 않는 이력서 추출 파일 형식입니다.", 422)
 
-    def extract_docx_text(self, content: bytes) -> str:
+    def extract_docx_text(self, content: bytes) -> dict[str, object]:
         try:
             with ZipFile(BytesIO(content)) as archive:
                 document_xml = archive.read("word/document.xml")
@@ -223,16 +331,52 @@ class ResumeService:
             for node in root.iter()
             if node.tag.rsplit("}", 1)[-1] == "t" and node.text and node.text.strip()
         ]
-        return "\n".join(texts).strip()
+        raw_text = "\n".join(texts).strip()
+        if not raw_text:
+            raise AppError("RESUME_EXTRACTION_TEXT_NOT_FOUND", "DOCX에서 추출 가능한 텍스트를 찾지 못했습니다.", 422)
+        return {"raw_text": raw_text, "page_texts": [{"page": 1, "text": raw_text, "page_break_supported": False}]}
 
-    def extract_pdf_text(self, content: bytes) -> str:
+    def extract_pdf_text(self, content: bytes) -> dict[str, object]:
+        if b"/Encrypt" in content[:4096] or b"/Encrypt" in content[-4096:]:
+            raise AppError("RESUME_EXTRACTION_PDF_ENCRYPTED", "암호화된 PDF는 텍스트를 추출할 수 없습니다.", 422)
         raw_text = content.decode("latin-1", errors="ignore")
         matches = [self.clean_pdf_literal(match) for match in PDF_TEXT_PATTERN.findall(raw_text)]
         text = "\n".join(match for match in matches if match).strip()
-        if text:
-            return text
-        visible = "".join(char if 32 <= ord(char) <= 126 or char in "\r\n\t" else " " for char in raw_text)
-        return re.sub(r"\s+", " ", visible.replace("%PDF-", " ")).strip()
+        if not matches:
+            raise AppError("RESUME_EXTRACTION_OCR_REQUIRED", "텍스트 레이어가 없는 PDF입니다. OCR이 필요합니다.", 422)
+        if not text:
+            raise AppError("RESUME_EXTRACTION_TEXT_NOT_FOUND", "PDF에서 추출 가능한 텍스트를 찾지 못했습니다.", 422)
+        page_count = max(1, len(PDF_PAGE_SPLIT_PATTERN.findall(raw_text)))
+        return {"raw_text": text, "page_texts": self.split_text_into_pages(text, page_count)}
+
+    def split_text_into_pages(self, text: str, page_count: int) -> list[dict[str, object]]:
+        if page_count <= 1:
+            return [{"page": 1, "text": text}]
+        lines = [line for line in text.splitlines() if line.strip()]
+        if not lines:
+            return [{"page": page, "text": ""} for page in range(1, page_count + 1)]
+        chunk_size = max(1, ceil(len(lines) / page_count))
+        return [
+            {"page": page + 1, "text": "\n".join(lines[page * chunk_size : (page + 1) * chunk_size]).strip()}
+            for page in range(page_count)
+        ]
+
+    def detect_sections(self, text: str) -> list[dict[str, object]]:
+        lowered = text.lower()
+        candidates = []
+        for section, keywords in SECTION_KEYWORDS.items():
+            if any(keyword.lower() in lowered for keyword in keywords):
+                candidates.append({"section": section, "confidence": 0.5, "text": section})
+        if not candidates:
+            candidates.append({"section": "UNKNOWN", "confidence": 0.1, "text": "UNKNOWN"})
+        return candidates
+
+    def status_for_extraction_error(self, code: str) -> ResumeExtractionStatus:
+        if code == "RESUME_EXTRACTION_TEXT_NOT_FOUND":
+            return ResumeExtractionStatus.TEXT_NOT_FOUND
+        if code == "RESUME_EXTRACTION_OCR_REQUIRED":
+            return ResumeExtractionStatus.OCR_REQUIRED
+        return ResumeExtractionStatus.FAILED
 
     def clean_pdf_literal(self, value: str) -> str:
         return (

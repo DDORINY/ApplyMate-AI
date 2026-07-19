@@ -11,6 +11,9 @@ from app.schemas.common import ApiResponse
 from app.schemas.resume import (
     ResumeCreate,
     ResumeDeletedData,
+    ResumeExtractionRunListData,
+    ResumeExtractionRunPublic,
+    ResumeExtractionUpdate,
     ResumeFileDeletedData,
     ResumeFileExtractionPublic,
     ResumeFilePublic,
@@ -177,4 +180,78 @@ async def get_resume_file_extraction(
         success=True,
         data=ResumeFileExtractionPublic.model_validate(extraction),
         message="이력서 텍스트 추출 결과입니다.",
+    )
+
+
+@router.patch(
+    "/{resume_id}/files/{file_id}/extraction",
+    response_model=ApiResponse[ResumeFileExtractionPublic],
+)
+async def update_resume_file_extraction(
+    resume_id: int,
+    file_id: int,
+    payload: ResumeExtractionUpdate,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeFileExtractionPublic]:
+    extraction = await ResumeService(session).update_extraction(current_user.id, resume_id, file_id, payload)
+    return ApiResponse(
+        success=True,
+        data=ResumeFileExtractionPublic.model_validate(extraction),
+        message="이력서 텍스트 수정본이 저장되었습니다.",
+    )
+
+
+@router.post(
+    "/{resume_id}/files/{file_id}/extraction/retry",
+    response_model=ApiResponse[ResumeFileExtractionPublic],
+)
+async def retry_resume_file_extraction(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeFileExtractionPublic]:
+    extraction = await ResumeService(session).extract_file(current_user.id, resume_id, file_id)
+    return ApiResponse(
+        success=True,
+        data=ResumeFileExtractionPublic.model_validate(extraction),
+        message="이력서 텍스트 재추출이 완료되었습니다.",
+    )
+
+
+@router.get(
+    "/{resume_id}/files/{file_id}/extraction/runs",
+    response_model=ApiResponse[ResumeExtractionRunListData],
+)
+async def list_resume_file_extraction_runs(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeExtractionRunListData]:
+    runs = await ResumeService(session).list_extraction_runs(current_user.id, resume_id, file_id)
+    return ApiResponse(
+        success=True,
+        data=ResumeExtractionRunListData(items=[ResumeExtractionRunPublic.model_validate(run) for run in runs]),
+        message="이력서 텍스트 추출 실행 이력입니다.",
+    )
+
+
+@router.get(
+    "/{resume_id}/files/{file_id}/extraction/runs/{run_id}",
+    response_model=ApiResponse[ResumeExtractionRunPublic],
+)
+async def get_resume_file_extraction_run(
+    resume_id: int,
+    file_id: int,
+    run_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeExtractionRunPublic]:
+    run = await ResumeService(session).get_extraction_run(current_user.id, resume_id, file_id, run_id)
+    return ApiResponse(
+        success=True,
+        data=ResumeExtractionRunPublic.model_validate(run),
+        message="이력서 텍스트 추출 실행 이력 상세입니다.",
     )

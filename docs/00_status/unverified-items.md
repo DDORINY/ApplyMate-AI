@@ -24,3 +24,4 @@
 - 부하 테스트
 - 실제 PostgreSQL 전체 migration chain
 - 파일 바이러스 스캔
+- OCR 기반 이미지 PDF 텍스트 추출

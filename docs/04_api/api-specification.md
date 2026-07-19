@@ -158,6 +158,10 @@
 | DELETE | `/resumes/{resumeId}/files/{fileId}` | Access Token | v0.3.0 | 파일 삭제 |
 | POST | `/resumes/{resumeId}/files/{fileId}/extraction` | Access Token | v0.3.1 | 이력서 파일 텍스트 추출 실행 |
 | GET | `/resumes/{resumeId}/files/{fileId}/extraction` | Access Token | v0.3.1 | 이력서 파일 텍스트 추출 결과 조회 |
+| PATCH | `/resumes/{resumeId}/files/{fileId}/extraction` | Access Token | v0.3.1 | 이력서 추출 텍스트 사용자 수정 |
+| POST | `/resumes/{resumeId}/files/{fileId}/extraction/retry` | Access Token | v0.3.1 | 이력서 파일 텍스트 재추출 |
+| GET | `/resumes/{resumeId}/files/{fileId}/extraction/runs` | Access Token | v0.3.1 | 이력서 파일 텍스트 추출 실행 이력 목록 |
+| GET | `/resumes/{resumeId}/files/{fileId}/extraction/runs/{runId}` | Access Token | v0.3.1 | 이력서 파일 텍스트 추출 실행 이력 상세 |
 
 `POST /resumes/{resumeId}/files` 요청은 `multipart/form-data`이며 필드명은 `file`이다.
 
@@ -175,6 +179,13 @@
 
 - `POST /resumes/{resumeId}/files/{fileId}/extraction`은 업로드된 PDF/DOCX 파일에서 텍스트를 추출하고 최신 결과를 저장한다.
 - `GET /resumes/{resumeId}/files/{fileId}/extraction`은 저장된 최신 추출 결과를 반환한다.
-- 추출 결과는 `COMPLETED` 또는 `FAILED` 상태를 가진다.
-- 추출 결과에는 `extracted_text`, `text_length`, `parser_version`, `source_file_hash`, `error_code`, `error_message`, `extracted_at`을 포함한다.
-- v0.3.1의 PDF 추출은 text literal 기반 best-effort이며, OCR과 이미지 PDF 분석은 포함하지 않는다.
+- `PATCH /resumes/{resumeId}/files/{fileId}/extraction`은 `edited_text`만 수정한다. `raw_text`는 보존한다.
+- `POST /resumes/{resumeId}/files/{fileId}/extraction/retry`는 재추출을 실행하고 실행 이력을 추가한다.
+- `GET /resumes/{resumeId}/files/{fileId}/extraction/runs`는 추출 실행 이력을 최신순으로 반환한다.
+- 추출 상태는 `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`, `TEXT_NOT_FOUND`, `OCR_REQUIRED` 중 하나다.
+- 추출 결과에는 `raw_text`, `edited_text`, `extracted_text`, `page_texts`, `section_candidates`, `page_count`, `character_count`, `input_hash`, `is_outdated`, `is_user_edited`, `current_run_id`, `error_code`, `error_message`, `extracted_at`을 포함한다.
+- DOCX는 실제 페이지 경계를 신뢰할 수 없으므로 `page_texts`를 단일 logical page로 제공하고 `page_break_supported=false`를 표시한다.
+- PDF는 텍스트 literal 기반 best-effort로 페이지 수를 추정한다. 이미지 기반 PDF/OCR은 v0.3.1 범위에서 제외한다.
+- 텍스트 레이어가 없는 PDF는 `OCR_REQUIRED` 상태로 저장하며 시스템 실패 `FAILED`로 취급하지 않는다.
+- 텍스트가 비어 있는 DOCX/PDF는 `TEXT_NOT_FOUND` 상태로 저장한다.
+- 섹션 후보는 AI 분석 결과가 아니라 규칙 기반 힌트이며 `SUMMARY`, `SKILLS`, `EXPERIENCE`, `PROJECTS`, `EDUCATION`, `CERTIFICATIONS`, `AWARDS`, `CONTACT`, `PORTFOLIO`, `UNKNOWN` 중 하나로 표시한다.
