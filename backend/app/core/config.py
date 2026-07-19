@@ -64,6 +64,15 @@ class Settings:
     external_token_encryption_key: str
     external_token_encryption_key_version: str
     calendar_oauth_state_expire_seconds: int
+    gmail_provider: str
+    google_gmail_client_id: str
+    google_gmail_client_secret: str
+    google_gmail_redirect_uri: str
+    google_gmail_scopes: tuple[str, ...]
+    gmail_oauth_state_expire_seconds: int
+    gmail_default_search_query: str
+    gmail_default_lookback_days: int
+    gmail_max_messages_per_sync: int
 
 
 @lru_cache
@@ -172,6 +181,28 @@ def get_settings() -> Settings:
         external_token_encryption_key=os.getenv("EXTERNAL_TOKEN_ENCRYPTION_KEY", ""),
         external_token_encryption_key_version=os.getenv("EXTERNAL_TOKEN_ENCRYPTION_KEY_VERSION", "v1"),
         calendar_oauth_state_expire_seconds=int(os.getenv("CALENDAR_OAUTH_STATE_EXPIRE_SECONDS", "300")),
+        gmail_provider=os.getenv("GMAIL_PROVIDER", "disabled").strip().lower(),
+        google_gmail_client_id=os.getenv("GOOGLE_GMAIL_CLIENT_ID", ""),
+        google_gmail_client_secret=os.getenv("GOOGLE_GMAIL_CLIENT_SECRET", ""),
+        google_gmail_redirect_uri=os.getenv(
+            "GOOGLE_GMAIL_REDIRECT_URI",
+            "http://localhost:8000/api/v1/integrations/gmail/callback",
+        ),
+        google_gmail_scopes=tuple(
+            item.strip()
+            for item in os.getenv(
+                "GOOGLE_GMAIL_SCOPES",
+                "openid,email,profile,https://www.googleapis.com/auth/gmail.readonly",
+            ).split(",")
+            if item.strip()
+        ),
+        gmail_oauth_state_expire_seconds=int(os.getenv("GMAIL_OAUTH_STATE_EXPIRE_SECONDS", "300")),
+        gmail_default_search_query=os.getenv(
+            "GMAIL_DEFAULT_SEARCH_QUERY",
+            "newer_than:30d (채용 OR 지원 OR 면접 OR 인터뷰 OR 코딩테스트 OR 과제 OR 서류 OR 합격 OR 불합격 OR recruit OR interview OR application OR assessment OR offer)",
+        ),
+        gmail_default_lookback_days=int(os.getenv("GMAIL_DEFAULT_LOOKBACK_DAYS", "30")),
+        gmail_max_messages_per_sync=int(os.getenv("GMAIL_MAX_MESSAGES_PER_SYNC", "50")),
     )
 
 

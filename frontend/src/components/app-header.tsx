@@ -9,6 +9,7 @@ const navItems = [
   { href: "/documents", label: "지원 문서" },
   { href: "/applications", label: "지원 현황" },
   { href: "/calendar", label: "일정" },
+  { href: "/inbox-candidates", label: "메일 후보" },
 ];
 
 const accountItems = [

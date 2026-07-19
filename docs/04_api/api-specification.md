@@ -40,6 +40,36 @@ Error response:
 | Calendar | `/calendar` | v0.4.1 | Schedule management |
 | Dashboard | `/dashboard` | v0.4.2 | Read-only application dashboard |
 | Calendar Integration | `/integrations/calendar` | v0.5.0 | Google Calendar connection and sync |
+| Gmail Integration | `/integrations/gmail`, `/email-candidates` | v0.5.1 | Gmail recruitment email analysis candidates |
+
+## v0.5.1 Gmail Integration API
+
+Base path: `/api/v1`
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| GET | `/integrations/gmail/status` | Access Token | v0.5.1 | Get Gmail connection status |
+| POST | `/integrations/gmail/connect` | Access Token | v0.5.1 | Create Gmail OAuth authorization URL |
+| GET | `/integrations/gmail/callback` | OAuth state | v0.5.1 | Complete Gmail OAuth callback |
+| PATCH | `/integrations/gmail/settings` | Access Token | v0.5.1 | Update Gmail search/sync settings |
+| DELETE | `/integrations/gmail/connection` | Access Token | v0.5.1 | Disconnect Gmail integration |
+| POST | `/integrations/gmail/sync` | Access Token | v0.5.1 | Search and analyze Gmail messages |
+| GET | `/integrations/gmail/sync-runs` | Access Token | v0.5.1 | List Gmail sync runs |
+| GET | `/integrations/gmail/sync-runs/{runId}` | Access Token | v0.5.1 | Get Gmail sync run detail |
+| GET | `/email-candidates` | Access Token | v0.5.1 | List email candidates |
+| GET | `/email-candidates/{candidateId}` | Access Token | v0.5.1 | Get email candidate detail |
+| POST | `/email-candidates/{candidateId}/approve` | Access Token | v0.5.1 | Approve candidate actions |
+| POST | `/email-candidates/{candidateId}/reject` | Access Token | v0.5.1 | Reject candidate |
+| POST | `/email-candidates/{candidateId}/link-application` | Access Token | v0.5.1 | Link candidate to application |
+| GET | `/email-candidates/{candidateId}/application-options` | Access Token | v0.5.1 | Suggest application links |
+
+Security rules:
+
+- Gmail OAuth is separate from login and Calendar OAuth.
+- Gmail uses read-only scope only.
+- Token values and raw provider errors are never returned.
+- Status changes and schedule creation require explicit approval request flags.
+- Actual Gmail API calls remain `NEEDS_VERIFICATION`.
 
 ## v0.5.0 Calendar Integration API
 

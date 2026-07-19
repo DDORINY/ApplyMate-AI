@@ -1,5 +1,22 @@
 # ERD
 
+## v0.5.1 Gmail Analysis ERD
+
+```mermaid
+erDiagram
+    users ||--o{ external_accounts : owns
+    external_accounts ||--o{ gmail_connections : has
+    gmail_connections ||--o{ email_sync_runs : runs
+    gmail_connections ||--o{ email_messages : messages
+    email_messages ||--o{ email_analysis_runs : analyzed_by
+    email_messages ||--o{ email_candidates : creates
+    email_analysis_runs ||--o{ email_candidates : produces
+    email_candidates ||--o{ email_candidate_actions : records
+    applications ||--o{ email_candidates : linked
+    applications ||--o{ email_candidate_actions : changed_by
+    schedule_events ||--o{ email_candidate_actions : created_by
+```
+
 ## v0.4.1 Schedule ERD
 
 ```mermaid

@@ -20,6 +20,7 @@
 | 이메일/푸시 알림 실제 발송 | PLANNED | 미정 |
 | 백그라운드 알림 워커 | PLANNED | 미정 |
 | Google Calendar 실제 일정 생성/수정/삭제 | NEEDS_VERIFICATION | 운영 Google Cloud OAuth credentials와 consent 설정 필요 |
-| Gmail 일정 자동 추출 | PLANNED | v0.5.1 |
+| Gmail 실제 OAuth token exchange/search/fetch | NEEDS_VERIFICATION | 운영 Google Cloud OAuth credentials와 consent 설정 필요 |
+| 실제 OpenAI Gmail 메일 분석 | NEEDS_VERIFICATION | API key/model 및 비용 검증 필요 |
 | 반복 일정 | DEFERRED | 미정 |
 | 일정 생성에 따른 지원 상태 자동 변경 | DEFERRED | 사용자 승인 흐름 설계 후 |

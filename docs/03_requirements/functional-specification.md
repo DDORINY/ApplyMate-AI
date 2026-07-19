@@ -1,5 +1,32 @@
 # Functional Specification
 
+Current implemented version: `v0.5.1`
+
+## v0.5.1 Gmail Recruitment Email Analysis Functional Specification
+
+### Purpose
+
+사용자가 명시적으로 연결한 Gmail 계정에서 채용 관련 메일을 읽기 전용으로 분석하여 지원 상태와 일정 후보를 생성한다.
+
+### Requirements
+
+- Gmail OAuth는 로그인 OAuth 및 Calendar OAuth와 분리한다.
+- Gmail scope는 읽기 전용 `gmail.readonly`로 제한한다.
+- 동일 메일은 중복 저장하지 않는다.
+- 메일 원문 전체 HTML과 첨부파일은 저장하지 않는다.
+- 후보는 유형, 근거, 신뢰도, 검토 필요 여부를 가진다.
+- 지원 상태 변경과 일정 생성은 사용자 승인 후에만 수행한다.
+- 승인 처리 중 상태 변경, 일정 생성, 후보 action 기록은 transaction으로 처리한다.
+- 모든 조회/승인 API는 `user_id` 소유권을 검증한다.
+- 실제 Gmail API 호출은 운영 credentials 검증 전까지 `NEEDS_VERIFICATION`으로 표시한다.
+
+### Prohibited
+
+- 사용자 승인 없는 Gmail 메일 수정/삭제/발송
+- 사용자 승인 없는 지원 상태 변경
+- 사용자 승인 없는 일정 생성
+- 메일 내 prompt injection 문자열을 시스템 명령으로 실행
+
 Current implemented version: `v0.4.1`
 
 ## Completed features

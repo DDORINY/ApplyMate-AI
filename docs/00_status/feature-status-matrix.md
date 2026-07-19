@@ -1,7 +1,7 @@
 # Feature Status Matrix
 
 문서 기준일: 2026-07-20
-현재 릴리스: `v0.5.0`
+현재 릴리스: `v0.5.1`
 
 ## 버전별 기능 상태
 
@@ -23,7 +23,7 @@
 | 일정 | 일정 CRUD, 알림 저장, 충돌 표시, 예정 일정, 변경 이력 | 완료 | v0.4.1 | backend tests, frontend lint/type-check/build |
 | 대시보드 | 지원/일정/마감/AI/문서/활동 요약 화면 | 완료 | v0.4.2 | backend tests, frontend type-check |
 | 연동 | Google Calendar OAuth, Calendar 선택, mock 동기화, mapping/run/error | 완료 | v0.5.0 | mock provider 검증, 실제 Google은 NEEDS_VERIFICATION |
-| 연동 | Gmail 채용 메일 분석 기반 | 예정 | v0.5.1 | 실제 메일 변경/발송 금지 |
+| 연동 | Gmail 채용 메일 분석, 후보 생성, 사용자 승인 반영 | 완료 | v0.5.1 | mock provider 검증, 실제 Gmail은 NEEDS_VERIFICATION |
 | 추천 | 일일 맞춤 채용공고 추천 | 예정 | v0.6.0 | 추천 규칙/피드백 기반 |
 | Release | MVP 안정화, E2E, 운영 문서, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
 
@@ -50,7 +50,7 @@
 | 실제 OpenAI 호출 | NEEDS_VERIFICATION | API key/model 필요, 비용 발생 가능 |
 | 운영 Google/GitHub OAuth | NEEDS_VERIFICATION | 운영 client/secret/redirect URI 필요 |
 | Google Calendar 실제 일정 생성 | NEEDS_VERIFICATION | 운영 Google credentials 필요 |
-| Gmail 실제 메일 분석 | 예정 | v0.5.1 범위 |
+| Gmail 실제 메일 조회/분석 | NEEDS_VERIFICATION | 운영 Google Gmail API credentials 필요 |
 | 이메일/푸시 알림 실제 발송 | 예정 | 현재는 알림 저장 중심 |
 | 운영 SMTP | NEEDS_VERIFICATION | 운영 SMTP 계정 필요 |
 | 브라우저 E2E 자동화 | 예정 | v0.9.0 이후 강화 |

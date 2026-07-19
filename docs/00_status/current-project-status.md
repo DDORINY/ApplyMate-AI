@@ -2,9 +2,9 @@
 
 ## 현재 버전
 
-- 버전: `v0.5.0`
-- 현재 migration head: `20260719_2100`
-- 최신 릴리스 범위: Google Calendar 연동 기반
+- 버전: `v0.5.1`
+- 현재 migration head: `20260719_2200`
+- 최신 릴리스 범위: Gmail 채용 메일 분석 기반
 - Calendar provider 검증 기준: `CALENDAR_PROVIDER=mock`
 - AI provider 검증 기준: `AI_PROVIDER=mock`
 
@@ -24,6 +24,7 @@
 - 일정 관리, 알림 저장, 충돌 표시, 변경 이력
 - 대시보드 집계 API와 `/dashboard` 화면
 - Google Calendar 전용 OAuth state, token 암호화 저장, Calendar 선택, mock 동기화, mapping/run/error 기록, 연결 해제
+- Gmail 전용 OAuth state, 읽기 전용 scope, mock 메일 조회, 채용 메일 후보 생성, 사용자 승인 기반 상태 변경/일정 생성
 
 ## 주요 화면
 
@@ -33,11 +34,12 @@
 - `/calendar/events/{eventId}`
 - `/settings/accounts`
 - `/settings/integrations`
+- `/inbox-candidates`
 - `/settings/security`
 
 ## 현재 DB
 
-최신 migration: `20260719_2100_create_calendar_integration_tables.py`
+최신 migration: `20260719_2200_create_gmail_analysis_tables.py`
 
 v0.5.0 신규 테이블:
 
@@ -47,6 +49,16 @@ v0.5.0 신규 테이블:
 - `calendar_sync_mappings`
 - `sync_runs`
 - `sync_errors`
+
+v0.5.1 신규 테이블:
+
+- `gmail_oauth_states`
+- `gmail_connections`
+- `email_sync_runs`
+- `email_messages`
+- `email_analysis_runs`
+- `email_candidates`
+- `email_candidate_actions`
 
 ## 최근 검증 기준
 
@@ -66,4 +78,4 @@ v0.5.0 신규 테이블:
 - 운영 SMTP
 - 운영 HTTPS Cookie
 - 운영 배포
-- Gmail 실제 메일 분석
+- Gmail 실제 API 조회/분석
