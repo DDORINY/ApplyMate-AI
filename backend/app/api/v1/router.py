@@ -6,6 +6,7 @@ from app.api.v1.endpoints.application_documents import router as application_doc
 from app.api.v1.endpoints.applications import router as applications_router
 from app.api.v1.endpoints.auth import router as auth_router
 from app.api.v1.endpoints.calendar import router as calendar_router
+from app.api.v1.endpoints.calendar_integration import router as calendar_integration_router
 from app.api.v1.endpoints.dashboard import router as dashboard_router
 from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.job_analysis import router as job_analysis_router
@@ -22,6 +23,7 @@ api_router.include_router(ai_router)
 api_router.include_router(application_documents_router)
 api_router.include_router(applications_router)
 api_router.include_router(calendar_router)
+api_router.include_router(calendar_integration_router)
 api_router.include_router(dashboard_router)
 api_router.include_router(health_router, tags=["health"])
 api_router.include_router(job_analysis_router)
