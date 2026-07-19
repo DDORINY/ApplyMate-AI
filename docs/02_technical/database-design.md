@@ -71,3 +71,12 @@ pgvector는 v0.3.x 이후 의미 기반 검색과 분석이 필요할 때 도입
 - enum으로 기업 규모, source type, 상태, 고용 형태, 근무 형태, 마감 유형을 제한한다.
 - 동일 사용자 기준 `source_url`, `content_hash`, `company_id + title + deadline_at`으로 중복을 방지한다.
 - migration 파일은 `backend/alembic/versions/20260719_1200_create_job_posting_tables.py`이다.
+# v0.2.1 AI 채용공고 분석 DB 변경
+
+- `job_analyses`: 채용공고별 현재 AI 분석 결과를 1개 저장합니다.
+- `job_analysis_runs`: 분석 실행 이력, Provider, token 사용량, 실패 사유를 저장합니다.
+- 분석 상태 enum은 `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`를 사용합니다.
+- 분석 결과의 구조화 필드는 PostgreSQL JSONB로 저장합니다.
+- `job_analyses.job_posting_id`는 unique 제약으로 공고당 current 분석 1개를 보장합니다.
+- `user_id`와 `job_posting_id` 기반 외래키와 index로 사용자 소유권 검사와 조회 성능을 확보합니다.
+- migration: `backend/alembic/versions/20260719_1300_create_job_analysis_tables.py`

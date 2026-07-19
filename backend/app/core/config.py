@@ -41,6 +41,17 @@ class Settings:
     email_resend_cooldown_seconds: int
     login_max_failed_attempts: int
     login_lockout_seconds: int
+    ai_provider: str
+    openai_api_key: str
+    openai_model: str
+    ai_request_timeout_seconds: int
+    ai_max_retries: int
+    ai_analysis_max_input_chars: int
+    ai_analysis_prompt_version: str
+    ai_analysis_schema_version: str
+    ai_store_raw_response: bool
+    ai_daily_analysis_limit: int
+    ai_analysis_cooldown_seconds: int
 
 
 @lru_cache
@@ -104,6 +115,17 @@ def get_settings() -> Settings:
         email_resend_cooldown_seconds=int(os.getenv("EMAIL_RESEND_COOLDOWN_SECONDS", "60")),
         login_max_failed_attempts=int(os.getenv("LOGIN_MAX_FAILED_ATTEMPTS", "5")),
         login_lockout_seconds=int(os.getenv("LOGIN_LOCKOUT_SECONDS", "900")),
+        ai_provider=os.getenv("AI_PROVIDER", "disabled").strip().lower(),
+        openai_api_key=os.getenv("OPENAI_API_KEY", ""),
+        openai_model=os.getenv("OPENAI_MODEL", ""),
+        ai_request_timeout_seconds=int(os.getenv("AI_REQUEST_TIMEOUT_SECONDS", "60")),
+        ai_max_retries=int(os.getenv("AI_MAX_RETRIES", "2")),
+        ai_analysis_max_input_chars=int(os.getenv("AI_ANALYSIS_MAX_INPUT_CHARS", "30000")),
+        ai_analysis_prompt_version=os.getenv("AI_ANALYSIS_PROMPT_VERSION", "v1"),
+        ai_analysis_schema_version=os.getenv("AI_ANALYSIS_SCHEMA_VERSION", "v1"),
+        ai_store_raw_response=os.getenv("AI_STORE_RAW_RESPONSE", "false").lower() == "true",
+        ai_daily_analysis_limit=int(os.getenv("AI_DAILY_ANALYSIS_LIMIT", "20")),
+        ai_analysis_cooldown_seconds=int(os.getenv("AI_ANALYSIS_COOLDOWN_SECONDS", "30")),
     )
 
 

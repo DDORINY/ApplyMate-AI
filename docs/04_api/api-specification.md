@@ -344,4 +344,28 @@ Query:
 
 ## DELETE /jobs/{jobId}
 
+# v0.2.1 AI 채용공고 분석 API
+
+모든 API는 `/api/v1` 기준이며 인증이 필요합니다. Provider Secret이나 API Key는 응답에 포함하지 않습니다.
+
+| Method | Endpoint | 설명 |
+| --- | --- | --- |
+| GET | `/ai/providers` | 현재 AI Provider 설정과 분석 가능 여부 조회 |
+| POST | `/jobs/{jobId}/analysis` | 채용공고 분석 실행. body: `{ "force": false }` |
+| GET | `/jobs/{jobId}/analysis` | 저장된 현재 분석 결과 조회 |
+| PATCH | `/jobs/{jobId}/analysis` | 사용자가 검토한 분석 결과 수정 |
+| DELETE | `/jobs/{jobId}/analysis` | 현재 분석 결과 삭제. 실행 이력은 보존 |
+| GET | `/jobs/{jobId}/analysis/runs` | 분석 실행 이력 조회 |
+
+주요 오류 코드:
+
+- `AI_PROVIDER_DISABLED`
+- `AI_PROVIDER_CONFIG_INVALID`
+- `AI_PROVIDER_INVALID_RESPONSE`
+- `AI_DAILY_ANALYSIS_LIMIT_EXCEEDED`
+- `AI_ANALYSIS_COOLDOWN`
+- `JOB_ANALYSIS_ALREADY_RUNNING`
+- `JOB_ANALYSIS_INPUT_EMPTY`
+- `JOB_ANALYSIS_NOT_FOUND`
+
 채용공고를 삭제한다.
