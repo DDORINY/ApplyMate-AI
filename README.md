@@ -96,6 +96,7 @@ npm run build
 - [문서 인덱스](docs/README.md)
 - [현재 프로젝트 상태](docs/00_status/current-project-status.md)
 - [Feature Status Matrix](docs/00_status/feature-status-matrix.md)
+- [환경 연결 상태](docs/00_status/environment-connection-status.md)
 - [버전 로드맵](docs/05_development-plan/version-roadmap.md)
 - [API 명세](docs/04_api/api-specification.md)
 - [DB 설계](docs/06_database/database-design.md)

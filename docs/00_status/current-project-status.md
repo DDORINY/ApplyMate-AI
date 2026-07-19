@@ -1,5 +1,18 @@
 # Current Project Status
 
+## 2026-07-20 환경 상태 업데이트
+
+- 현재 완료 릴리스: `v0.5.1`
+- 현재 작업 브랜치: `feature/v0.6.0-job-recommendations`
+- 현재 migration head: `20260719_2200`
+- `v0.5.1`은 `main`에 병합되었고 `v0.5.1` 태그가 생성되었다.
+- `v0.6.0` 계획 브랜치가 생성되었고 `docs/05_development-plan/releases/v0.6.0-plan.md`가 추가되었다.
+- 현재 `.env` 기준 Gmail은 실제 연결되지 않는다. `GMAIL_PROVIDER`가 비어 있고 Gmail OAuth credential이 없다.
+- 현재 `.env` 기준 AI는 `AI_PROVIDER=mock`이므로 실제 OpenAI 호출은 연결되지 않는다.
+- 기본 Docker PostgreSQL 연결은 기존 로컬 volume 비밀번호 불일치로 막혀 있다. 깨끗한 별도 Compose project에서는 backend/PostgreSQL/Redis 연결이 정상 확인되었다.
+
+상세 연결 메모: [환경 연결 상태](environment-connection-status.md)
+
 ## 현재 버전
 
 - 버전: `v0.5.1`

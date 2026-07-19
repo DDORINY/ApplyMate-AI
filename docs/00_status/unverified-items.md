@@ -1,5 +1,17 @@
 # Unverified Items
 
+## 2026-07-20 현재 로컬 환경 메모
+
+| 항목 | 상태 | 사유 |
+| --- | --- | --- |
+| 기본 Docker PostgreSQL 연결 | NOT_CONNECTED | 기존 기본 Docker volume의 DB 비밀번호가 현재 `.env` DB 자격 증명과 맞지 않는다. volume은 삭제하지 않았다. |
+| 현재 `.env` 기준 Gmail 연동 | NOT_CONNECTED | `GMAIL_PROVIDER`가 비어 있고 Gmail OAuth client/secret 변수가 없어서 Compose에서 `disabled`로 해석된다. |
+| 실제 OpenAI 호출 | NOT_CONNECTED | `AI_PROVIDER=mock`이며 `OPENAI_API_KEY`, `OPENAI_MODEL`이 비어 있다. |
+| Google Calendar live API | NEEDS_VERIFICATION | Calendar provider와 credential은 설정되어 있으나 실제 Google OAuth/API 동작은 별도 live 검증이 필요하다. |
+| SMTP 실제 발송 | NEEDS_VERIFICATION | SMTP credential은 설정되어 있으나 실제 외부 메일 발송은 이번 확인 범위에서 검증하지 않았다. |
+
+자세한 안전 요약은 [환경 연결 상태](environment-connection-status.md)를 기준으로 한다.
+
 ## 운영 환경 검증 필요
 
 | 항목 | 상태 | 이유 |

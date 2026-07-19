@@ -64,7 +64,7 @@ services:
       GOOGLE_GMAIL_REDIRECT_URI: ${GOOGLE_GMAIL_REDIRECT_URI:-http://localhost:8000/api/v1/integrations/gmail/callback}
       GOOGLE_GMAIL_SCOPES: ${GOOGLE_GMAIL_SCOPES:-openid,email,profile,https://www.googleapis.com/auth/gmail.readonly}
       GMAIL_OAUTH_STATE_EXPIRE_SECONDS: ${GMAIL_OAUTH_STATE_EXPIRE_SECONDS:-300}
-      GMAIL_DEFAULT_SEARCH_QUERY: ${GMAIL_DEFAULT_SEARCH_QUERY:-newer_than:30d (채용 OR 지원 OR 면접 OR 인터뷰 OR 코딩테스트 OR 과제 OR 서류 OR 합격 OR 불합격 OR recruit OR interview OR application OR assessment OR offer)}
+      GMAIL_DEFAULT_SEARCH_QUERY: ${GMAIL_DEFAULT_SEARCH_QUERY:-newer_than:30d (recruit OR interview OR application OR assessment OR offer OR rejected OR deadline)}
       GMAIL_DEFAULT_LOOKBACK_DAYS: ${GMAIL_DEFAULT_LOOKBACK_DAYS:-30}
       GMAIL_MAX_MESSAGES_PER_SYNC: ${GMAIL_MAX_MESSAGES_PER_SYNC:-50}
       EMAIL_PROVIDER: ${EMAIL_PROVIDER:-development}

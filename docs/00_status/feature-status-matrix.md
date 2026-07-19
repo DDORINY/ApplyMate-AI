@@ -1,5 +1,17 @@
 # Feature Status Matrix
 
+## 2026-07-20 latest status summary
+
+| Area | Feature | Implementation | Current environment status |
+| --- | --- | --- | --- |
+| Release | v0.5.1 Gmail recruitment email analysis | Done, merged, tagged `v0.5.1` | Mock flow verified; real Gmail is not connected in current `.env`. |
+| Planning | v0.6.0 daily job recommendations | Branch and plan created | `feature/v0.6.0-job-recommendations` is active. |
+| AI | AI provider abstraction | Done | Current `.env` uses `AI_PROVIDER=mock`; real OpenAI is not connected. |
+| Calendar | Google Calendar integration foundation | Done | `CALENDAR_PROVIDER=google` and credentials exist; live Google API verification remains. |
+| Infrastructure | Docker Compose backend/PostgreSQL/Redis | Done | Clean Compose project connects; default local PostgreSQL volume has password mismatch. |
+
+Detailed environment notes: [Environment Connection Status](environment-connection-status.md)
+
 문서 기준일: 2026-07-20
 현재 릴리스: `v0.5.1`
 

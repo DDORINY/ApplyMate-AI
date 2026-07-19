@@ -22,6 +22,7 @@
 ## v0.5.1에서 최신화된 주요 문서
 
 - [현재 프로젝트 상태](00_status/current-project-status.md)
+- [환경 연결 상태](00_status/environment-connection-status.md)
 - [완료 기능 목록](00_status/completed-features.md)
 - [Feature Status Matrix](00_status/feature-status-matrix.md)
 - [미검증 항목](00_status/unverified-items.md)
