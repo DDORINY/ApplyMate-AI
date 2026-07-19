@@ -73,6 +73,38 @@ class JobAnalysisStatus(str, enum.Enum):
     FAILED = "FAILED"
 
 
+class JobMatchStatus(str, enum.Enum):
+    PENDING = "PENDING"
+    PROCESSING = "PROCESSING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class JobMatchGrade(str, enum.Enum):
+    EXCELLENT = "EXCELLENT"
+    GOOD = "GOOD"
+    MODERATE = "MODERATE"
+    LOW = "LOW"
+    VERY_LOW = "VERY_LOW"
+
+
+class JobMatchRecommendationStatus(str, enum.Enum):
+    STRONGLY_RECOMMENDED = "STRONGLY_RECOMMENDED"
+    RECOMMENDED = "RECOMMENDED"
+    CONSIDER = "CONSIDER"
+    NOT_RECOMMENDED = "NOT_RECOMMENDED"
+    INSUFFICIENT_DATA = "INSUFFICIENT_DATA"
+
+
+class JobMatchFeedbackType(str, enum.Enum):
+    ACCURATE = "ACCURATE"
+    TOO_HIGH = "TOO_HIGH"
+    TOO_LOW = "TOO_LOW"
+    MISSING_STRENGTH = "MISSING_STRENGTH"
+    MISSING_RISK = "MISSING_RISK"
+    OTHER = "OTHER"
+
+
 class Company(Base):
     __tablename__ = "companies"
     __table_args__ = (Index("ix_companies_normalized_name", "normalized_name"),)
@@ -185,6 +217,9 @@ class JobPosting(Base):
     analysis_runs = relationship(
         "JobAnalysisRun", back_populates="job_posting", cascade="all, delete-orphan"
     )
+    match = relationship(
+        "JobMatch", back_populates="job_posting", cascade="all, delete-orphan", uselist=False
+    )
 
 
 class JobAnalysis(Base):
@@ -285,3 +320,144 @@ class JobAnalysisRun(Base):
 
     job_posting = relationship("JobPosting", back_populates="analysis_runs")
     analysis = relationship("JobAnalysis", back_populates="runs")
+
+
+class JobMatch(Base):
+    __tablename__ = "job_matches"
+    __table_args__ = (
+        Index("ix_job_matches_user_id", "user_id"),
+        Index("ix_job_matches_user_grade", "user_id", "grade"),
+        Index("ix_job_matches_user_recommendation", "user_id", "recommendation_status"),
+        UniqueConstraint("user_id", "job_posting_id", name="uq_job_matches_user_job"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    job_posting_id: Mapped[int] = mapped_column(
+        ForeignKey("job_postings.id", ondelete="CASCADE"), nullable=False
+    )
+    job_analysis_id: Mapped[int] = mapped_column(
+        ForeignKey("job_analyses.id", ondelete="RESTRICT"), nullable=False
+    )
+    status: Mapped[JobMatchStatus] = mapped_column(
+        Enum(JobMatchStatus, name="job_match_status"),
+        nullable=False,
+        default=JobMatchStatus.PENDING,
+        server_default=JobMatchStatus.PENDING.value,
+    )
+    total_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    grade: Mapped[JobMatchGrade] = mapped_column(
+        Enum(JobMatchGrade, name="job_match_grade"),
+        nullable=False,
+        default=JobMatchGrade.VERY_LOW,
+        server_default=JobMatchGrade.VERY_LOW.value,
+    )
+    recommendation_status: Mapped[JobMatchRecommendationStatus] = mapped_column(
+        Enum(JobMatchRecommendationStatus, name="job_match_recommendation_status"),
+        nullable=False,
+        default=JobMatchRecommendationStatus.INSUFFICIENT_DATA,
+        server_default=JobMatchRecommendationStatus.INSUFFICIENT_DATA.value,
+    )
+    role_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    skill_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    experience_score: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    project_score: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    preference_score: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    risk_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    matched_skills: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    missing_skills: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    matched_projects: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    strengths: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    gaps: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    risks: Mapped[list | None] = mapped_column(JSON, nullable=True)
+    recommendation_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    profile_completeness: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
+    profile_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    job_analysis_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    calculation_version: Mapped[str] = mapped_column(String(30), nullable=False)
+    explanation_provider: Mapped[str] = mapped_column(String(30), nullable=False)
+    calculated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    job_posting = relationship("JobPosting", back_populates="match")
+    job_analysis = relationship("JobAnalysis")
+    runs = relationship("JobMatchRun", back_populates="match")
+    feedback = relationship("JobMatchFeedback", back_populates="match", cascade="all, delete-orphan")
+
+
+class JobMatchRun(Base):
+    __tablename__ = "job_match_runs"
+    __table_args__ = (
+        Index("ix_job_match_runs_user_id", "user_id"),
+        Index("ix_job_match_runs_job_posting_id", "job_posting_id"),
+        Index("ix_job_match_runs_created_at", "created_at"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    job_match_id: Mapped[int | None] = mapped_column(
+        ForeignKey("job_matches.id", ondelete="SET NULL"), nullable=True
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    job_posting_id: Mapped[int] = mapped_column(
+        ForeignKey("job_postings.id", ondelete="CASCADE"), nullable=False
+    )
+    job_analysis_id: Mapped[int] = mapped_column(
+        ForeignKey("job_analyses.id", ondelete="RESTRICT"), nullable=False
+    )
+    status: Mapped[JobMatchStatus] = mapped_column(
+        Enum(JobMatchStatus, name="job_match_status"),
+        nullable=False,
+        default=JobMatchStatus.PROCESSING,
+        server_default=JobMatchStatus.PROCESSING.value,
+    )
+    profile_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    job_analysis_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    calculation_version: Mapped[str] = mapped_column(String(30), nullable=False)
+    total_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    result_snapshot: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    error_code: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+    match = relationship("JobMatch", back_populates="runs")
+
+
+class JobMatchFeedback(Base):
+    __tablename__ = "job_match_feedback"
+    __table_args__ = (Index("ix_job_match_feedback_user_match", "user_id", "job_match_id"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    job_match_id: Mapped[int] = mapped_column(
+        ForeignKey("job_matches.id", ondelete="CASCADE"), nullable=False
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    feedback_type: Mapped[JobMatchFeedbackType] = mapped_column(
+        Enum(JobMatchFeedbackType, name="job_match_feedback_type"), nullable=False
+    )
+    rating: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    match = relationship("JobMatch", back_populates="feedback")

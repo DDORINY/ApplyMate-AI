@@ -307,3 +307,45 @@ backend/alembic/versions/20260719_1200_create_job_posting_tables.py
 - `started_at`, `completed_at`, `created_at`
 
 Migration: `backend/alembic/versions/20260719_1300_create_job_analysis_tables.py`
+# v0.2.2 사용자-공고 적합도 분석
+
+## job_matches
+
+채용공고 1개에 대한 현재 적합도 분석 결과입니다.
+
+| 컬럼 | 설명 |
+| --- | --- |
+| `id` | PK |
+| `user_id` | 사용자 소유권 검사용 FK |
+| `job_posting_id` | 대상 채용공고 FK |
+| `job_analysis_id` | 사용한 공고 분석 FK |
+| `status` | `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED` |
+| `total_score` | 0~100 종합 점수 |
+| `grade` | `EXCELLENT`, `GOOD`, `MODERATE`, `LOW`, `VERY_LOW` |
+| `recommendation_status` | 추천/검토/비추천/정보부족 상태 |
+| `role_score` | 직무 적합도 점수 |
+| `skill_score` | 기술 적합도 점수 |
+| `experience_score` | 경력 적합도 점수 |
+| `project_score` | 프로젝트 근거 점수 |
+| `preference_score` | 희망 조건 일치 점수 |
+| `risk_score` | 위험/제외 조건 점수 |
+| `matched_skills`, `missing_skills`, `matched_projects` | JSON 근거 |
+| `strengths`, `gaps`, `risks` | JSON 판단 근거 |
+| `profile_hash`, `job_analysis_hash` | 최신성 판단 hash |
+| `calculation_version` | 산식 버전 |
+| `explanation_provider` | 설명 생성 방식 |
+
+제약:
+
+- `(user_id, job_posting_id)` unique
+- 점수 컬럼은 0~100 check constraint
+
+## job_match_runs
+
+적합도 분석 실행 이력입니다. 재계산마다 새 run을 저장합니다.
+
+## job_match_feedback
+
+사용자 피드백입니다. 피드백 타입은 `ACCURATE`, `TOO_HIGH`, `TOO_LOW`, `MISSING_STRENGTH`, `MISSING_RISK`, `OTHER`입니다.
+
+Migration: `backend/alembic/versions/20260719_1400_create_job_match_tables.py`

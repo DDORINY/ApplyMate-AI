@@ -15,6 +15,7 @@ import type {
   JobWorkType,
 } from "@/types/job";
 import { JobAnalysisPanel } from "./job-analysis-panel";
+import { JobMatchPanel } from "./job-match-panel";
 import {
   companySizeLabels,
   deadlineTypeLabels,
@@ -200,6 +201,7 @@ export function JobDetailPanel({ jobId }: JobDetailPanelProps) {
       </section>
 
       <JobAnalysisPanel jobId={jobId} />
+      <JobMatchPanel jobId={jobId} />
 
       <section className="panel max-w-none">
         <h2 className="text-xl font-semibold text-slate-950">채용공고 수정</h2>

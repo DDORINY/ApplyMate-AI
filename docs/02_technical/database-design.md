@@ -80,3 +80,38 @@ pgvector는 v0.3.x 이후 의미 기반 검색과 분석이 필요할 때 도입
 - `job_analyses.job_posting_id`는 unique 제약으로 공고당 current 분석 1개를 보장합니다.
 - `user_id`와 `job_posting_id` 기반 외래키와 index로 사용자 소유권 검사와 조회 성능을 확보합니다.
 - migration: `backend/alembic/versions/20260719_1300_create_job_analysis_tables.py`
+# v0.2.2 사용자-공고 적합도 분석 DB 변경
+
+Migration:
+
+```text
+backend/alembic/versions/20260719_1400_create_job_match_tables.py
+```
+
+## job_matches
+
+공고별 현재 적합도 분석 결과를 1개 저장합니다.
+
+- `user_id`: 사용자 소유권 검사용 FK
+- `job_posting_id`: 대상 채용공고 FK, 사용자별 unique
+- `job_analysis_id`: 적합도 계산에 사용한 완료된 공고 분석 FK
+- `status`: `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED`
+- `total_score`: 0~100 종합 점수
+- `grade`: `EXCELLENT`, `GOOD`, `MODERATE`, `LOW`, `VERY_LOW`
+- `recommendation_status`: `STRONGLY_RECOMMENDED`, `RECOMMENDED`, `CONSIDER`, `NOT_RECOMMENDED`, `INSUFFICIENT_DATA`
+- `role_score`, `skill_score`, `experience_score`, `project_score`, `preference_score`, `risk_score`
+- `matched_skills`, `missing_skills`, `matched_projects`, `strengths`, `gaps`, `risks`: JSON 근거 데이터
+- `profile_hash`, `job_analysis_hash`: 최신성 판단용 hash
+- `calculation_version`, `explanation_provider`, `calculated_at`
+
+## job_match_runs
+
+적합도 분석 실행 이력을 저장합니다. 현재 결과가 삭제되어도 실행 이력은 `job_match_id = null`로 보존됩니다.
+
+## job_match_feedback
+
+사용자가 적합도 결과에 대한 피드백을 남기는 테이블입니다.
+
+- `feedback_type`: `ACCURATE`, `TOO_HIGH`, `TOO_LOW`, `MISSING_STRENGTH`, `MISSING_RISK`, `OTHER`
+- `rating`: 1~5 선택값
+- `comment`: 선택 입력

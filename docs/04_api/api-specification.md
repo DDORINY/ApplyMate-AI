@@ -369,3 +369,108 @@ Query:
 - `JOB_ANALYSIS_NOT_FOUND`
 
 채용공고를 삭제한다.
+## v0.2.2 사용자-공고 적합도 분석 API
+
+모든 API는 `/api/v1` 기준이며 인증이 필요합니다. 적합도 분석은 완료된 최신 채용공고 분석 결과와 사용자의 커리어 프로필을 비교합니다.
+
+| Method | Endpoint | 설명 |
+| --- | --- | --- |
+| POST | `/jobs/{jobId}/match` | 적합도 분석 실행 또는 최신 결과 재사용 |
+| GET | `/jobs/{jobId}/match` | 저장된 현재 적합도 분석 결과 조회 |
+| DELETE | `/jobs/{jobId}/match` | 현재 적합도 분석 결과 삭제 |
+| GET | `/jobs/{jobId}/match/runs` | 적합도 분석 실행 이력 조회 |
+| POST | `/jobs/{jobId}/match/feedback` | 적합도 분석 피드백 등록 |
+| GET | `/jobs/{jobId}/match/feedback` | 적합도 분석 피드백 목록 조회 |
+| PATCH | `/jobs/{jobId}/match/feedback/{feedbackId}` | 피드백 수정 |
+| DELETE | `/jobs/{jobId}/match/feedback/{feedbackId}` | 피드백 삭제 |
+
+### POST `/jobs/{jobId}/match`
+
+요청:
+
+```json
+{
+  "force": false,
+  "generate_explanation": true
+}
+```
+
+처리 규칙:
+
+- `force=false`이고 저장된 결과가 현재 프로필/공고 분석 hash와 일치하면 기존 결과를 반환합니다.
+- 완료된 공고 분석이 없으면 `JOB_ANALYSIS_REQUIRED`를 반환합니다.
+- 공고 내용이 변경되어 분석 결과가 오래되었으면 `JOB_ANALYSIS_OUTDATED`를 반환합니다.
+- 커리어 프로필이 없으면 `JOB_MATCH_PROFILE_REQUIRED`를 반환합니다.
+- 사용자 기술 또는 희망 조건이 없으면 `JOB_MATCH_PROFILE_INCOMPLETE`를 반환합니다.
+- 점수는 규칙 기반으로만 계산하며 AI는 숫자 점수를 변경하지 않습니다.
+
+응답:
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "job_posting_id": 10,
+    "job_analysis_id": 5,
+    "status": "COMPLETED",
+    "total_score": 78,
+    "grade": "GOOD",
+    "recommendation_status": "RECOMMENDED",
+    "scores": {
+      "role": 90,
+      "skill": 75,
+      "experience": 85,
+      "project": 75,
+      "preference": 80,
+      "risk": 65
+    },
+    "matched_skills": [],
+    "missing_skills": [],
+    "matched_projects": [],
+    "strengths": [],
+    "gaps": [],
+    "risks": [],
+    "recommendation_summary": "공고 요구사항과 사용자 프로필의 핵심 근거가 잘 맞습니다.",
+    "profile_completeness": 80,
+    "calculation_version": "v1",
+    "explanation_provider": "template",
+    "is_outdated": false,
+    "calculated_at": "2026-07-19T12:00:00Z"
+  },
+  "message": "공고 적합도 분석이 완료되었습니다."
+}
+```
+
+### GET `/jobs/{jobId}/match/runs`
+
+Query:
+
+| 이름 | 설명 |
+| --- | --- |
+| `page` | 1부터 시작하는 페이지 번호 |
+| `size` | 페이지 크기, 최대 100 |
+| `status` | `PENDING`, `PROCESSING`, `COMPLETED`, `FAILED` |
+
+### Feedback
+
+피드백 타입:
+
+```text
+ACCURATE
+TOO_HIGH
+TOO_LOW
+MISSING_STRENGTH
+MISSING_RISK
+OTHER
+```
+
+등록 요청:
+
+```json
+{
+  "feedback_type": "ACCURATE",
+  "rating": 5,
+  "comment": "실제 느낌과 유사합니다."
+}
+```
