@@ -55,7 +55,14 @@ def docx_bytes() -> bytes:
     output = BytesIO()
     with ZipFile(output, "w") as archive:
         archive.writestr("[Content_Types].xml", "<Types />")
-        archive.writestr("word/document.xml", "<document />")
+        archive.writestr(
+            "word/document.xml",
+            (
+                '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+                "<w:body><w:p><w:r><w:t>ApplyMate DOCX Resume</w:t></w:r></w:p></w:body>"
+                "</w:document>"
+            ),
+        )
     return output.getvalue()
 
 
@@ -312,3 +319,157 @@ def test_download_returns_error_when_storage_file_is_missing(client, resume_stor
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "RESUME_FILE_MISSING_ON_STORAGE"
+
+
+def test_extract_docx_resume_text(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=docx_file(),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    extract = client.post(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+    get_result = client.get(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+
+    assert extract.status_code == 200
+    assert extract.json()["data"]["status"] == "COMPLETED"
+    assert extract.json()["data"]["extracted_text"] == "ApplyMate DOCX Resume"
+    assert extract.json()["data"]["raw_text"] == "ApplyMate DOCX Resume"
+    assert extract.json()["data"]["page_texts"][0]["page"] == 1
+    assert extract.json()["data"]["is_outdated"] is False
+    assert get_result.status_code == 200
+    assert get_result.json()["data"]["text_length"] == len("ApplyMate DOCX Resume")
+
+
+def test_extract_pdf_resume_text(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(content=b"%PDF-1.4\nBT (ApplyMate PDF Resume) Tj ET\n%%EOF"),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    response = client.post(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["data"]["status"] == "COMPLETED"
+    assert response.json()["data"]["extracted_text"] == "ApplyMate PDF Resume"
+
+
+def test_extract_pdf_without_text_layer_requires_ocr(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(content=b"%PDF-1.4\n/image-only\n%%EOF"),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    response = client.post(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["data"]["status"] == "OCR_REQUIRED"
+    assert response.json()["data"]["error_code"] == "RESUME_EXTRACTION_OCR_REQUIRED"
+
+
+def test_update_extraction_preserves_raw_text_and_marks_user_edited(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(content=b"%PDF-1.4\nBT (ApplyMate PDF Resume) Tj ET\n%%EOF"),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+    client.post(f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction", headers=headers)
+
+    response = client.patch(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        json={"edited_text": "Edited resume text"},
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["data"]["raw_text"] == "ApplyMate PDF Resume"
+    assert response.json()["data"]["edited_text"] == "Edited resume text"
+    assert response.json()["data"]["extracted_text"] == "Edited resume text"
+    assert response.json()["data"]["is_user_edited"] is True
+
+
+def test_retry_extraction_preserves_run_history(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(content=b"%PDF-1.4\nBT (ApplyMate PDF Resume) Tj ET\n%%EOF"),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    first = client.post(f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction", headers=headers)
+    retry = client.post(f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction/retry", headers=headers)
+    runs = client.get(f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction/runs", headers=headers)
+
+    assert first.status_code == 200
+    assert retry.status_code == 200
+    assert runs.status_code == 200
+    assert len(runs.json()["data"]["items"]) == 2
+    assert runs.json()["data"]["items"][0]["status"] == "COMPLETED"
+
+
+def test_extraction_ownership_is_enforced(client, resume_storage):
+    owner_headers = auth_headers(client, email="extract-owner@example.com")
+    resume = create_resume(client, owner_headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(content=b"%PDF-1.4\nBT (ApplyMate PDF Resume) Tj ET\n%%EOF"),
+        headers=owner_headers,
+    )
+    file_id = upload.json()["data"]["id"]
+    client.cookies.clear()
+    other_headers = auth_headers(client, email="extract-other@example.com")
+
+    response = client.post(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=other_headers,
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "RESUME_FILE_NOT_FOUND"
+
+
+def test_get_extraction_requires_existing_result(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    response = client.get(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "RESUME_EXTRACTION_NOT_FOUND"

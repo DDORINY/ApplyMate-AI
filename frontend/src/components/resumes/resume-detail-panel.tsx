@@ -9,11 +9,17 @@ import {
   deleteResume,
   deleteResumeFile,
   downloadResumeFile,
+  extractResumeFile,
   getResume,
+  getResumeFileExtraction,
+  listResumeFileExtractionRuns,
+  retryResumeFileExtraction,
   setDefaultResume,
   updateResume,
+  updateResumeFileExtraction,
   uploadResumeFile,
 } from "@/lib/api/resume";
+import type { ResumeFilePublic } from "@/types/resume";
 
 export function ResumeDetailPanel({ resumeId }: { resumeId: number }) {
   const router = useRouter();
@@ -109,7 +115,7 @@ export function ResumeDetailPanel({ resumeId }: { resumeId: number }) {
       </div>
 
       <section className="panel max-w-none">
-        <p className="text-sm font-semibold text-sky-700">ApplyMate AI v0.3.0</p>
+        <p className="text-sm font-semibold text-sky-700">ApplyMate AI v0.3.1</p>
         <h1 className="mt-2 text-3xl font-semibold text-slate-950">{resume.title}</h1>
         <p className="mt-2 text-slate-600">{resume.description ?? "설명 없음"}</p>
       </section>
@@ -148,37 +154,17 @@ export function ResumeDetailPanel({ resumeId }: { resumeId: number }) {
       </section>
 
       <section className="panel max-w-none">
-        <h2 className="text-xl font-semibold text-slate-950">파일</h2>
+        <h2 className="text-xl font-semibold text-slate-950">파일 및 텍스트 추출</h2>
         <div className="mt-5 grid gap-3">
           {resume.files.length === 0 ? <p className="text-sm text-slate-600">업로드된 파일이 없습니다.</p> : null}
           {resume.files.map((resumeFile) => (
-            <div className="rounded-2xl border border-slate-200 p-4" key={resumeFile.id}>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-semibold text-slate-950">{resumeFile.original_filename}</p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {formatBytes(resumeFile.file_size)} · {resumeFile.content_type}
-                  </p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    className="button-secondary"
-                    type="button"
-                    onClick={() => downloadResumeFile(resumeId, resumeFile.id, resumeFile.original_filename)}
-                  >
-                    다운로드
-                  </button>
-                  <button
-                    className="button-secondary border-rose-200 text-rose-700"
-                    type="button"
-                    disabled={deleteFileMutation.isPending}
-                    onClick={() => deleteFileMutation.mutate(resumeFile.id)}
-                  >
-                    파일 삭제
-                  </button>
-                </div>
-              </div>
-            </div>
+            <ResumeFileCard
+              key={resumeFile.id}
+              resumeId={resumeId}
+              resumeFile={resumeFile}
+              onDelete={(fileId) => deleteFileMutation.mutate(fileId)}
+              deleting={deleteFileMutation.isPending}
+            />
           ))}
         </div>
 
@@ -206,6 +192,178 @@ export function ResumeDetailPanel({ resumeId }: { resumeId: number }) {
       </section>
     </div>
   );
+}
+
+function ResumeFileCard({
+  resumeId,
+  resumeFile,
+  deleting,
+  onDelete,
+}: {
+  resumeId: number;
+  resumeFile: ResumeFilePublic;
+  deleting: boolean;
+  onDelete: (fileId: number) => void;
+}) {
+  const queryClient = useQueryClient();
+  const [editedText, setEditedText] = useState("");
+
+  const extractionQuery = useQuery({
+    queryKey: ["resume-file-extraction", resumeId, resumeFile.id],
+    queryFn: () => getResumeFileExtraction(resumeId, resumeFile.id),
+    retry: false,
+  });
+  const runsQuery = useQuery({
+    queryKey: ["resume-file-extraction-runs", resumeId, resumeFile.id],
+    queryFn: () => listResumeFileExtractionRuns(resumeId, resumeFile.id),
+    retry: false,
+  });
+
+  useEffect(() => {
+    const extraction = extractionQuery.data?.data;
+    if (extraction) {
+      setEditedText(extraction.edited_text ?? extraction.raw_text ?? "");
+    }
+  }, [extractionQuery.data]);
+
+  const extractMutation = useMutation({
+    mutationFn: () => extractResumeFile(resumeId, resumeFile.id),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["resume-file-extraction", resumeId, resumeFile.id], response);
+      queryClient.invalidateQueries({ queryKey: ["resume-file-extraction-runs", resumeId, resumeFile.id] });
+    },
+  });
+  const retryMutation = useMutation({
+    mutationFn: () => retryResumeFileExtraction(resumeId, resumeFile.id),
+    onSuccess: (response) => {
+      queryClient.setQueryData(["resume-file-extraction", resumeId, resumeFile.id], response);
+      queryClient.invalidateQueries({ queryKey: ["resume-file-extraction-runs", resumeId, resumeFile.id] });
+    },
+  });
+  const updateExtractionMutation = useMutation({
+    mutationFn: () => updateResumeFileExtraction(resumeId, resumeFile.id, editedText),
+    onSuccess: (response) => queryClient.setQueryData(["resume-file-extraction", resumeId, resumeFile.id], response),
+  });
+
+  const extraction = extractionQuery.data?.data;
+  const isBusy = extractMutation.isPending || retryMutation.isPending || extraction?.status === "PROCESSING";
+
+  return (
+    <div className="rounded-2xl border border-slate-200 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="font-semibold text-slate-950">{resumeFile.original_filename}</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {formatBytes(resumeFile.file_size)} · {resumeFile.content_type}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button className="button-secondary" type="button" onClick={() => downloadResumeFile(resumeId, resumeFile.id, resumeFile.original_filename)}>
+            다운로드
+          </button>
+          <button className="button-primary" type="button" disabled={isBusy} onClick={() => extractMutation.mutate()}>
+            텍스트 추출
+          </button>
+          <button className="button-secondary" type="button" disabled={isBusy || !extraction} onClick={() => retryMutation.mutate()}>
+            재추출
+          </button>
+          <button
+            className="button-secondary border-rose-200 text-rose-700"
+            type="button"
+            disabled={deleting}
+            onClick={() => onDelete(resumeFile.id)}
+          >
+            파일 삭제
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-4 rounded-xl bg-slate-50 p-4">
+        {extractionQuery.isLoading ? <p className="text-sm text-slate-600">추출 결과를 확인하는 중입니다.</p> : null}
+        {extractionQuery.error ? <p className="text-sm text-slate-500">아직 추출 결과가 없습니다.</p> : null}
+        {extraction ? (
+          <div className="grid gap-4">
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              <span className="rounded-full bg-sky-100 px-3 py-1 font-semibold text-sky-700">{statusLabel(extraction.status)}</span>
+              <span className="text-slate-500">문자 {extraction.character_count.toLocaleString()}자</span>
+              <span className="text-slate-500">페이지 {extraction.page_count.toLocaleString()}개</span>
+              {extraction.is_outdated ? <span className="rounded-full bg-amber-100 px-3 py-1 font-semibold text-amber-700">원본 변경됨</span> : null}
+              {extraction.is_user_edited ? <span className="rounded-full bg-emerald-100 px-3 py-1 font-semibold text-emerald-700">사용자 수정본</span> : null}
+            </div>
+            {extraction.status === "OCR_REQUIRED" ? (
+              <p className="text-sm text-amber-700">텍스트 레이어가 없는 PDF입니다. v0.3.1에서는 OCR을 실행하지 않습니다.</p>
+            ) : null}
+            {extraction.error_message ? <p className="text-sm text-rose-700">{extraction.error_message}</p> : null}
+            {extraction.extracted_text ? (
+              <label className="grid gap-2 text-sm font-medium text-slate-700">
+                추출/수정 텍스트
+                <textarea className="input min-h-48" value={editedText} onChange={(event) => setEditedText(event.target.value)} />
+              </label>
+            ) : null}
+            {extraction.extracted_text ? (
+              <button
+                className="button-primary w-fit"
+                type="button"
+                disabled={updateExtractionMutation.isPending || !editedText.trim()}
+                onClick={() => updateExtractionMutation.mutate()}
+              >
+                수정본 저장
+              </button>
+            ) : null}
+            {extraction.page_texts.length > 0 ? (
+              <details className="rounded-xl border border-slate-200 bg-white p-3">
+                <summary className="cursor-pointer text-sm font-semibold text-slate-700">페이지별 텍스트</summary>
+                <div className="mt-3 grid gap-3">
+                  {extraction.page_texts.map((page) => (
+                    <pre className="whitespace-pre-wrap rounded-lg bg-slate-950 p-3 text-xs text-slate-100" key={page.page}>
+                      {`Page ${page.page}\n${page.text}`}
+                    </pre>
+                  ))}
+                </div>
+              </details>
+            ) : null}
+            {extraction.section_candidates.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {extraction.section_candidates.map((section) => (
+                  <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-600" key={section.section}>
+                    {section.section}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+        {extractMutation.error ? <p className="mt-3 text-sm text-rose-700">{extractMutation.error.message}</p> : null}
+        {retryMutation.error ? <p className="mt-3 text-sm text-rose-700">{retryMutation.error.message}</p> : null}
+        {updateExtractionMutation.error ? <p className="mt-3 text-sm text-rose-700">{updateExtractionMutation.error.message}</p> : null}
+      </div>
+
+      {runsQuery.data?.data.items.length ? (
+        <details className="mt-4 rounded-xl border border-slate-200 p-3">
+          <summary className="cursor-pointer text-sm font-semibold text-slate-700">추출 실행 이력</summary>
+          <ul className="mt-3 grid gap-2 text-sm text-slate-600">
+            {runsQuery.data.data.items.map((run) => (
+              <li className="rounded-lg bg-slate-50 p-3" key={run.id}>
+                #{run.id} · {statusLabel(run.status)} · {new Date(run.started_at).toLocaleString()}
+              </li>
+            ))}
+          </ul>
+        </details>
+      ) : null}
+    </div>
+  );
+}
+
+function statusLabel(status: string) {
+  const labels: Record<string, string> = {
+    PENDING: "대기",
+    PROCESSING: "처리 중",
+    COMPLETED: "완료",
+    FAILED: "실패",
+    TEXT_NOT_FOUND: "텍스트 없음",
+    OCR_REQUIRED: "OCR 필요",
+  };
+  return labels[status] ?? status;
 }
 
 function formatBytes(bytes: number) {

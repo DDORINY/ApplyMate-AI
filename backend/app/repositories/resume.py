@@ -2,7 +2,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.resume import Resume, ResumeFile
+from app.models.resume import Resume, ResumeExtractionRun, ResumeFile, ResumeFileExtraction
 
 
 class ResumeRepository:
@@ -44,6 +44,36 @@ class ResumeRepository:
     async def get_duplicate_file_hash(self, user_id: int, file_hash: str) -> ResumeFile | None:
         result = await self.session.execute(
             select(ResumeFile).where(ResumeFile.user_id == user_id, ResumeFile.file_hash == file_hash)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_extraction(self, user_id: int, resume_file_id: int) -> ResumeFileExtraction | None:
+        result = await self.session.execute(
+            select(ResumeFileExtraction).where(
+                ResumeFileExtraction.user_id == user_id,
+                ResumeFileExtraction.resume_file_id == resume_file_id,
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def list_extraction_runs(self, user_id: int, resume_file_id: int) -> list[ResumeExtractionRun]:
+        result = await self.session.execute(
+            select(ResumeExtractionRun)
+            .where(
+                ResumeExtractionRun.user_id == user_id,
+                ResumeExtractionRun.resume_file_id == resume_file_id,
+            )
+            .order_by(ResumeExtractionRun.started_at.desc(), ResumeExtractionRun.id.desc())
+        )
+        return list(result.scalars().all())
+
+    async def get_extraction_run(self, user_id: int, resume_file_id: int, run_id: int) -> ResumeExtractionRun | None:
+        result = await self.session.execute(
+            select(ResumeExtractionRun).where(
+                ResumeExtractionRun.id == run_id,
+                ResumeExtractionRun.user_id == user_id,
+                ResumeExtractionRun.resume_file_id == resume_file_id,
+            )
         )
         return result.scalar_one_or_none()
 

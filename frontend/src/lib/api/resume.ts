@@ -1,7 +1,15 @@
 import { getAccessToken } from "@/lib/auth/token";
 import { apiBaseUrl } from "@/lib/env/client";
 import type { ApiErrorResponse, ApiResponse } from "@/types/auth";
-import type { ResumeFilePublic, ResumeListData, ResumePayload, ResumePublic } from "@/types/resume";
+import type {
+  ResumeExtractionRunListData,
+  ResumeExtractionRunPublic,
+  ResumeFileExtractionPublic,
+  ResumeFilePublic,
+  ResumeListData,
+  ResumePayload,
+  ResumePublic,
+} from "@/types/resume";
 
 async function parseError(response: Response): Promise<Error> {
   try {
@@ -112,4 +120,35 @@ export async function downloadResumeFile(resumeId: number, fileId: number, filen
   anchor.click();
   anchor.remove();
   window.URL.revokeObjectURL(url);
+}
+
+export async function extractResumeFile(resumeId: number, fileId: number) {
+  return request<ResumeFileExtractionPublic>(`/resumes/${resumeId}/files/${fileId}/extraction`, {
+    method: "POST",
+  });
+}
+
+export async function getResumeFileExtraction(resumeId: number, fileId: number) {
+  return request<ResumeFileExtractionPublic>(`/resumes/${resumeId}/files/${fileId}/extraction`);
+}
+
+export async function updateResumeFileExtraction(resumeId: number, fileId: number, editedText: string) {
+  return request<ResumeFileExtractionPublic>(`/resumes/${resumeId}/files/${fileId}/extraction`, {
+    method: "PATCH",
+    body: JSON.stringify({ edited_text: editedText }),
+  });
+}
+
+export async function retryResumeFileExtraction(resumeId: number, fileId: number) {
+  return request<ResumeFileExtractionPublic>(`/resumes/${resumeId}/files/${fileId}/extraction/retry`, {
+    method: "POST",
+  });
+}
+
+export async function listResumeFileExtractionRuns(resumeId: number, fileId: number) {
+  return request<ResumeExtractionRunListData>(`/resumes/${resumeId}/files/${fileId}/extraction/runs`);
+}
+
+export async function getResumeFileExtractionRun(resumeId: number, fileId: number, runId: number) {
+  return request<ResumeExtractionRunPublic>(`/resumes/${resumeId}/files/${fileId}/extraction/runs/${runId}`);
 }

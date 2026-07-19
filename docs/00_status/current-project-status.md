@@ -2,8 +2,8 @@
 
 ## 현재 버전
 
-- 버전: `v0.3.0`
-- migration head: `20260719_1500`
+- 버전: `v0.3.1`
+- migration head: `20260719_1600`
 - AI provider 검증 기준: `AI_PROVIDER=mock`
 
 ## 현재 구현 완료 기능
@@ -17,6 +17,7 @@
 - AI 채용공고 분석
 - 사용자-공고 적합도 분석
 - 이력서 PDF/DOCX 업로드와 파일 관리
+- 이력서 PDF/DOCX 텍스트 추출, 사용자 수정, 재추출, 실행 이력 관리
 
 ## 현재 주요 화면
 
@@ -36,8 +37,8 @@
 
 ## 현재 DB
 
-- 최신 migration: `20260719_1500_create_resume_upload_tables.py`
-- 신규 테이블: `resumes`, `resume_files`
+- 최신 migration: `20260719_1600_create_resume_extraction_tables.py`
+- 신규 테이블: `resume_file_extractions`, `resume_extraction_runs`
 
 ## 미검증
 

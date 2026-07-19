@@ -63,3 +63,19 @@
 | `RESUME_FILE_MISSING_ON_STORAGE` | 404 | DB에는 파일 메타데이터가 있으나 저장소에 실제 파일이 없음 |
 | `RESUME_FILE_DELETE_FAILED` | 500 | 저장소 파일 삭제 실패 |
 | `RESUME_DEFAULT_CONFLICT` | 409 | 기본 이력서 DB 제약 충돌 |
+
+## v0.3.1 Resume Extraction
+
+| Code | HTTP Status | 설명 |
+| --- | ---: | --- |
+| `RESUME_EXTRACTION_NOT_FOUND` | 404 | 이력서 파일 텍스트 추출 결과 없음 |
+| `RESUME_EXTRACTION_TEXT_EMPTY` | 422 | 추출된 텍스트가 없음 |
+| `RESUME_EXTRACTION_UNSUPPORTED_FILE_TYPE` | 422 | 텍스트 추출을 지원하지 않는 파일 형식 |
+| `RESUME_EXTRACTION_FAILED` | 422 | 이력서 텍스트 추출 실패 |
+| `RESUME_EXTRACTION_ALREADY_PROCESSING` | 409 | 동일 파일의 추출이 이미 진행 중 |
+| `RESUME_EXTRACTION_NOT_EDITABLE` | 409 | 현재 상태에서 추출 텍스트 수정 불가 |
+| `RESUME_EXTRACTION_RUN_NOT_FOUND` | 404 | 이력서 텍스트 추출 실행 이력 없음 |
+| `RESUME_EXTRACTION_TEXT_NOT_FOUND` | 422 | 파일에서 추출 가능한 텍스트 없음 |
+| `RESUME_EXTRACTION_OCR_REQUIRED` | 422 | 텍스트 레이어가 없어 OCR 필요 |
+| `RESUME_EXTRACTION_PDF_ENCRYPTED` | 422 | 암호화된 PDF라 텍스트 추출 불가 |
+| `RESUME_EXTRACTION_PDF_INVALID` | 422 | 손상되었거나 읽을 수 없는 PDF |

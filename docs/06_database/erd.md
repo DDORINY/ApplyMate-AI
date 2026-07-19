@@ -16,6 +16,8 @@ erDiagram
     users ||--o{ job_matches : owns
     users ||--o{ resumes : owns
     users ||--o{ resume_files : owns
+    users ||--o{ resume_file_extractions : owns
+    users ||--o{ resume_extraction_runs : owns
 
     career_profiles ||--o{ user_skills : has
     skills ||--o{ user_skills : referenced_by
@@ -32,6 +34,8 @@ erDiagram
     job_matches ||--o{ job_match_feedback : receives
 
     resumes ||--o{ resume_files : has
+    resume_files ||--o| resume_file_extractions : extracted_as
+    resume_file_extractions ||--o{ resume_extraction_runs : has
 ```
 
 ## v0.3.0 추가 관계
@@ -41,3 +45,9 @@ erDiagram
 - `users` 1:N `resume_files`
 
 `resume_files.user_id`는 조회 성능과 소유권 검사를 위해 중복 저장한다.
+
+## v0.3.1 추가 관계
+
+- `resume_file_extractions`는 파일별 최신 텍스트 추출 결과와 사용자 수정본을 저장한다.
+- `resume_extraction_runs`는 최초 추출과 재추출 실행 이력을 모두 보존한다.
+- 모든 이력서 추출 관련 테이블은 `user_id`를 저장하여 사용자 소유권 검사를 명시적으로 수행한다.
