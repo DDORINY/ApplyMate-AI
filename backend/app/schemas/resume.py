@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.resume import ResumeSourceType
+from app.models.resume import ResumeExtractionStatus, ResumeSourceType
 
 
 class ResumeCreate(BaseModel):
@@ -59,3 +59,20 @@ class ResumeDeletedData(BaseModel):
 
 class ResumeFileDeletedData(BaseModel):
     deleted: bool
+
+
+class ResumeFileExtractionPublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    resume_file_id: int
+    status: ResumeExtractionStatus
+    extracted_text: str | None
+    text_length: int
+    parser_version: str
+    source_file_hash: str
+    error_code: str | None
+    error_message: str | None
+    extracted_at: datetime
+    created_at: datetime
+    updated_at: datetime

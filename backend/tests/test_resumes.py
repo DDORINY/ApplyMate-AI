@@ -55,7 +55,14 @@ def docx_bytes() -> bytes:
     output = BytesIO()
     with ZipFile(output, "w") as archive:
         archive.writestr("[Content_Types].xml", "<Types />")
-        archive.writestr("word/document.xml", "<document />")
+        archive.writestr(
+            "word/document.xml",
+            (
+                '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+                "<w:body><w:p><w:r><w:t>ApplyMate DOCX Resume</w:t></w:r></w:p></w:body>"
+                "</w:document>"
+            ),
+        )
     return output.getvalue()
 
 
@@ -312,3 +319,68 @@ def test_download_returns_error_when_storage_file_is_missing(client, resume_stor
 
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "RESUME_FILE_MISSING_ON_STORAGE"
+
+
+def test_extract_docx_resume_text(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=docx_file(),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    extract = client.post(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+    get_result = client.get(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+
+    assert extract.status_code == 200
+    assert extract.json()["data"]["status"] == "COMPLETED"
+    assert extract.json()["data"]["extracted_text"] == "ApplyMate DOCX Resume"
+    assert get_result.status_code == 200
+    assert get_result.json()["data"]["text_length"] == len("ApplyMate DOCX Resume")
+
+
+def test_extract_pdf_resume_text(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(content=b"%PDF-1.4\nBT (ApplyMate PDF Resume) Tj ET\n%%EOF"),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    response = client.post(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    assert response.json()["data"]["status"] == "COMPLETED"
+    assert response.json()["data"]["extracted_text"] == "ApplyMate PDF Resume"
+
+
+def test_get_extraction_requires_existing_result(client, resume_storage):
+    headers = auth_headers(client)
+    resume = create_resume(client, headers)
+    upload = client.post(
+        f"/api/v1/resumes/{resume['id']}/files",
+        files=pdf_file(),
+        headers=headers,
+    )
+    file_id = upload.json()["data"]["id"]
+
+    response = client.get(
+        f"/api/v1/resumes/{resume['id']}/files/{file_id}/extraction",
+        headers=headers,
+    )
+
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "RESUME_EXTRACTION_NOT_FOUND"

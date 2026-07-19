@@ -63,3 +63,12 @@
 | `RESUME_FILE_MISSING_ON_STORAGE` | 404 | DB에는 파일 메타데이터가 있으나 저장소에 실제 파일이 없음 |
 | `RESUME_FILE_DELETE_FAILED` | 500 | 저장소 파일 삭제 실패 |
 | `RESUME_DEFAULT_CONFLICT` | 409 | 기본 이력서 DB 제약 충돌 |
+
+## v0.3.1 Resume Extraction
+
+| Code | HTTP Status | 설명 |
+| --- | ---: | --- |
+| `RESUME_EXTRACTION_NOT_FOUND` | 404 | 이력서 파일 텍스트 추출 결과 없음 |
+| `RESUME_EXTRACTION_TEXT_EMPTY` | 422 | 추출된 텍스트가 없음 |
+| `RESUME_EXTRACTION_UNSUPPORTED_FILE_TYPE` | 422 | 텍스트 추출을 지원하지 않는 파일 형식 |
+| `RESUME_EXTRACTION_FAILED` | 422 | 이력서 텍스트 추출 실패 |

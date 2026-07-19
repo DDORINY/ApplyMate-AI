@@ -156,6 +156,8 @@
 | GET | `/resumes/{resumeId}/files/{fileId}` | Access Token | v0.3.0 | 파일 메타데이터 조회 |
 | GET | `/resumes/{resumeId}/files/{fileId}/download` | Access Token | v0.3.0 | 파일 다운로드 |
 | DELETE | `/resumes/{resumeId}/files/{fileId}` | Access Token | v0.3.0 | 파일 삭제 |
+| POST | `/resumes/{resumeId}/files/{fileId}/extraction` | Access Token | v0.3.1 | 이력서 파일 텍스트 추출 실행 |
+| GET | `/resumes/{resumeId}/files/{fileId}/extraction` | Access Token | v0.3.1 | 이력서 파일 텍스트 추출 결과 조회 |
 
 `POST /resumes/{resumeId}/files` 요청은 `multipart/form-data`이며 필드명은 `file`이다.
 
@@ -168,3 +170,11 @@
 - 내부 저장명은 UUID 기반이며 원본 파일명을 저장 경로에 사용하지 않는다.
 - 다운로드는 storage base directory 내부 경로인지 재검증한다.
 - 다운로드 응답은 `Content-Disposition: attachment`, `filename*`, `X-Content-Type-Options: nosniff`를 사용한다.
+
+## v0.3.1 Resume Text Extraction
+
+- `POST /resumes/{resumeId}/files/{fileId}/extraction`은 업로드된 PDF/DOCX 파일에서 텍스트를 추출하고 최신 결과를 저장한다.
+- `GET /resumes/{resumeId}/files/{fileId}/extraction`은 저장된 최신 추출 결과를 반환한다.
+- 추출 결과는 `COMPLETED` 또는 `FAILED` 상태를 가진다.
+- 추출 결과에는 `extracted_text`, `text_length`, `parser_version`, `source_file_hash`, `error_code`, `error_message`, `extracted_at`을 포함한다.
+- v0.3.1의 PDF 추출은 text literal 기반 best-effort이며, OCR과 이미지 PDF 분석은 포함하지 않는다.

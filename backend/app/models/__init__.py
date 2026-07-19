@@ -51,7 +51,7 @@ from app.models.oauth import (
     OAuthState,
 )
 from app.models.refresh_token import RefreshToken
-from app.models.resume import Resume, ResumeFile, ResumeSourceType
+from app.models.resume import Resume, ResumeExtractionStatus, ResumeFile, ResumeFileExtraction, ResumeSourceType
 from app.models.user import User, UserStatus
 
 __all__ = [
@@ -95,7 +95,9 @@ __all__ = [
     "ProficiencyLevel",
     "RefreshToken",
     "Resume",
+    "ResumeExtractionStatus",
     "ResumeFile",
+    "ResumeFileExtraction",
     "ResumeSourceType",
     "RemotePreference",
     "SecurityEvent",

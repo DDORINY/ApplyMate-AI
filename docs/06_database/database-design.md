@@ -147,6 +147,7 @@ resume_files
 | `20260719_1300` | job analysis |
 | `20260719_1400` | job matching |
 | `20260719_1500` | resume upload |
+| `20260719_1600` | resume text extraction |
 
 ## v0.3.0 보완 DB 제약
 
@@ -165,3 +166,27 @@ uq_resume_files_user_file_hash = (user_id, file_hash)
 ```
 
 원본 파일명은 표시용이며 저장 경로에는 사용하지 않는다. 실제 저장 파일명은 UUID 기반이다.
+
+## v0.3.1 Resume Extraction
+
+### `resume_file_extractions`
+
+업로드된 이력서 파일의 텍스트 추출 결과를 저장한다.
+
+| 컬럼 | 설명 |
+| --- | --- |
+| `id` | Primary Key |
+| `resume_file_id` | 대상 이력서 파일 ID, 파일 삭제 시 cascade |
+| `user_id` | 소유 사용자 ID |
+| `status` | `COMPLETED`, `FAILED` |
+| `extracted_text` | 추출된 텍스트 |
+| `text_length` | 추출 텍스트 길이 |
+| `parser_version` | 추출기 버전 |
+| `source_file_hash` | 추출 당시 원본 파일 hash |
+| `error_code`, `error_message` | 실패 시 오류 정보 |
+| `extracted_at` | 추출 실행 시각 |
+
+제약:
+
+- `resume_file_id`는 unique로 관리하여 파일당 최신 추출 결과 1개만 유지한다.
+- 모든 조회는 `user_id` 소유권 조건을 함께 사용한다.

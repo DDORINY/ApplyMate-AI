@@ -1,4 +1,8 @@
+import re
+from io import BytesIO
 from math import ceil
+from xml.etree import ElementTree
+from zipfile import BadZipFile, ZipFile
 
 from fastapi import UploadFile
 from sqlalchemy.exc import IntegrityError
@@ -6,10 +10,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import AppError
 from app.core.security import utc_now
-from app.models.resume import Resume, ResumeFile
+from app.models.resume import Resume, ResumeExtractionStatus, ResumeFile, ResumeFileExtraction
 from app.repositories.resume import ResumeRepository
 from app.schemas.resume import ResumeCreate, ResumeListData, ResumePublic, ResumeUpdate
 from app.services.storage import LocalFileStorage
+
+RESUME_EXTRACTION_PARSER_VERSION = "v0.3.1-basic"
+PDF_TEXT_PATTERN = re.compile(r"\((.*?)\)\s*Tj", re.DOTALL)
 
 
 class ResumeService:
@@ -125,3 +132,113 @@ class ResumeService:
         self.storage.delete(storage_path, missing_ok=True)
         await self.session.delete(resume_file)
         await self.session.commit()
+
+    async def extract_file(self, user_id: int, resume_id: int, file_id: int) -> ResumeFileExtraction:
+        resume_file = await self.get_file(user_id, resume_id, file_id)
+        path = self.storage.existing_file_path(resume_file.storage_path)
+        content = path.read_bytes()
+        try:
+            extracted_text = self.extract_text(resume_file.file_extension, content)
+            if not extracted_text:
+                raise AppError("RESUME_EXTRACTION_TEXT_EMPTY", "추출된 이력서 텍스트가 없습니다.", 422)
+            return await self.upsert_extraction(
+                user_id=user_id,
+                resume_file=resume_file,
+                status=ResumeExtractionStatus.COMPLETED,
+                extracted_text=extracted_text,
+                error_code=None,
+                error_message=None,
+            )
+        except AppError as exc:
+            if exc.code == "RESUME_FILE_MISSING_ON_STORAGE":
+                raise
+            return await self.upsert_extraction(
+                user_id=user_id,
+                resume_file=resume_file,
+                status=ResumeExtractionStatus.FAILED,
+                extracted_text=None,
+                error_code=exc.code,
+                error_message=exc.message,
+            )
+
+    async def get_extraction(self, user_id: int, resume_id: int, file_id: int) -> ResumeFileExtraction:
+        resume_file = await self.get_file(user_id, resume_id, file_id)
+        extraction = await self.repository.get_extraction(user_id, resume_file.id)
+        if not extraction:
+            raise AppError("RESUME_EXTRACTION_NOT_FOUND", "이력서 텍스트 추출 결과를 찾을 수 없습니다.", 404)
+        return extraction
+
+    async def upsert_extraction(
+        self,
+        *,
+        user_id: int,
+        resume_file: ResumeFile,
+        status: ResumeExtractionStatus,
+        extracted_text: str | None,
+        error_code: str | None,
+        error_message: str | None,
+    ) -> ResumeFileExtraction:
+        extraction = await self.repository.get_extraction(user_id, resume_file.id)
+        if extraction is None:
+            extraction = ResumeFileExtraction(
+                resume_file_id=resume_file.id,
+                user_id=user_id,
+                status=status,
+                parser_version=RESUME_EXTRACTION_PARSER_VERSION,
+                source_file_hash=resume_file.file_hash,
+                extracted_at=utc_now(),
+            )
+            self.session.add(extraction)
+        extraction.status = status
+        extraction.extracted_text = extracted_text
+        extraction.text_length = len(extracted_text or "")
+        extraction.parser_version = RESUME_EXTRACTION_PARSER_VERSION
+        extraction.source_file_hash = resume_file.file_hash
+        extraction.error_code = error_code
+        extraction.error_message = error_message
+        extraction.extracted_at = utc_now()
+        await self.session.commit()
+        await self.session.refresh(extraction)
+        return extraction
+
+    def extract_text(self, extension: str, content: bytes) -> str:
+        if extension == ".docx":
+            return self.extract_docx_text(content)
+        if extension == ".pdf":
+            return self.extract_pdf_text(content)
+        raise AppError("RESUME_EXTRACTION_UNSUPPORTED_FILE_TYPE", "지원하지 않는 이력서 추출 파일 형식입니다.", 422)
+
+    def extract_docx_text(self, content: bytes) -> str:
+        try:
+            with ZipFile(BytesIO(content)) as archive:
+                document_xml = archive.read("word/document.xml")
+        except (BadZipFile, KeyError) as exc:
+            raise AppError("RESUME_EXTRACTION_FAILED", "DOCX 텍스트 추출에 실패했습니다.", 422) from exc
+        try:
+            root = ElementTree.fromstring(document_xml)
+        except ElementTree.ParseError as exc:
+            raise AppError("RESUME_EXTRACTION_FAILED", "DOCX XML 파싱에 실패했습니다.", 422) from exc
+        texts = [
+            node.text.strip()
+            for node in root.iter()
+            if node.tag.rsplit("}", 1)[-1] == "t" and node.text and node.text.strip()
+        ]
+        return "\n".join(texts).strip()
+
+    def extract_pdf_text(self, content: bytes) -> str:
+        raw_text = content.decode("latin-1", errors="ignore")
+        matches = [self.clean_pdf_literal(match) for match in PDF_TEXT_PATTERN.findall(raw_text)]
+        text = "\n".join(match for match in matches if match).strip()
+        if text:
+            return text
+        visible = "".join(char if 32 <= ord(char) <= 126 or char in "\r\n\t" else " " for char in raw_text)
+        return re.sub(r"\s+", " ", visible.replace("%PDF-", " ")).strip()
+
+    def clean_pdf_literal(self, value: str) -> str:
+        return (
+            value.replace(r"\(", "(")
+            .replace(r"\)", ")")
+            .replace(r"\\", "\\")
+            .replace(r"\n", "\n")
+            .strip()
+        )

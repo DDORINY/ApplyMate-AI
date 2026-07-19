@@ -60,6 +60,49 @@ class ResumeFile(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     resume = relationship("Resume", back_populates="files")
+    extraction = relationship(
+        "ResumeFileExtraction",
+        back_populates="resume_file",
+        cascade="all, delete-orphan",
+        uselist=False,
+    )
+
+
+class ResumeExtractionStatus(str, enum.Enum):
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class ResumeFileExtraction(Base):
+    __tablename__ = "resume_file_extractions"
+    __table_args__ = (
+        Index("ix_resume_file_extractions_user_id", "user_id"),
+        UniqueConstraint("resume_file_id", name="uq_resume_file_extractions_resume_file_id"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    resume_file_id: Mapped[int] = mapped_column(
+        ForeignKey("resume_files.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    status: Mapped[ResumeExtractionStatus] = mapped_column(
+        Enum(ResumeExtractionStatus, name="resume_extraction_status"),
+        nullable=False,
+    )
+    extracted_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    text_length: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+    parser_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    source_file_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    error_code: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    extracted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+    resume_file = relationship("ResumeFile", back_populates="extraction")
 
 
 Index(

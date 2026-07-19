@@ -12,6 +12,7 @@ from app.schemas.resume import (
     ResumeCreate,
     ResumeDeletedData,
     ResumeFileDeletedData,
+    ResumeFileExtractionPublic,
     ResumeFilePublic,
     ResumeListData,
     ResumePublic,
@@ -141,3 +142,39 @@ async def delete_resume_file(
 ) -> ApiResponse[ResumeFileDeletedData]:
     await ResumeService(session).delete_file(current_user.id, resume_id, file_id)
     return ApiResponse(success=True, data=ResumeFileDeletedData(deleted=True), message="이력서 파일이 삭제되었습니다.")
+
+
+@router.post(
+    "/{resume_id}/files/{file_id}/extraction",
+    response_model=ApiResponse[ResumeFileExtractionPublic],
+)
+async def extract_resume_file(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeFileExtractionPublic]:
+    extraction = await ResumeService(session).extract_file(current_user.id, resume_id, file_id)
+    return ApiResponse(
+        success=True,
+        data=ResumeFileExtractionPublic.model_validate(extraction),
+        message="이력서 텍스트 추출이 완료되었습니다.",
+    )
+
+
+@router.get(
+    "/{resume_id}/files/{file_id}/extraction",
+    response_model=ApiResponse[ResumeFileExtractionPublic],
+)
+async def get_resume_file_extraction(
+    resume_id: int,
+    file_id: int,
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+) -> ApiResponse[ResumeFileExtractionPublic]:
+    extraction = await ResumeService(session).get_extraction(current_user.id, resume_id, file_id)
+    return ApiResponse(
+        success=True,
+        data=ResumeFileExtractionPublic.model_validate(extraction),
+        message="이력서 텍스트 추출 결과입니다.",
+    )
