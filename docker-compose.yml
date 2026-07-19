@@ -76,6 +76,10 @@ services:
       AI_STORE_RAW_RESPONSE: ${AI_STORE_RAW_RESPONSE:-false}
       AI_DAILY_ANALYSIS_LIMIT: ${AI_DAILY_ANALYSIS_LIMIT:-20}
       AI_ANALYSIS_COOLDOWN_SECONDS: ${AI_ANALYSIS_COOLDOWN_SECONDS:-30}
+      RESUME_STORAGE_DIR: ${RESUME_STORAGE_DIR:-storage/resumes}
+      RESUME_MAX_FILE_SIZE_BYTES: ${RESUME_MAX_FILE_SIZE_BYTES:-5242880}
+      RESUME_ALLOWED_EXTENSIONS: ${RESUME_ALLOWED_EXTENSIONS:-.pdf,.docx}
+      RESUME_ALLOWED_CONTENT_TYPES: ${RESUME_ALLOWED_CONTENT_TYPES:-application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document}
     ports:
       - "8000:8000"
     depends_on:

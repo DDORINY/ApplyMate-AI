@@ -7,6 +7,7 @@ const navItems = [
   { href: "/me", label: "내 계정" },
   { href: "/profile", label: "프로필" },
   { href: "/jobs", label: "채용공고" },
+  { href: "/resumes", label: "이력서" },
   { href: "/settings/accounts", label: "계정 연결" },
   { href: "/settings/security", label: "보안" },
 ];

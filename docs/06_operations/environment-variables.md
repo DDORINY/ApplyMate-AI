@@ -52,3 +52,11 @@
 | 변수 | 설명 | 예시 |
 | --- | --- | --- |
 | `OPENAI_API_KEY` | 향후 AI 기능용 API key | 실제 값은 `.env`에만 저장 |
+# v0.3.0 Resume Upload
+
+| 변수 | 예시 | 설명 |
+| --- | --- | --- |
+| `RESUME_STORAGE_DIR` | `storage/resumes` | 이력서 파일 로컬 저장 경로 |
+| `RESUME_MAX_FILE_SIZE_BYTES` | `5242880` | 이력서 파일 최대 크기 |
+| `RESUME_ALLOWED_EXTENSIONS` | `.pdf,.docx` | 허용 확장자 |
+| `RESUME_ALLOWED_CONTENT_TYPES` | `application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document` | 허용 MIME |

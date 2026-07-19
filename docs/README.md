@@ -87,3 +87,23 @@
 - [브랜치 전략](07_codex/branch-strategy.md)
 - [Definition of Done](07_codex/definition-of-done.md)
 - [프롬프트 예시](07_codex/prompt-examples.md)
+# ApplyMate AI Docs
+
+현재 문서 기준 버전: `v0.3.0`
+
+## 핵심 문서
+
+- [현재 상태](00_status/current-project-status.md)
+- [완료 기능](00_status/completed-features.md)
+- [기능 상태 매트릭스](00_status/feature-status-matrix.md)
+- [미검증 항목](00_status/unverified-items.md)
+- [버전 로드맵](05_development-plan/version-roadmap.md)
+- [v1.0.0 완성 마스터 플랜](05_development-plan/master-completion-plan.md)
+- [API 명세](04_api/api-specification.md)
+- [오류 코드](04_api/error-codes.md)
+- [DB 설계](06_database/database-design.md)
+- [내비게이션 구조](08_design/navigation-structure.md)
+
+## 릴리스 문서
+
+- [v0.3.0 이력서 파일 업로드](11_releases/v0.3.0-resume-upload.md)
