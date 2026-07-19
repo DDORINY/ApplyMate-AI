@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from io import BytesIO
+from urllib.error import HTTPError
 
 from sqlalchemy import select
 
@@ -256,3 +257,107 @@ def test_import_url_rejects_duplicate_url(client, monkeypatch):
 
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "JOB_POSTING_ALREADY_EXISTS"
+
+
+def test_import_url_blocks_redirect_to_private_ip(client, monkeypatch):
+    headers = auth_headers(client)
+
+    class FakeOpener:
+        def open(self, request, timeout):  # noqa: ANN001
+            raise HTTPError(
+                request.full_url,
+                302,
+                "Found",
+                {"Location": "http://127.0.0.1/private"},
+                BytesIO(),
+            )
+
+    monkeypatch.setattr(
+        job_url_importer.socket,
+        "getaddrinfo",
+        lambda host, *_args: [
+            (None, None, None, None, ("127.0.0.1" if host == "127.0.0.1" else "93.184.216.34", 0))
+        ],
+    )
+    monkeypatch.setattr(job_url_importer, "build_opener", lambda *_args: FakeOpener())
+
+    response = client.post(
+        "/api/v1/jobs/import-url",
+        json={"url": "https://example.com/redirect"},
+        headers=headers,
+    )
+
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "JOB_POSTING_URL_BLOCKED"
+
+
+def test_import_url_rejects_non_html_content(client, monkeypatch):
+    headers = auth_headers(client)
+
+    class FakeOpener:
+        def open(self, _request, timeout):  # noqa: ANN001
+            return FakeResponse(b'{"ok": true}', content_type="application/json")
+
+    monkeypatch.setattr(
+        job_url_importer.socket,
+        "getaddrinfo",
+        lambda *_args: [(None, None, None, None, ("93.184.216.34", 0))],
+    )
+    monkeypatch.setattr(job_url_importer, "build_opener", lambda *_args: FakeOpener())
+
+    response = client.post(
+        "/api/v1/jobs/import-url",
+        json={"url": "https://example.com/json"},
+        headers=headers,
+    )
+
+    assert response.status_code == 415
+    assert response.json()["error"]["code"] == "JOB_POSTING_URL_UNSUPPORTED_CONTENT"
+
+
+def test_import_url_rejects_large_response(client, monkeypatch):
+    headers = auth_headers(client)
+
+    class FakeOpener:
+        def open(self, _request, timeout):  # noqa: ANN001
+            return FakeResponse(b"x" * (job_url_importer.MAX_RESPONSE_BYTES + 1))
+
+    monkeypatch.setattr(
+        job_url_importer.socket,
+        "getaddrinfo",
+        lambda *_args: [(None, None, None, None, ("93.184.216.34", 0))],
+    )
+    monkeypatch.setattr(job_url_importer, "build_opener", lambda *_args: FakeOpener())
+
+    response = client.post(
+        "/api/v1/jobs/import-url",
+        json={"url": "https://example.com/large"},
+        headers=headers,
+    )
+
+    assert response.status_code == 413
+    assert response.json()["error"]["code"] == "JOB_POSTING_URL_CONTENT_TOO_LARGE"
+
+
+def test_import_url_handles_timeout(client, monkeypatch):
+    headers = auth_headers(client)
+
+    class FakeOpener:
+        def open(self, _request, timeout):  # noqa: ANN001
+            raise TimeoutError("timed out")
+
+    monkeypatch.setattr(
+        job_url_importer.socket,
+        "getaddrinfo",
+        lambda *_args: [(None, None, None, None, ("93.184.216.34", 0))],
+    )
+    monkeypatch.setattr(job_url_importer, "build_opener", lambda *_args: FakeOpener())
+
+    response = client.post(
+        "/api/v1/jobs/import-url",
+        json={"url": "https://example.com/timeout"},
+        headers=headers,
+    )
+
+    assert response.status_code == 502
+    assert response.json()["error"]["code"] == "JOB_POSTING_URL_FETCH_FAILED"

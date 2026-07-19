@@ -105,9 +105,11 @@ API 오류 응답은 다음 공통 구조를 사용합니다.
 | --- | ---: | --- |
 | `JOB_POSTING_NOT_FOUND` | 404 | 채용공고를 찾을 수 없거나 사용자가 소유하지 않은 공고입니다. |
 | `JOB_POSTING_ALREADY_EXISTS` | 409 | 동일 사용자 기준 중복 채용공고입니다. |
-| `JOB_INVALID_URL` | 422 | URL 형식, scheme, host, 응답 형식이 허용되지 않습니다. |
-| `JOB_URL_FETCH_FAILED` | 422 | URL 응답을 가져오지 못했습니다. |
-| `JOB_URL_TOO_LARGE` | 422 | URL 응답 본문이 허용 크기를 초과했습니다. |
+| `JOB_POSTING_URL_INVALID` | 422 | URL 형식, scheme, host 또는 사용자 정보 포함 여부가 허용되지 않습니다. |
+| `JOB_POSTING_URL_BLOCKED` | 422 | 내부망, localhost, reserved IP 또는 redirect 제한으로 URL 등록이 차단되었습니다. |
+| `JOB_POSTING_URL_FETCH_FAILED` | 502 | URL 응답을 가져오지 못했습니다. |
+| `JOB_POSTING_URL_UNSUPPORTED_CONTENT` | 415 | HTML이 아닌 응답입니다. |
+| `JOB_POSTING_URL_CONTENT_TOO_LARGE` | 413 | URL 응답 본문이 허용 크기를 초과했습니다. |
 | `JOB_INVALID_SALARY_RANGE` | 422 | 최대 급여가 최소 급여보다 작습니다. |
 | `JOB_INVALID_DEADLINE` | 422 | 마감일이 게시일보다 빠릅니다. |
 | `JOB_DEADLINE_REQUIRED` | 422 | 고정 마감 공고에 마감일이 없습니다. |

@@ -216,10 +216,10 @@ v0.1.2에서 구현된 커리어 프로필 도메인입니다.
 | 컬럼 | 타입 | 설명 |
 | --- | --- | --- |
 | `id` | bigint pk | 기업 ID |
-| `name` | varchar(255) | 표시 기업명 |
-| `normalized_name` | varchar(255), unique | 중복 재사용을 위한 정규화 기업명 |
-| `website_url` | varchar(2048), nullable | 기업 홈페이지 |
-| `industry` | varchar(255), nullable | 산업 |
+| `name` | varchar(160) | 표시 기업명 |
+| `normalized_name` | varchar(160), unique | 중복 재사용을 위한 정규화 기업명 |
+| `website_url` | varchar(500), nullable | 기업 홈페이지 |
+| `industry` | varchar(120), nullable | 산업 |
 | `company_size` | enum | 기업 규모 |
 | `description` | text, nullable | 기업 설명 |
 | `created_at` | timestamptz | 생성일 |
@@ -234,25 +234,25 @@ v0.1.2에서 구현된 커리어 프로필 도메인입니다.
 | `id` | bigint pk | 채용공고 ID |
 | `user_id` | bigint fk users.id | 소유 사용자 |
 | `company_id` | bigint fk companies.id | 기업 |
-| `title` | varchar(255) | 공고 제목 |
-| `position` | varchar(255), nullable | 직무 |
+| `title` | varchar(200) | 공고 제목 |
+| `position` | varchar(160), nullable | 직무 |
 | `employment_type` | enum | 고용 형태 |
 | `career_requirement` | varchar(255), nullable | 경력 조건 |
 | `education_requirement` | varchar(255), nullable | 학력 조건 |
-| `location` | varchar(255), nullable | 근무 지역 |
+| `location` | varchar(200), nullable | 근무 지역 |
 | `work_type` | enum | 근무 형태 |
 | `salary_min`, `salary_max` | integer, nullable | 급여 범위 |
-| `salary_text` | varchar(500), nullable | 급여 설명 |
+| `salary_text` | varchar(200), nullable | 급여 설명 |
 | `description` | text, nullable | 주요 업무/본문 |
 | `requirements` | text, nullable | 필수 조건 |
 | `preferred_qualifications` | text, nullable | 우대 조건 |
 | `benefits` | text, nullable | 복지 |
 | `recruitment_process` | text, nullable | 채용 절차 |
 | `source_type` | enum | `MANUAL`, `URL` |
-| `source_url` | varchar(2048), nullable | 원문 URL |
-| `source_site` | varchar(255), nullable | 원문 host |
+| `source_url` | varchar(1000), nullable | 원문 URL |
+| `source_site` | varchar(120), nullable | 원문 host |
 | `original_content` | text, nullable | URL에서 추출한 원문 텍스트 |
-| `content_hash` | varchar(64) | 중복 감지용 hash |
+| `content_hash` | varchar(128) | 중복 감지용 hash |
 | `published_at` | timestamptz, nullable | 게시일 |
 | `deadline_at` | timestamptz, nullable | 마감일 |
 | `deadline_type` | enum | 마감 유형 |
