@@ -11,13 +11,15 @@
 | 운영 배포 | NEEDS_VERIFICATION | 서버/도메인/DB/Redis 환경 필요 |
 | 브라우저 E2E 자동화 | PLANNED | v0.9.0 안정화 단계에서 강화 예정 |
 
-## v0.4.1 제외 또는 후속 범위
+## v0.4.2 제외 또는 후속 범위
 
 | 항목 | 상태 | 후속 버전 |
 | --- | --- | --- |
+| 대시보드 위젯 사용자 커스터마이징 | DEFERRED | 미정 |
+| 대시보드 차트 라이브러리 기반 고급 시각화 | DEFERRED | 미정 |
 | 이메일/푸시 알림 실제 발송 | PLANNED | 미정 |
 | 백그라운드 알림 워커 | PLANNED | 미정 |
-| Google Calendar 실제 일정 생성 | PLANNED | v0.5.0 |
+| Google Calendar 실제 일정 생성/동기화 | PLANNED | v0.5.0 |
 | Gmail 일정 자동 추출 | PLANNED | v0.5.1 |
 | 반복 일정 | DEFERRED | 미정 |
 | 일정 생성에 따른 지원 상태 자동 변경 | DEFERRED | 사용자 승인 흐름 설계 후 |

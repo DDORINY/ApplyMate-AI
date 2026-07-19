@@ -1,38 +1,42 @@
 # Version Roadmap
 
-## 현재 기준
+## 현재 상태
 
-- 현재 버전: `v0.4.1`
+- 최신 완료 버전: `v0.4.2`
+- 다음 개발 버전: `v0.5.0`
 - 현재 migration head: `20260719_2000`
-- 최신 릴리스 범위: 일정 관리
 
-## 완료 버전
+## Roadmap
 
-| 버전 | 상태 | 범위 | 상세 문서 |
-| --- | --- | --- | --- |
-| v0.1.0 | 완료 | 프로젝트 기반, Health API, Docker Compose | [v0.1.0](../11_releases/v0.1.0-foundation.md) |
-| v0.1.1 | 완료 | 이메일 회원가입/로그인, JWT, refresh token | [v0.1.1](../11_releases/v0.1.1-authentication.md) |
-| v0.1.2 | 완료 | 커리어 프로필 | [v0.1.2](../11_releases/v0.1.2-career-profile.md) |
-| v0.1.3 | 완료 | Google/GitHub OAuth | [v0.1.3](../11_releases/v0.1.3-social-authentication.md) |
-| v0.1.4 | 완료 | 계정 보안·복구 | [v0.1.4](../11_releases/v0.1.4-account-security.md) |
-| v0.2.0 | 완료 | 채용공고 등록/관리 | [v0.2.0](../11_releases/v0.2.0-job-posting-management.md) |
-| v0.2.1 | 완료 | AI 채용공고 분석 | [v0.2.1](../11_releases/v0.2.1-ai-job-analysis.md) |
-| v0.2.2 | 완료 | 사용자-공고 적합도 분석 | [v0.2.2](../11_releases/v0.2.2-job-matching.md) |
-| v0.3.0 | 완료 | 이력서 업로드 | [v0.3.0](../11_releases/v0.3.0-resume-upload.md) |
-| v0.3.1 | 완료 | 이력서 텍스트 추출 | [v0.3.1](../11_releases/v0.3.1-resume-extraction.md) |
-| v0.3.2 | 완료 | AI 이력서 구조화 분석 | [v0.3.2](../11_releases/v0.3.2-resume-analysis.md) |
-| v0.3.3 | 완료 | 맞춤 지원 문서 생성 | [v0.3.3](../11_releases/v0.3.3-application-documents.md) |
-| v0.4.0 | 완료 | 지원 현황 관리 | [v0.4.0](../11_releases/v0.4.0-application-tracking.md) |
-| v0.4.1 | 완료 | 일정 관리 | [v0.4.1](../11_releases/v0.4.1-schedule-management.md) |
-
-## 다음 버전
-
-| 버전 | 상태 | 목적 |
+| 버전 | 목표 | 상태 |
 | --- | --- | --- |
-| v0.4.2 | 예정 | 대시보드: 지원 통계, 오늘/이번 주 일정, 임박 마감, 최근 AI 분석/문서 |
-| v0.5.0 | 예정 | Google Calendar 연동 기반 |
-| v0.5.1 | 예정 | Gmail 채용 메일 분석 기반 |
-| v0.6.0 | 예정 | 일일 맞춤 채용공고 추천 |
-| v1.0.0 | 예정 | 공식 MVP 릴리스 |
+| v0.1.0 | 프로젝트 기반, Docker Compose, Health API | 완료 |
+| v0.1.1 | 회원 및 인증 | 완료 |
+| v0.1.2 | 커리어 프로필 | 완료 |
+| v0.1.3 | 소셜 로그인과 계정 연결 | 완료 |
+| v0.1.4 | 계정 보안과 복구 | 완료 |
+| v0.2.0 | 채용공고 관리 | 완료 |
+| v0.2.1 | AI 채용공고 분석 | 완료 |
+| v0.2.2 | 사용자-공고 적합도 분석 | 완료 |
+| v0.3.0 | 이력서 파일 관리 | 완료 |
+| v0.3.1 | 이력서 텍스트 추출 | 완료 |
+| v0.3.2 | AI 이력서 구조화 분석 | 완료 |
+| v0.3.3 | 맞춤 지원 문서 생성 | 완료 |
+| v0.4.0 | 지원 현황 관리 | 완료 |
+| v0.4.1 | 일정 관리 | 완료 |
+| v0.4.2 | 대시보드 | 완료 |
+| v0.5.0 | Google Calendar 연동 | 예정 |
+| v0.5.1 | Gmail 채용 메일 분석 기반 | 예정 |
+| v0.6.0 | 일일 맞춤 채용공고 추천 | 예정 |
+| v0.7.0 | AI 자기소개서 개선 루프 | 예정 |
+| v0.8.0 | 알림/리마인더 운영화 | 예정 |
+| v0.9.0 | E2E/성능/보안 안정화 | 예정 |
+| v1.0.0 | MVP 릴리스 | 예정 |
 
-전체 완성 계획은 [master-completion-plan.md](master-completion-plan.md)를 기준으로 한다.
+## v0.5.0 방향
+
+- 로그인 OAuth와 Google Calendar OAuth를 분리한다.
+- Google Calendar 권한은 사용자가 명시적으로 계정 연결을 수행할 때만 요청한다.
+- Calendar token은 암호화 저장한다.
+- 내부 일정 저장 실패가 외부 동기화 실패와 섞이지 않도록 상태와 오류를 분리한다.
+- 실제 Google credentials가 없을 때도 mock provider로 로컬 검증 가능해야 한다.

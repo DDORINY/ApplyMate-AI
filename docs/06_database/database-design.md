@@ -61,3 +61,20 @@ Stores reminder settings. v0.4.1 implements persistence and UI display only; rea
 Stores schedule creation, update, status change, reminder change, completion, cancellation, and archive history.
 
 Migration file: `backend/alembic/versions/20260719_2000_create_schedule_tables.py`
+# v0.4.2 Dashboard Database Note
+
+v0.4.2 대시보드는 신규 테이블, 컬럼, 인덱스를 추가하지 않는다.
+
+현재 migration head는 `20260719_2000`이며, 대시보드는 다음 기존 테이블을 읽기 전용으로 조회해 집계한다.
+
+- `applications`
+- `application_status_history`
+- `schedule_events`
+- `job_postings`
+- `job_analyses`
+- `job_matches`
+- `resume_analyses`
+- `resume_files`
+- `application_documents`
+
+대시보드 조회는 사용자 소유권(`user_id`)을 기준으로 제한하며, 아카이브된 지원 항목과 취소/아카이브된 일정은 주요 집계에서 제외한다.

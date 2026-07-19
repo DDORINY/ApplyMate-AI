@@ -10,6 +10,13 @@
 | `RESOURCE_NOT_FOUND` | 404 | Resource or route not found |
 | `INTERNAL_SERVER_ERROR` | 500 | Internal server error |
 
+## v0.4.2 Dashboard Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| `DASHBOARD_INVALID_TIMEZONE` | 400 | Dashboard timezone is not a valid IANA timezone |
+| `DASHBOARD_INVALID_DATE_RANGE` | 400 | Dashboard custom date range is missing or invalid |
+
 ## v0.4.1 Calendar Error Codes
 
 | Code | HTTP | Description |
