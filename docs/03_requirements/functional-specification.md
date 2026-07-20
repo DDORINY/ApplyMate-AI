@@ -1,6 +1,32 @@
 # Functional Specification
 
-Current implemented version: `v0.6.0`
+Current implemented version: `v0.6.1`
+
+## v0.6.1 Recommendation Automation Foundation Functional Specification
+
+### Purpose
+
+추천 실행 설정, 실행 조건 판단, Snapshot, 변화 판정, 알림 후보 저장을 제공해 일일 맞춤 추천 자동화 기반을 만든다.
+
+### Requirements
+
+- 기본 추천 실행 설정은 비활성화와 `MANUAL`이다.
+- `run-if-due`는 인증된 사용자만 호출할 수 있다.
+- 실행 조건을 충족하지 않으면 `DISABLED`, `NOT_DUE`, `PROFILE_MISSING`, `NO_ACTIVE_JOBS`, `DUPLICATE_INPUT`, `ALREADY_RUNNING` 중 하나를 반환한다.
+- 추천 실행 후 Snapshot과 Snapshot item을 저장한다.
+- 신규 추천, 점수 상승/하락, 등급 상승/하락, 오래된 추천을 Backend에서 판정한다.
+- 추천 결과 응답에는 최신 변화 타입, 점수 변화, 순위, 데이터 완성도, 추천 confidence를 포함할 수 있다.
+- 알림 후보는 저장만 하며 실제 이메일·푸시 발송은 하지 않는다.
+- 모든 설정, Snapshot, 알림 후보는 사용자 소유권을 검증한다.
+- 대시보드는 Snapshot을 읽기만 하며 추천을 자동 실행하지 않는다.
+
+### Prohibited
+
+- 외부 채용공고 자동 수집
+- 실제 이메일·푸시 알림 발송 완료 표시
+- AI/ML 추천 호출
+- 사용자 승인 없는 지원 상태 변경
+- 자동 지원 제출
 
 ## v0.6.0 Rule-Based Job Recommendation Functional Specification
 

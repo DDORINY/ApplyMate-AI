@@ -37,3 +37,12 @@ Do not label v0.6.0 recommendations as AI, machine learning, or automatic extern
 Feedback is stored but does not automatically train or adjust weights in v0.6.0.
 
 `HIDDEN` and `NOT_INTERESTED` can exclude the same job from later generation.
+
+## v0.6.1 Automation Policy
+
+- Recommendation automation starts disabled and `MANUAL`.
+- `run-if-due` only evaluates execution conditions and calls the existing `RULE_BASED` recommendation service.
+- Snapshot change detection is calculated by Backend.
+- Notification candidates are stored for user review, but no email or push is sent.
+- Dashboard reads existing Snapshot data and does not trigger recommendation generation.
+- External job crawling, AI/ML recommendation calls, automatic application submission, and automatic feedback learning remain excluded.

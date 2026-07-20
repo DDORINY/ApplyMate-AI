@@ -1,5 +1,72 @@
 # ERD
 
+## v0.6.1 Recommendation Automation ERD
+
+```mermaid
+erDiagram
+    users ||--o| job_recommendation_settings : configures
+    users ||--o{ job_recommendation_snapshots : owns
+    job_recommendation_runs ||--o{ job_recommendation_snapshots : creates
+    job_recommendation_snapshots ||--o{ job_recommendation_snapshot_items : contains
+    job_recommendations ||--o{ job_recommendation_snapshot_items : captured_as
+    job_recommendation_snapshots ||--o{ recommendation_notification_candidates : produces
+    job_recommendation_snapshot_items ||--o{ recommendation_notification_candidates : explains
+
+    job_recommendation_settings {
+      int id PK
+      int user_id FK
+      bool enabled
+      string frequency
+      int preferred_run_hour
+      string timezone
+      int minimum_score
+      bool exclude_applied_jobs
+      bool exclude_hidden_jobs
+      datetime last_run_at
+      datetime next_run_at
+    }
+
+    job_recommendation_snapshots {
+      int id PK
+      int user_id FK
+      int run_id FK
+      string profile_hash
+      string policy_version
+      int recommended_count
+      int new_count
+      int changed_count
+      int removed_count
+      datetime generated_at
+    }
+
+    job_recommendation_snapshot_items {
+      int id PK
+      int snapshot_id FK
+      int recommendation_id FK
+      int job_id FK
+      int score
+      string grade
+      int rank
+      string change_type
+      int previous_score
+      int score_delta
+      int rank_delta
+      int data_completeness_score
+      string recommendation_confidence
+    }
+
+    recommendation_notification_candidates {
+      int id PK
+      int user_id FK
+      int recommendation_id FK
+      int snapshot_id FK
+      string notification_type
+      string status
+      string title
+      json payload
+    }
+```
+
 ## v0.6.0 Job Recommendations ERD
 
 ```mermaid

@@ -13,6 +13,7 @@ from app.models.job_recommendation import (
     JobRecommendationRun,
     JobRecommendationStatus,
 )
+from app.models.job_recommendation_automation import JobRecommendationSnapshotItem, RecommendationChangeType
 
 
 class JobRecommendationRepository:
@@ -144,6 +145,7 @@ class JobRecommendationRepository:
         has_blocking_mismatch: bool | None = None,
         keyword: str | None = None,
         feedback: JobRecommendationFeedbackType | None = None,
+        change_type: RecommendationChangeType | None = None,
         include_hidden: bool = False,
         include_outdated: bool = False,
         sort: str = "score",
@@ -188,6 +190,11 @@ class JobRecommendationRepository:
                     JobRecommendationFeedback.feedback_type == feedback,
                 )
             )
+        if change_type:
+            query = query.join(
+                JobRecommendationSnapshotItem,
+                JobRecommendationSnapshotItem.recommendation_id == JobRecommendation.id,
+            ).where(JobRecommendationSnapshotItem.change_type == change_type)
         total_result = await self.session.execute(select(func.count()).select_from(query.order_by(None).subquery()))
         total = int(total_result.scalar_one())
         sort_column = {

@@ -10,6 +10,12 @@ import type {
   JobRecommendationGrade,
   JobRecommendationListData,
   JobRecommendationPolicyData,
+  JobRecommendationRunIfDueData,
+  JobRecommendationSettings,
+  JobRecommendationSnapshotListData,
+  RecommendationChangeType,
+  RecommendationNotificationListData,
+  RecommendationNotificationStatus,
 } from "@/types/job-recommendation";
 
 async function parseError(response: Response): Promise<Error> {
@@ -49,6 +55,7 @@ export type JobRecommendationListParams = {
   size?: number;
   min_score?: number;
   grade?: JobRecommendationGrade | "";
+  change_type?: RecommendationChangeType | "";
   has_blocking_mismatch?: boolean | "";
   keyword?: string;
   include_hidden?: boolean;
@@ -101,4 +108,51 @@ export async function createJobRecommendationFeedback(
 
 export async function getJobRecommendationPolicy() {
   return request<JobRecommendationPolicyData>("/recommendations/jobs/policy");
+}
+
+export async function getJobRecommendationSettings() {
+  return request<JobRecommendationSettings>("/recommendations/settings");
+}
+
+export async function updateJobRecommendationSettings(payload: Partial<JobRecommendationSettings>) {
+  return request<JobRecommendationSettings>("/recommendations/settings", {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function runJobRecommendationsIfDue(payload: { force?: boolean } = {}) {
+  return request<JobRecommendationRunIfDueData>("/recommendations/jobs/run-if-due", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function listJobRecommendationSnapshots(params: { page?: number; size?: number } = {}) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      search.set(key, String(value));
+    }
+  });
+  const suffix = search.toString() ? `?${search.toString()}` : "";
+  return request<JobRecommendationSnapshotListData>(`/recommendations/jobs/snapshots${suffix}`);
+}
+
+export async function listRecommendationNotifications(params: { status?: RecommendationNotificationStatus | ""; page?: number; size?: number } = {}) {
+  const search = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== "" && value !== null) {
+      search.set(key, String(value));
+    }
+  });
+  const suffix = search.toString() ? `?${search.toString()}` : "";
+  return request<RecommendationNotificationListData>(`/recommendation-notifications${suffix}`);
+}
+
+export async function updateRecommendationNotification(notificationId: number, status: RecommendationNotificationStatus) {
+  return request(`/recommendation-notifications/${notificationId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
 }

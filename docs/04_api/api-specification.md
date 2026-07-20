@@ -42,6 +42,31 @@ Error response:
 | Calendar Integration | `/integrations/calendar` | v0.5.0 | Google Calendar connection and sync |
 | Gmail Integration | `/integrations/gmail`, `/email-candidates` | v0.5.1 | Gmail recruitment email analysis candidates |
 | Job Recommendations | `/recommendations/jobs` | v0.6.0 | Rule-based saved job recommendations |
+| Recommendation Automation | `/recommendations/settings`, `/recommendations/jobs/snapshots`, `/recommendation-notifications` | v0.6.1 | Recommendation settings, snapshots, change detection, notification candidates |
+
+## v0.6.1 Recommendation Automation API
+
+Base path: `/api/v1`
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| GET | `/recommendations/settings` | Access Token | v0.6.1 | Get user's recommendation execution settings |
+| PATCH | `/recommendations/settings` | Access Token | v0.6.1 | Update recommendation execution settings |
+| POST | `/recommendations/jobs/run-if-due` | Access Token | v0.6.1 | Run recommendation generation only when execution conditions are met, or when forced by the user |
+| GET | `/recommendations/jobs/snapshots` | Access Token | v0.6.1 | List recommendation snapshots |
+| GET | `/recommendations/jobs/snapshots/{snapshotId}` | Access Token | v0.6.1 | Get one recommendation snapshot |
+| GET | `/recommendations/jobs/changes` | Access Token | v0.6.1 | List snapshot item changes |
+| GET | `/recommendation-notifications` | Access Token | v0.6.1 | List recommendation notification candidates |
+| PATCH | `/recommendation-notifications/{notificationId}` | Access Token | v0.6.1 | Mark notification candidate as read, dismissed, pending, or expired |
+| DELETE | `/recommendation-notifications/{notificationId}` | Access Token | v0.6.1 | Dismiss notification candidate |
+
+Rules:
+
+- v0.6.1 stores notification candidates only; it does not send email or push notifications.
+- `run-if-due` is authenticated and is not a public scheduler endpoint.
+- The default execution setting is disabled and `MANUAL`.
+- Backend owns change detection; Frontend does not calculate score deltas.
+- External job crawling, AI/ML recommendation calls, and automatic application submission remain excluded.
 
 ## v0.6.0 Rule-based Job Recommendations API
 

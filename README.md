@@ -1,8 +1,19 @@
 # ApplyMate AI
 
-현재 버전: `v0.6.0`
+현재 버전: `v0.6.1`
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 이력서, 채용공고, AI 분석 결과, 지원 문서, 지원 현황, 일정을 연결해 취업 준비 흐름을 한곳에서 관리합니다.
+
+## v0.6.1 주요 기능
+
+- 사용자별 추천 실행 설정
+- 스케줄러가 호출 가능한 `run-if-due` API
+- 추천 실행 Snapshot과 추천 변화 판정
+- 새 추천, 점수 상승/하락, 등급 변화 배지
+- 추천 알림 후보 저장
+- `/recommendations/history` 추천 이력 화면
+- `/settings/recommendations` 추천 설정 화면
+- 실제 외부 수집, 이메일·푸시 발송, 자동 지원은 제외
 
 ## v0.6.0 주요 기능
 
@@ -81,8 +92,10 @@ docker compose up --build
 - `/applications`
 - `/calendar`
 - `/recommendations`
+- `/recommendations/history`
 - `/settings/accounts`
 - `/settings/integrations`
+- `/settings/recommendations`
 - `/settings/security`
 
 ## 검증
@@ -113,15 +126,16 @@ npm run build
 - [버전 로드맵](docs/05_development-plan/version-roadmap.md)
 - [API 명세](docs/04_api/api-specification.md)
 - [DB 설계](docs/06_database/database-design.md)
+- [v0.6.1 릴리스 노트](docs/11_releases/v0.6.1-recommendation-automation.md)
 - [v0.6.0 릴리스 노트](docs/11_releases/v0.6.0-job-recommendations.md)
 - [v0.5.1 릴리스 노트](docs/11_releases/v0.5.1-gmail-analysis.md)
 - [v0.5.0 릴리스 노트](docs/11_releases/v0.5.0-google-calendar.md)
 
 ## 현재 migration head
 
-`20260719_2300`
+`20260720_0000`
 
-v0.6.0은 규칙 기반 채용공고 추천 실행, 추천 결과, 추천 이유, 사용자 피드백 테이블을 추가합니다.
+v0.6.1은 추천 실행 설정, Snapshot, Snapshot item, 추천 알림 후보 테이블을 추가합니다.
 
 ## 미검증/운영 확인 필요
 

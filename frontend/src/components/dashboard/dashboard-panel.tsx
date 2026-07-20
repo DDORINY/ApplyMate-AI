@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 
 import { getDashboard } from "@/lib/api/dashboard";
-import { listJobRecommendations } from "@/lib/api/job-recommendation";
+import { listJobRecommendationSnapshots, listJobRecommendations } from "@/lib/api/job-recommendation";
 import type {
   DashboardActivityItem,
   DashboardData,
@@ -19,7 +19,7 @@ import type {
   DashboardRecentResumeAnalysis,
   DashboardScheduleItem,
 } from "@/types/dashboard";
-import type { JobRecommendation } from "@/types/job-recommendation";
+import type { JobRecommendation, JobRecommendationSnapshot } from "@/types/job-recommendation";
 
 const periodOptions: { label: string; value: DashboardPeriod }[] = [
   { label: "최근 7일", value: "7d" },
@@ -58,6 +58,11 @@ export function DashboardPanel() {
   const recommendationsQuery = useQuery({
     queryKey: ["dashboard-job-recommendations"],
     queryFn: () => listJobRecommendations({ include_outdated: false, size: 3 }),
+    retry: false,
+  });
+  const recommendationSnapshotsQuery = useQuery({
+    queryKey: ["dashboard-job-recommendation-snapshots"],
+    queryFn: () => listJobRecommendationSnapshots({ size: 1 }),
     retry: false,
   });
 
@@ -130,6 +135,7 @@ export function DashboardPanel() {
       <DashboardRecommendationSection
         isLoading={recommendationsQuery.isLoading}
         items={recommendationsQuery.data?.data.items ?? []}
+        latestSnapshot={recommendationSnapshotsQuery.data?.data.items[0] ?? null}
       />
 
       <SummaryCards dashboard={dashboard} />
@@ -163,9 +169,11 @@ export function DashboardPanel() {
 function DashboardRecommendationSection({
   isLoading,
   items,
+  latestSnapshot,
 }: {
   isLoading: boolean;
   items: JobRecommendation[];
+  latestSnapshot: JobRecommendationSnapshot | null;
 }) {
   const gradeLabels: Record<string, string> = {
     EXCELLENT: "매우 적합",
@@ -187,6 +195,17 @@ function DashboardRecommendationSection({
           <p className="text-sm font-semibold text-violet-600">추천 준비</p>
           <h2 className="mt-1 text-lg font-bold text-slate-950">아직 생성된 추천 공고가 없습니다.</h2>
           <p className="mt-2 text-sm text-slate-600">저장된 공고와 프로필을 기준으로 추천을 생성해 보세요.</p>
+        </Link>
+      ) : null}
+      {latestSnapshot ? (
+        <Link className="rounded-3xl border border-violet-100 bg-violet-600 p-5 text-white shadow-sm transition hover:bg-violet-700" href="/recommendations/history">
+          <p className="text-sm font-semibold opacity-80">마지막 추천 실행</p>
+          <h2 className="mt-1 text-lg font-bold">{formatDateTime(latestSnapshot.generated_at)}</h2>
+          <div className="mt-4 grid grid-cols-3 gap-2 text-center text-xs font-bold">
+            <span className="rounded-2xl bg-white/15 px-2 py-2">신규 {latestSnapshot.new_count}</span>
+            <span className="rounded-2xl bg-white/15 px-2 py-2">변경 {latestSnapshot.changed_count}</span>
+            <span className="rounded-2xl bg-white/15 px-2 py-2">추천 {latestSnapshot.recommended_count}</span>
+          </div>
         </Link>
       ) : null}
       {items.map((item) => (

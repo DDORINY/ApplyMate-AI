@@ -1,7 +1,7 @@
 # Environment Connection Status
 
 Last updated: 2026-07-20  
-Local branch at update time: `feature/v0.6.0-job-recommendations`
+Local branch at update time: `feature/v0.6.1-recommendation-automation`
 
 This document summarizes the current local environment connection state without exposing secret values. It is based on `.env` key presence, provider modes, and the latest local Docker/API checks.
 
@@ -104,11 +104,11 @@ Calendar and SMTP have credential-shaped environment values, but this pass did n
 
 ## Last verified behavior
 
-- Backend tests: `153 passed`
+- Backend tests: `157 passed`
 - Frontend lint/type-check/build: passed
 - Docker Compose config: passed
-- Alembic head: `20260719_2300`
-- v0.6.0 isolated Docker PostgreSQL migration upgrade: passed
+- Alembic head: `20260720_0000`
+- v0.6.1 isolated Docker PostgreSQL migration upgrade/downgrade/upgrade: passed
 - Clean Compose backend/PostgreSQL/Redis health: passed
 - Gmail mock flow with temporary `GMAIL_PROVIDER=mock`: connect/callback/sync passed
 

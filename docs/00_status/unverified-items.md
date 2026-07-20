@@ -10,6 +10,7 @@
 | Google Calendar live API | NEEDS_VERIFICATION | Calendar provider와 credential은 설정되어 있으나 실제 Google OAuth/API 동작은 별도 live 검증이 필요하다. |
 | SMTP 실제 발송 | NEEDS_VERIFICATION | SMTP credential은 설정되어 있으나 실제 외부 메일 발송은 이번 확인 범위에서 검증하지 않았다. |
 | 추천 자동 실행 스케줄러 | DEFERRED | v0.6.0은 수동 생성 API/화면까지 구현하고 일일 자동 실행은 후속 범위로 둔다. |
+| 실제 Background Worker 추천 실행 | DEFERRED | v0.6.1은 설정, 실행 조건, 수동 API, Snapshot, 알림 후보까지만 구현한다. |
 
 자세한 안전 요약은 [환경 연결 상태](environment-connection-status.md)를 기준으로 한다.
 
@@ -33,6 +34,15 @@
 | 일일 추천 자동 실행 스케줄러 | DEFERRED | v0.6.1 이후 |
 | 추천 알림 발송 | DEFERRED | 알림/리마인더 운영화 단계 |
 | 피드백 기반 자동 학습 | DEFERRED | 사용자 통제 정책 설계 후 |
+
+## v0.6.1 제외 또는 후속 범위
+
+| 항목 | 상태 | 후속 버전 |
+| --- | --- | --- |
+| 실제 Background Worker 운영 | DEFERRED | 운영 스케줄러 설계 후 |
+| 실제 이메일/푸시 추천 알림 발송 | DEFERRED | v0.8.0 알림 운영화 |
+| 외부 채용 사이트 자동 수집 | EXCLUDED | 정책상 기본 기능에서 제외 |
+| 피드백 기반 가중치 자동 학습 | DEFERRED | 사용자 통제 정책 설계 후 |
 
 ## v0.4.2 제외 또는 후속 범위
 

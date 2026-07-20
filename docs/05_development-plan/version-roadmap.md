@@ -2,12 +2,13 @@
 
 ## 2026-07-20 현재 상태
 
-- 최신 완료 버전: `v0.6.0`
-- 현재 작업 브랜치: `feature/v0.6.0-job-recommendations`
-- 다음 개발 버전: `v0.6.1`
-- 현재 migration head: `20260719_2300`
+- 최신 완료 버전: `v0.6.1`
+- 현재 작업 브랜치: `feature/v0.6.1-recommendation-automation`
+- 다음 개발 버전: `v0.7.0`
+- 현재 migration head: `20260720_0000`
 - `v0.5.1`은 `main` 병합 및 `v0.5.1` 태그 push가 완료되었다.
-- `v0.6.0`은 저장된 공고 기반 규칙 추천 구현 단계이며, 계획 문서는 `docs/05_development-plan/releases/v0.6.0-plan.md`를 기준으로 한다.
+- `v0.6.0`은 저장된 공고 기반 규칙 추천으로 완료되었다.
+- `v0.6.1`은 추천 UX 개선과 추천 실행 자동화 기반 구현 단계이며, 계획 문서는 `docs/05_development-plan/releases/v0.6.1-plan.md`를 기준으로 한다.
 
 ## Environment connection note
 
@@ -39,7 +40,7 @@
 | v0.5.0 | Google Calendar 연동 | 완료 |
 | v0.5.1 | Gmail 채용 메일 분석 기반 | 완료 |
 | v0.6.0 | 저장된 채용공고 기반 규칙 추천 | 완료 |
-| v0.6.1 | 추천 UX 개선과 추천 실행 자동화 기반 | 예정 |
+| v0.6.1 | 추천 UX 개선과 추천 실행 자동화 기반 | 완료 |
 | v0.7.0 | AI 자기소개서 개선 루프 | 예정 |
 | v0.8.0 | 알림/리마인더 운영화 | 예정 |
 | v0.9.0 | E2E/성능/보안 안정화 | 예정 |

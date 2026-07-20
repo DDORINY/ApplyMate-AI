@@ -15,7 +15,9 @@ from app.models.job_recommendation import (
     JobRecommendationStatus,
     JobRecommendationType,
 )
+from app.models.job_recommendation_automation import RecommendationChangeType
 from app.repositories.job_recommendation import JobRecommendationRepository
+from app.repositories.job_recommendation_automation import JobRecommendationAutomationRepository
 from app.schemas.job_recommendation import (
     JobRecommendationDeletedData,
     JobRecommendationFeedbackCreate,
@@ -44,6 +46,7 @@ class JobRecommendationService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
         self.repository = JobRecommendationRepository(session)
+        self.automation_repository = JobRecommendationAutomationRepository(session)
         self.policy = JobRecommendationPolicy()
 
     async def generate(self, user_id: int, payload: JobRecommendationGenerateRequest) -> JobRecommendationGenerateData:
@@ -217,6 +220,7 @@ class JobRecommendationService:
         has_blocking_mismatch: bool | None,
         keyword: str | None,
         feedback: JobRecommendationFeedbackType | None,
+        change_type: RecommendationChangeType | None,
         include_hidden: bool,
         include_outdated: bool,
         sort: str,
@@ -231,6 +235,7 @@ class JobRecommendationService:
             has_blocking_mismatch=has_blocking_mismatch,
             keyword=keyword,
             feedback=feedback,
+            change_type=change_type,
             include_hidden=include_hidden,
             include_outdated=include_outdated,
             sort=sort,
@@ -344,6 +349,7 @@ class JobRecommendationService:
             recommendation.status = JobRecommendationStatus.OUTDATED
             await self.session.commit()
         feedback = next((item for item in recommendation.feedback if item.user_id == recommendation.user_id), None)
+        latest_item = await self.automation_repository.latest_item_for_recommendation(recommendation.user_id, recommendation.id)
         company_name = recommendation.job.company.name if recommendation.job.company else "회사명 미상"
         return JobRecommendationPublic(
             id=recommendation.id,
@@ -378,4 +384,13 @@ class JobRecommendationService:
             ),
             reasons=[JobRecommendationReasonPublic.model_validate(reason) for reason in recommendation.reasons],
             feedback=JobRecommendationFeedbackPublic.model_validate(feedback) if feedback else None,
+            latest_change_type=latest_item.change_type if latest_item else None,
+            previous_score=latest_item.previous_score if latest_item else None,
+            score_delta=latest_item.score_delta if latest_item else None,
+            previous_grade=latest_item.previous_grade if latest_item else None,
+            rank=latest_item.rank if latest_item else None,
+            rank_delta=latest_item.rank_delta if latest_item else None,
+            missing_job_fields=latest_item.missing_job_fields if latest_item and latest_item.missing_job_fields else [],
+            data_completeness_score=latest_item.data_completeness_score if latest_item else None,
+            recommendation_confidence=latest_item.recommendation_confidence if latest_item else None,
         )
