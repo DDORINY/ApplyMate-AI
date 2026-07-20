@@ -1,8 +1,22 @@
 # Database Design
 
+## v0.6.1 Recommendation Automation Database
+
+v0.6.1 adds recommendation execution settings, snapshots, snapshot items, and notification candidates. Current migration head is `20260720_0000`.
+
+- `job_recommendation_settings`: user-level execution settings, frequency, score threshold, include/exclude policies, last/next run timestamps
+- `job_recommendation_snapshots`: one record per recommendation execution result bundle
+- `job_recommendation_snapshot_items`: score, grade, rank, change type, previous values, data completeness, confidence per recommended job
+- `recommendation_notification_candidates`: notification candidates for new/high-score/changed/outdated recommendations without actual email or push delivery
+
+Migration:
+
+- 신규 revision: `20260720_0000`
+- 이전 revision: `20260719_2300`
+
 ## v0.6.0 Rule-based Job Recommendations Database
 
-v0.6.0 adds rule-based recommendation storage. Current migration head is `20260719_2300`.
+v0.6.0 adds rule-based recommendation storage.
 
 - `job_recommendation_runs`: generation status, policy version, input/recommended/excluded/failed counts
 - `job_recommendations`: score, grade, rule-based type, blocking mismatch, snapshot hashes, outdated status
@@ -36,7 +50,7 @@ Migration:
 - Datetime values are stored in UTC.
 - User-owned data has `user_id`.
 - Schema changes are managed with Alembic migrations.
-- Current migration head: `20260719_2300`.
+- Current migration head: `20260720_0000`.
 
 ## Main tables
 
@@ -45,7 +59,7 @@ Migration:
 | Auth | `users`, `refresh_tokens`, `email_verification_tokens`, `password_reset_tokens`, `security_events` |
 | OAuth | `oauth_accounts`, `oauth_states`, `oauth_login_tickets` |
 | Profile | `career_profiles`, `skills`, `user_skills`, `experiences`, `projects`, `job_preferences`, `excluded_conditions`, `portfolio_links` |
-| Jobs | `companies`, `job_postings`, `job_analyses`, `job_analysis_runs`, `job_matches`, `job_match_runs`, `job_match_feedback`, `job_recommendation_runs`, `job_recommendations`, `job_recommendation_reasons`, `job_recommendation_feedback` |
+| Jobs | `companies`, `job_postings`, `job_analyses`, `job_analysis_runs`, `job_matches`, `job_match_runs`, `job_match_feedback`, `job_recommendation_runs`, `job_recommendations`, `job_recommendation_reasons`, `job_recommendation_feedback`, `job_recommendation_settings`, `job_recommendation_snapshots`, `job_recommendation_snapshot_items`, `recommendation_notification_candidates` |
 | Resumes | `resumes`, `resume_files`, `resume_file_extractions`, `resume_extraction_runs`, `resume_analyses`, `resume_analysis_runs` |
 | Documents | `application_documents`, `application_document_versions`, `application_document_sources`, `generation_runs` |
 | Applications | `applications`, `application_status_history`, `application_notes` |

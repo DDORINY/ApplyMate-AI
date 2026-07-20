@@ -2,9 +2,9 @@
 
 ## 현재 위치
 
-- 완료: `v0.6.0` 규칙 기반 채용공고 추천
-- 다음: `v0.6.1` 추천 UX 개선과 추천 실행 자동화 기반
-- 최신 DB head: `20260719_2300`
+- 완료: `v0.6.1` 추천 UX 개선과 추천 실행 자동화 기반
+- 다음: `v0.7.0` AI 자기소개서 개선 루프
+- 최신 DB head: `20260720_0000`
 
 ## 완료된 큰 흐름
 
@@ -20,13 +20,13 @@
 10. Google Calendar 연동 기반
 11. Gmail 채용 메일 분석 기반
 12. 규칙 기반 채용공고 추천
+13. 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 기반
 
 ## 남은 큰 흐름
 
-1. 추천 UX 개선과 일일 추천 실행 자동화 기반을 정리한다.
-2. AI 자기소개서 개선 루프를 구현한다.
-3. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
-4. v1.0.0 MVP 릴리스를 완료한다.
+1. AI 자기소개서 개선 루프를 구현한다.
+2. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
+3. v1.0.0 MVP 릴리스를 완료한다.
 
 ## v0.4.2 방향
 
@@ -64,3 +64,11 @@
 - `/recommendations`, `/recommendations/{recommendationId}`, 대시보드 추천 카드, 공고 상세 추천 CTA를 구현한다.
 - AI/ML 호출, 외부 크롤링, 자동 지원 제출은 제외한다.
 - v0.6.0 완료 후 다음 개발 브랜치는 `feature/v0.6.1-recommendation-automation`이다.
+
+# v0.6.1 Completion Update
+
+- 추천 실행 설정, `run-if-due`, Snapshot, 추천 변화 판정, 추천 알림 후보 저장 기반을 구현한다.
+- `/recommendations` UX를 새 추천/점수 변화/피드백 필터 중심으로 개선한다.
+- `/recommendations/history`와 `/settings/recommendations` 화면을 추가한다.
+- 실제 Background Worker 운영, 외부 공고 수집, 이메일·푸시 발송, 자동 지원은 제외한다.
+- v0.6.1 완료 후 다음 개발 브랜치는 `feature/v0.7.0-cover-letter-improvement`이다.

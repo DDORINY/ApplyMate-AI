@@ -220,8 +220,8 @@ def test_schedule_upcoming_overdue_and_ownership(client: TestClient):
         client,
         first_headers,
         title="다가오는 일정",
-        start_at="2026-07-20T10:00:00+09:00",
-        end_at="2026-07-20T11:00:00+09:00",
+        start_at="2026-07-21T10:00:00+09:00",
+        end_at="2026-07-21T11:00:00+09:00",
     )
     second_headers = auth_headers(client, "schedule-other@example.com")
 

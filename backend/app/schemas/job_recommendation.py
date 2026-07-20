@@ -15,6 +15,7 @@ from app.models.job_recommendation import (
     JobRecommendationStatus,
     JobRecommendationType,
 )
+from app.models.job_recommendation_automation import RecommendationChangeType, RecommendationConfidence
 
 
 class JobRecommendationGenerateRequest(BaseModel):
@@ -122,6 +123,15 @@ class JobRecommendationPublic(BaseModel):
     job: JobRecommendationJobSummary
     reasons: list[JobRecommendationReasonPublic] = Field(default_factory=list)
     feedback: JobRecommendationFeedbackPublic | None = None
+    latest_change_type: RecommendationChangeType | None = None
+    previous_score: int | None = None
+    score_delta: int | None = None
+    previous_grade: str | None = None
+    rank: int | None = None
+    rank_delta: int | None = None
+    missing_job_fields: list[str] = Field(default_factory=list)
+    data_completeness_score: int | None = None
+    recommendation_confidence: RecommendationConfidence | None = None
 
 
 class JobRecommendationListData(BaseModel):

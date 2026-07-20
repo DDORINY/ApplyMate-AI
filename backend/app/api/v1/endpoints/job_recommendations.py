@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps.auth import get_current_user
 from app.db.session import get_session
 from app.models.job_recommendation import JobRecommendationFeedbackType, JobRecommendationGrade
+from app.models.job_recommendation_automation import RecommendationChangeType
 from app.models.user import User
 from app.schemas.common import ApiResponse
 from app.schemas.job_recommendation import (
@@ -19,6 +20,7 @@ from app.schemas.job_recommendation import (
     JobRecommendationRunsData,
 )
 from app.services.job_recommendation import JobRecommendationService
+from app.services.job_recommendation_snapshot import JobRecommendationSnapshotService
 
 router = APIRouter(prefix="/recommendations/jobs", tags=["job-recommendations"])
 
@@ -30,6 +32,7 @@ async def generate_job_recommendations(
     session: AsyncSession = Depends(get_session),
 ) -> ApiResponse[JobRecommendationGenerateData]:
     data = await JobRecommendationService(session).generate(current_user.id, payload)
+    await JobRecommendationSnapshotService(session).create_for_run(current_user.id, data.run_id)
     return ApiResponse(success=True, data=data, message="규칙 기반 채용공고 추천이 생성되었습니다.")
 
 
@@ -44,6 +47,7 @@ async def list_job_recommendations(
     has_blocking_mismatch: bool | None = None,
     keyword: str | None = None,
     feedback: JobRecommendationFeedbackType | None = None,
+    change_type: RecommendationChangeType | None = None,
     include_hidden: bool = False,
     include_outdated: bool = False,
     sort: str = Query(default="score", pattern="^(score|generated_at|job_deadline|company_name)$"),
@@ -58,6 +62,7 @@ async def list_job_recommendations(
         has_blocking_mismatch=has_blocking_mismatch,
         keyword=keyword,
         feedback=feedback,
+        change_type=change_type,
         include_hidden=include_hidden,
         include_outdated=include_outdated,
         sort=sort,

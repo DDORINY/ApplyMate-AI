@@ -2,6 +2,16 @@ export type JobRecommendationGrade = "EXCELLENT" | "GOOD" | "POSSIBLE" | "LOW" |
 export type JobRecommendationStatus = "ACTIVE" | "OUTDATED" | "HIDDEN" | "ARCHIVED";
 export type JobRecommendationType = "RULE_BASED";
 export type JobRecommendationFeedbackType = "INTERESTED" | "NOT_INTERESTED" | "HIDDEN" | "APPLIED" | "SAVED_FOR_LATER";
+export type RecommendationRunFrequency = "MANUAL" | "DAILY" | "WEEKLY";
+export type RecommendationChangeType = "NEW" | "UNCHANGED" | "SCORE_UP" | "SCORE_DOWN" | "GRADE_UP" | "GRADE_DOWN" | "REMOVED" | "OUTDATED";
+export type RecommendationConfidence = "HIGH" | "MEDIUM" | "LOW";
+export type RecommendationNotificationStatus = "PENDING" | "READ" | "DISMISSED" | "EXPIRED";
+export type RecommendationNotificationType =
+  | "NEW_HIGH_SCORE_RECOMMENDATION"
+  | "RECOMMENDATION_SCORE_INCREASED"
+  | "RECOMMENDATION_GRADE_INCREASED"
+  | "APPLICATION_DEADLINE_APPROACHING"
+  | "RECOMMENDATION_BECAME_OUTDATED";
 export type JobRecommendationFeedbackReason =
   | "LOCATION"
   | "SALARY"
@@ -72,6 +82,15 @@ export type JobRecommendation = {
   job: JobRecommendationJobSummary;
   reasons: JobRecommendationReason[];
   feedback: JobRecommendationFeedback | null;
+  latest_change_type: RecommendationChangeType | null;
+  previous_score: number | null;
+  score_delta: number | null;
+  previous_grade: string | null;
+  rank: number | null;
+  rank_delta: number | null;
+  missing_job_fields: string[];
+  data_completeness_score: number | null;
+  recommendation_confidence: RecommendationConfidence | null;
 };
 
 export type JobRecommendationListData = {
@@ -99,4 +118,107 @@ export type JobRecommendationPolicyData = {
   weights: Record<string, number>;
   grades: Record<string, string>;
   note: string;
+};
+
+export type JobRecommendationSettings = {
+  id: number;
+  user_id: number;
+  enabled: boolean;
+  frequency: RecommendationRunFrequency;
+  preferred_run_hour: number;
+  timezone: string;
+  minimum_score: number;
+  include_jobs_without_analysis: boolean;
+  exclude_applied_jobs: boolean;
+  exclude_hidden_jobs: boolean;
+  notify_new_recommendations: boolean;
+  notify_score_changes: boolean;
+  last_run_at: string | null;
+  next_run_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type JobRecommendationRunIfDueData = {
+  executed: boolean;
+  skip_reason: string | null;
+  run_id: number | null;
+  snapshot_id: number | null;
+  recommended_count: number;
+  new_count: number;
+  changed_count: number;
+  removed_count: number;
+  next_run_at: string | null;
+  message: string;
+};
+
+export type JobRecommendationSnapshotItem = {
+  id: number;
+  snapshot_id: number;
+  recommendation_id: number | null;
+  job_id: number;
+  score: number;
+  grade: string;
+  rank: number;
+  blocking_mismatch: boolean;
+  change_type: RecommendationChangeType;
+  previous_score: number | null;
+  score_delta: number | null;
+  previous_grade: string | null;
+  rank_delta: number | null;
+  reason_summary: string[];
+  missing_job_fields: string[];
+  data_completeness_score: number;
+  recommendation_confidence: RecommendationConfidence;
+  created_at: string;
+};
+
+export type JobRecommendationSnapshot = {
+  id: number;
+  user_id: number;
+  run_id: number;
+  profile_hash: string;
+  policy_version: string;
+  input_job_count: number;
+  recommended_count: number;
+  new_count: number;
+  changed_count: number;
+  removed_count: number;
+  generated_at: string;
+  created_at: string;
+  items: JobRecommendationSnapshotItem[];
+};
+
+export type JobRecommendationSnapshotListData = {
+  items: JobRecommendationSnapshot[];
+  page: number;
+  size: number;
+  total: number;
+  total_pages: number;
+};
+
+export type RecommendationNotification = {
+  id: number;
+  user_id: number;
+  recommendation_id: number | null;
+  snapshot_id: number;
+  snapshot_item_id: number | null;
+  notification_type: RecommendationNotificationType;
+  status: RecommendationNotificationStatus;
+  title: string;
+  message: string;
+  payload: Record<string, unknown> | null;
+  expires_at: string | null;
+  read_at: string | null;
+  dismissed_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RecommendationNotificationListData = {
+  items: RecommendationNotification[];
+  page: number;
+  size: number;
+  total: number;
+  total_pages: number;
 };

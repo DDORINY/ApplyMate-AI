@@ -10,6 +10,19 @@
 | `RESOURCE_NOT_FOUND` | 404 | Resource or route not found |
 | `INTERNAL_SERVER_ERROR` | 500 | Internal server error |
 
+## v0.6.1 Recommendation Automation Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| `RECOMMENDATION_SETTINGS_NOT_FOUND` | 404 | Recommendation settings were not found |
+| `RECOMMENDATION_FREQUENCY_INVALID` | 400 | Recommendation execution frequency is invalid |
+| `RECOMMENDATION_RUN_NOT_DUE` | 409 | Recommendation execution is not due |
+| `RECOMMENDATION_RUN_ALREADY_RUNNING` | 409 | Recommendation execution is already running |
+| `RECOMMENDATION_SNAPSHOT_NOT_FOUND` | 404 | Recommendation snapshot was not found |
+| `RECOMMENDATION_NOTIFICATION_NOT_FOUND` | 404 | Recommendation notification candidate was not found |
+| `RECOMMENDATION_NOTIFICATION_ALREADY_DISMISSED` | 409 | Recommendation notification candidate is already dismissed |
+| `RECOMMENDATION_AUTOMATION_FORBIDDEN` | 403 | Recommendation automation resource access is forbidden |
+
 ## v0.6.0 Job Recommendation Error Codes
 
 | Code | HTTP | Description |

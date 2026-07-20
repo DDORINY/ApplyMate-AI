@@ -4,7 +4,8 @@
 
 | Area | Feature | Implementation | Current environment status |
 | --- | --- | --- | --- |
-| Release | v0.6.0 rule-based job recommendations | Implemented locally | Saved-job-only rule-based flow verified locally; release finalization in progress. |
+| Release | v0.6.1 recommendation automation foundation | Done locally | Settings, run-if-due, snapshots, changes, notification candidates verified locally. |
+| Release | v0.6.0 rule-based job recommendations | Done, merged, tagged `v0.6.0` | Saved-job-only rule-based flow verified. |
 | Release | v0.5.1 Gmail recruitment email analysis | Done, merged, tagged `v0.5.1` | Mock flow verified; real Gmail is not connected in current `.env`. |
 | AI | AI provider abstraction | Done | Current `.env` uses `AI_PROVIDER=mock`; real OpenAI is not connected. |
 | Calendar | Google Calendar integration foundation | Done | `CALENDAR_PROVIDER=google` and credentials exist; live Google API verification remains. |
@@ -13,7 +14,7 @@
 Detailed environment notes: [Environment Connection Status](environment-connection-status.md)
 
 문서 기준일: 2026-07-20
-현재 릴리스: `v0.6.0`
+현재 릴리스: `v0.6.1`
 
 ## 버전별 기능 상태
 
@@ -37,7 +38,21 @@ Detailed environment notes: [Environment Connection Status](environment-connecti
 | 연동 | Google Calendar OAuth, Calendar 선택, mock 동기화, mapping/run/error | 완료 | v0.5.0 | mock provider 검증, 실제 Google은 NEEDS_VERIFICATION |
 | 연동 | Gmail 채용 메일 분석, 후보 생성, 사용자 승인 반영 | 완료 | v0.5.1 | mock provider 검증, 실제 Gmail은 NEEDS_VERIFICATION |
 | 추천 | 저장된 채용공고 기반 규칙 추천 | 완료 | v0.6.0 | RULE_BASED 점수/등급/이유/피드백 |
+| 추천 | 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 | 완료 | v0.6.1 | 실제 알림 발송/외부 수집 제외 |
 | Release | MVP 안정화, E2E, 운영 문서, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
+
+## v0.6.1 세부 상태
+
+| 기능 | 상태 | 검증 |
+| --- | --- | --- |
+| `GET/PATCH /api/v1/recommendations/settings` | 완료 | `backend/tests/test_job_recommendation_automation.py` |
+| `POST /api/v1/recommendations/jobs/run-if-due` | 완료 | 실행/skip reason 테스트 |
+| 추천 Snapshot 저장 | 완료 | 최초 실행/신규 추천 테스트 |
+| 추천 변화 응답 | 완료 | 목록 응답 `latest_change_type` 테스트 |
+| 추천 알림 후보 | 완료 | 목록/소유권 테스트 |
+| `/recommendations/history` | 완료 | frontend lint/type-check/build |
+| `/settings/recommendations` | 완료 | frontend lint/type-check/build |
+| 대시보드 Snapshot 요약 | 완료 | frontend lint/type-check/build |
 
 ## v0.6.0 세부 상태
 

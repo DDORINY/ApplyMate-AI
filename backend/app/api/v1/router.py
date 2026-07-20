@@ -12,6 +12,7 @@ from app.api.v1.endpoints.health import router as health_router
 from app.api.v1.endpoints.gmail_integration import router as gmail_integration_router
 from app.api.v1.endpoints.job_analysis import router as job_analysis_router
 from app.api.v1.endpoints.job_match import router as job_match_router
+from app.api.v1.endpoints.job_recommendation_automation import router as job_recommendation_automation_router
 from app.api.v1.endpoints.job_recommendations import router as job_recommendations_router
 from app.api.v1.endpoints.jobs import router as jobs_router
 from app.api.v1.endpoints.oauth import router as oauth_router
@@ -31,6 +32,7 @@ api_router.include_router(health_router, tags=["health"])
 api_router.include_router(gmail_integration_router)
 api_router.include_router(job_analysis_router)
 api_router.include_router(job_match_router)
+api_router.include_router(job_recommendation_automation_router)
 api_router.include_router(job_recommendations_router)
 api_router.include_router(jobs_router)
 api_router.include_router(oauth_router)

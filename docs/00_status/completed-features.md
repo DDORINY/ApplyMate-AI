@@ -22,6 +22,7 @@
 | v0.5.0 | Google Calendar 전용 OAuth, token 암호화, Calendar 선택, mock 동기화, mapping/run/error 기록 |
 | v0.5.1 | Gmail 전용 OAuth, 읽기 전용 메일 조회, 후보 생성, 사용자 승인 기반 상태/일정 반영 |
 | v0.6.0 | 저장된 채용공고 기반 규칙 추천, 추천 점수/이유/부족 조건, 사용자 피드백 |
+| v0.6.1 | 추천 실행 설정, run-if-due, Snapshot, 변화 판정, 알림 후보, 추천 UX 개선 |
 
 ## v0.4.2 완료 상세
 
@@ -72,3 +73,15 @@
 - `/recommendations` 목록 화면과 `/recommendations/{recommendationId}` 상세 화면 추가
 - 대시보드에서 상위 추천 공고 카드 표시
 - 신규 migration `20260719_2300`
+
+## v0.6.1 완료 상세
+
+- 사용자별 추천 실행 설정 추가
+- 스케줄러가 호출 가능한 `run-if-due` API 추가
+- 수동 추천 생성과 run-if-due 실행 시 Snapshot 저장
+- Snapshot item에 신규/점수 상승/점수 하락/등급 변화/outdated 판정 저장
+- 추천 알림 후보 저장, 읽음/해제 처리
+- 추천 목록에 변화/피드백/최소 점수 필터와 변화 배지 추가
+- `/recommendations/history` 추천 이력 화면 추가
+- `/settings/recommendations` 추천 설정 화면 추가
+- 신규 migration `20260720_0000`
