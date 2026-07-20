@@ -1,8 +1,22 @@
 # Database Design
 
+## v0.7.0 Document Improvement Database
+
+v0.7.0 adds AI document improvement runs on top of existing application document versions. Current migration head is `20260720_0100`.
+
+- `document_improvement_runs`: improvement request, base/result version links, provider metadata, prompt/schema versions, hash, status, output summary, warnings, confidence
+- `document_improvement_suggestions`: paragraph/sentence-level before/after suggestions, change type, evidence, risk level, selection/status
+- `document_improvement_sources`: source snapshots used for the run, including current document and explicit user instruction
+- `document_improvement_actions`: approval, rejection, apply, and reject history for audit
+
+Migration:
+
+- 신규 revision: `20260720_0100`
+- 이전 revision: `20260720_0000`
+
 ## v0.6.1 Recommendation Automation Database
 
-v0.6.1 adds recommendation execution settings, snapshots, snapshot items, and notification candidates. Current migration head is `20260720_0000`.
+v0.6.1 added recommendation execution settings, snapshots, snapshot items, and notification candidates. Release migration head was `20260720_0000`.
 
 - `job_recommendation_settings`: user-level execution settings, frequency, score threshold, include/exclude policies, last/next run timestamps
 - `job_recommendation_snapshots`: one record per recommendation execution result bundle
@@ -50,7 +64,7 @@ Migration:
 - Datetime values are stored in UTC.
 - User-owned data has `user_id`.
 - Schema changes are managed with Alembic migrations.
-- Current migration head: `20260720_0000`.
+- Current migration head: `20260720_0100`.
 
 ## Main tables
 
@@ -61,7 +75,7 @@ Migration:
 | Profile | `career_profiles`, `skills`, `user_skills`, `experiences`, `projects`, `job_preferences`, `excluded_conditions`, `portfolio_links` |
 | Jobs | `companies`, `job_postings`, `job_analyses`, `job_analysis_runs`, `job_matches`, `job_match_runs`, `job_match_feedback`, `job_recommendation_runs`, `job_recommendations`, `job_recommendation_reasons`, `job_recommendation_feedback`, `job_recommendation_settings`, `job_recommendation_snapshots`, `job_recommendation_snapshot_items`, `recommendation_notification_candidates` |
 | Resumes | `resumes`, `resume_files`, `resume_file_extractions`, `resume_extraction_runs`, `resume_analyses`, `resume_analysis_runs` |
-| Documents | `application_documents`, `application_document_versions`, `application_document_sources`, `generation_runs` |
+| Documents | `application_documents`, `application_document_versions`, `application_document_sources`, `generation_runs`, `document_improvement_runs`, `document_improvement_suggestions`, `document_improvement_sources`, `document_improvement_actions` |
 | Applications | `applications`, `application_status_history`, `application_notes` |
 | Calendar | `schedule_events`, `schedule_reminders`, `schedule_event_history` |
 

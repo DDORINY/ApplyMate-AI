@@ -1,5 +1,44 @@
 # ERD
 
+## v0.7.0 Document Improvement ERD
+
+```mermaid
+erDiagram
+    users ||--o{ document_improvement_runs : owns
+    application_documents ||--o{ document_improvement_runs : improved_by
+    application_document_versions ||--o{ document_improvement_runs : base_version
+    document_improvement_runs ||--o{ document_improvement_suggestions : proposes
+    document_improvement_runs ||--o{ document_improvement_sources : uses
+    document_improvement_runs ||--o{ document_improvement_actions : records
+    document_improvement_suggestions ||--o{ document_improvement_actions : acted_on
+
+    document_improvement_runs {
+      int id PK
+      int user_id FK
+      int application_document_id FK
+      int base_version_id FK
+      int result_version_id FK
+      string status
+      string improvement_type
+      string provider
+      string prompt_version
+      string schema_version
+      bool outdated
+    }
+
+    document_improvement_suggestions {
+      int id PK
+      int run_id FK
+      int paragraph_index
+      int sentence_index
+      text original_text
+      text suggested_text
+      string risk_level
+      string status
+      bool selected
+    }
+```
+
 ## v0.6.1 Recommendation Automation ERD
 
 ```mermaid

@@ -1,6 +1,33 @@
 # Functional Specification
 
-Current implemented version: `v0.6.1`
+Current implemented version: `v0.7.0`
+
+## v0.7.0 AI Document Improvement Loop Functional Specification
+
+### Purpose
+
+기존 지원 문서 버전을 기준으로 AI 개선안을 생성하고, 사용자가 문장별 제안을 검토·승인한 뒤 새 문서 버전으로 저장한다.
+
+### Requirements
+
+- v0.3.3 지원 문서 생성/버전 기능을 확장하고 중복 생성 기능을 만들지 않는다.
+- 개선 실행은 기준 문서 버전, 개선 유형, 사용자 요청, 목표 톤/길이, provider metadata를 저장한다.
+- 개선 유형은 명확성, 간결화, 전문적 톤, 직무/기업 연결, 기술/경력/프로젝트/성과 강조, 구조, 문법, 길이 조정, 직접 요청을 지원한다.
+- AI 출력은 전체 개선안과 문장별 원문/개선 문장/변경 이유/근거/위험도/선택 상태를 포함한다.
+- 승인 전 기존 문서 버전은 변경하지 않는다.
+- 사용자가 적용하면 승인 또는 선택된 제안만 반영한 새 `application_document_versions`를 생성한다.
+- 개선 실행 이후 최신 문서 버전이 바뀌면 outdated로 표시하고 적용을 차단한다.
+- 모든 개선 실행, 제안, source, action은 `user_id` 소유권을 검증한다.
+- 근거 없는 회사명, 기술, 성과 수치, 날짜, 자격증, 프로젝트는 생성하지 않는다.
+- source와 사용자 입력의 prompt injection 지시는 따르지 않는다.
+
+### Prohibited
+
+- 사용자 승인 없는 문서 변경
+- 지원자 실제 경험에 없는 사실 생성
+- 선택하지 않은 외부 source 자동 추가
+- 외부 웹 검색 기반 기업 인재상 추정
+- 기존 문서 생성 API 응답 구조 변경
 
 ## v0.6.1 Recommendation Automation Foundation Functional Specification
 

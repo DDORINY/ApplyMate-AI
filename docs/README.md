@@ -1,6 +1,6 @@
 # ApplyMate AI Documentation
 
-현재 문서 기준 버전: `v0.6.1`
+현재 문서 기준 버전: `v0.7.0`
 
 ## 문서 구조
 
@@ -19,7 +19,7 @@
 - `10_ai`: AI 프롬프트와 출력 스키마
 - `11_releases`: 버전별 릴리스 노트
 
-## v0.6.1에서 최신화된 주요 문서
+## v0.7.0에서 최신화된 주요 문서
 
 - [현재 프로젝트 상태](00_status/current-project-status.md)
 - [환경 연결 상태](00_status/environment-connection-status.md)
@@ -46,6 +46,10 @@
 - [v0.6.0 규칙 기반 채용공고 추천 계획](05_development-plan/releases/v0.6.0-plan.md)
 - [v0.6.1 일일 맞춤 추천 계획](05_development-plan/releases/v0.6.1-plan.md)
 - [v0.7.0 자기소개서 개선 루프 계획](05_development-plan/releases/v0.7.0-plan.md)
+- [지원 문서 개선 정책](07_policies/document-improvement-policy.md)
+- [지원 문서 개선 프롬프트](10_ai/document-improvement-prompt.md)
+- [지원 문서 개선 스키마](10_ai/document-improvement-schema.md)
+- [v0.7.0 릴리스 노트](11_releases/v0.7.0-document-improvement.md)
 - [채용공고 추천 정책](07_policies/job-recommendation-policy.md)
 - [v0.6.1 릴리스 노트](11_releases/v0.6.1-recommendation-automation.md)
 - [v0.6.0 릴리스 노트](11_releases/v0.6.0-job-recommendations.md)

@@ -2,9 +2,9 @@
 
 ## 현재 위치
 
-- 완료: `v0.6.1` 추천 UX 개선과 추천 실행 자동화 기반
-- 다음: `v0.7.0` AI 자기소개서 개선 루프
-- 최신 DB head: `20260720_0000`
+- 완료: `v0.7.0` AI 지원 문서 개선 루프
+- 다음: `v0.8.0` 알림/리마인더 운영화
+- 최신 DB head: `20260720_0100`
 
 ## 완료된 큰 흐름
 
@@ -21,10 +21,11 @@
 11. Gmail 채용 메일 분석 기반
 12. 규칙 기반 채용공고 추천
 13. 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 기반
+14. AI 지원 문서 개선 루프
 
 ## 남은 큰 흐름
 
-1. AI 자기소개서 개선 루프를 구현한다.
+1. 알림/리마인더 운영화를 구현한다.
 2. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
 3. v1.0.0 MVP 릴리스를 완료한다.
 
@@ -71,4 +72,14 @@
 - `/recommendations` UX를 새 추천/점수 변화/피드백 필터 중심으로 개선한다.
 - `/recommendations/history`와 `/settings/recommendations` 화면을 추가한다.
 - 실제 Background Worker 운영, 외부 공고 수집, 이메일·푸시 발송, 자동 지원은 제외한다.
-- v0.6.1 완료 후 다음 개발 브랜치는 `feature/v0.7.0-cover-letter-improvement`이다.
+- v0.6.1 완료 후 다음 개발 브랜치는 `feature/v0.7.0-document-improvement`이다.
+
+# v0.7.0 Completion Update
+
+- 기존 지원 문서 버전을 기준으로 AI 개선 실행을 생성한다.
+- 문장별 원문/개선안/근거/위험도/선택 상태를 저장한다.
+- 승인 전에는 기존 문서를 변경하지 않고, 적용 시 새 버전을 생성한다.
+- 기준 문서보다 최신 버전이 있으면 적용을 차단한다.
+- `/documents/{documentId}/improve`와 `/documents/{documentId}/improvements/{runId}` 화면을 추가한다.
+- 실제 OpenAI 개선 호출은 `NEEDS_VERIFICATION`으로 남긴다.
+- v0.7.0 완료 후 다음 개발 브랜치는 `feature/v0.8.0-notification-operations`이다.

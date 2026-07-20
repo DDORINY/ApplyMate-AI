@@ -1,6 +1,6 @@
 # Database Design Overview
 
-문서 기준 버전: `v0.4.0`
+문서 기준 버전: `v0.7.0`
 
 상세 DB 문서는 [docs/06_database/database-design.md](../06_database/database-design.md)를 기준으로 한다.
 
@@ -9,7 +9,7 @@
 - DB: PostgreSQL
 - ORM: SQLAlchemy
 - Migration: Alembic
-- 현재 migration head: `20260719_1900`
+- 현재 migration head: `20260720_0100`
 
 ## 현재 구현 테이블
 
@@ -38,6 +38,14 @@ job_analysis_runs
 job_matches
 job_match_runs
 job_match_feedback
+job_recommendation_runs
+job_recommendations
+job_recommendation_reasons
+job_recommendation_feedback
+job_recommendation_settings
+job_recommendation_snapshots
+job_recommendation_snapshot_items
+recommendation_notification_candidates
 resumes
 resume_files
 resume_file_extractions
@@ -48,9 +56,29 @@ application_documents
 application_document_versions
 application_document_sources
 generation_runs
+document_improvement_runs
+document_improvement_suggestions
+document_improvement_sources
+document_improvement_actions
 applications
 application_status_history
 application_notes
+schedule_events
+schedule_reminders
+schedule_event_history
+calendar_oauth_states
+external_accounts
+calendar_connections
+calendar_sync_mappings
+sync_runs
+sync_errors
+gmail_oauth_states
+gmail_connections
+email_sync_runs
+email_messages
+email_analysis_runs
+email_candidates
+email_candidate_actions
 ```
 
 ## 설계 원칙
@@ -62,13 +90,4 @@ application_notes
 - AI 결과는 현재 결과와 실행 이력을 분리한다.
 - 업로드 파일은 원본 파일명과 내부 저장명을 분리한다.
 - 지원 항목은 제출 문서 버전을 `application_document_version_id`로 고정한다.
-
-## v0.4.1 예상 확장
-
-v0.4.1 일정 관리에서는 다음 테이블을 추가할 예정이다.
-
-```text
-schedule_events
-schedule_reminders
-schedule_event_history
-```
+- 문서 개선은 승인 전 기존 문서를 변경하지 않고 적용 시 새 문서 버전을 생성한다.

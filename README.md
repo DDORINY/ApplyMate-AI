@@ -1,8 +1,18 @@
 # ApplyMate AI
 
-현재 버전: `v0.6.1`
+현재 버전: `v0.7.0`
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 이력서, 채용공고, AI 분석 결과, 지원 문서, 지원 현황, 일정을 연결해 취업 준비 흐름을 한곳에서 관리합니다.
+
+## v0.7.0 주요 기능
+
+- 기존 지원 문서 버전 기반 AI 개선 실행
+- 명확성, 간결화, 전문적 톤, 직무/기업 연결, 기술/경력/성과 강조 등 14개 개선 유형
+- 문장별 원문/개선안/근거/위험도/선택 상태 관리
+- 승인 전 기존 문서 보존, 적용 시 새 문서 버전 생성
+- 개선 실행 source/action 이력 저장
+- `/documents/{documentId}/improve` 개선 요청 화면
+- `/documents/{documentId}/improvements/{runId}` before/after 비교와 제안 승인 화면
 
 ## v0.6.1 주요 기능
 
@@ -89,6 +99,8 @@ docker compose up --build
 - `/jobs`
 - `/resumes`
 - `/documents`
+- `/documents/{documentId}/improve`
+- `/documents/{documentId}/improvements/{runId}`
 - `/applications`
 - `/calendar`
 - `/recommendations`
@@ -126,6 +138,7 @@ npm run build
 - [버전 로드맵](docs/05_development-plan/version-roadmap.md)
 - [API 명세](docs/04_api/api-specification.md)
 - [DB 설계](docs/06_database/database-design.md)
+- [v0.7.0 릴리스 노트](docs/11_releases/v0.7.0-document-improvement.md)
 - [v0.6.1 릴리스 노트](docs/11_releases/v0.6.1-recommendation-automation.md)
 - [v0.6.0 릴리스 노트](docs/11_releases/v0.6.0-job-recommendations.md)
 - [v0.5.1 릴리스 노트](docs/11_releases/v0.5.1-gmail-analysis.md)
@@ -133,9 +146,9 @@ npm run build
 
 ## 현재 migration head
 
-`20260720_0000`
+`20260720_0100`
 
-v0.6.1은 추천 실행 설정, Snapshot, Snapshot item, 추천 알림 후보 테이블을 추가합니다.
+v0.7.0은 지원 문서 개선 실행, 문장별 제안, 개선 source, 개선 action 테이블을 추가합니다.
 
 ## 미검증/운영 확인 필요
 

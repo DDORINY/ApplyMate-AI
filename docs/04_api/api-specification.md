@@ -36,6 +36,7 @@ Error response:
 | Jobs | `/jobs` | v0.2.0~v0.2.2 | Job postings, analysis, matching |
 | Resumes | `/resumes` | v0.3.0~v0.3.2 | Resumes, files, extraction, analysis |
 | Documents | `/documents` | v0.3.3 | Application documents and versions |
+| Document Improvements | `/documents/{documentId}/improvements` | v0.7.0 | AI document improvement runs, sentence suggestions, approval-based versioning |
 | Applications | `/applications` | v0.4.0 | Application tracking |
 | Calendar | `/calendar` | v0.4.1 | Schedule management |
 | Dashboard | `/dashboard` | v0.4.2 | Read-only application dashboard |
@@ -43,6 +44,55 @@ Error response:
 | Gmail Integration | `/integrations/gmail`, `/email-candidates` | v0.5.1 | Gmail recruitment email analysis candidates |
 | Job Recommendations | `/recommendations/jobs` | v0.6.0 | Rule-based saved job recommendations |
 | Recommendation Automation | `/recommendations/settings`, `/recommendations/jobs/snapshots`, `/recommendation-notifications` | v0.6.1 | Recommendation settings, snapshots, change detection, notification candidates |
+
+## v0.7.0 Document Improvement API
+
+Base path: `/api/v1/documents/{documentId}/improvements`
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| POST | `` | Access Token | v0.7.0 | Create an AI improvement run from the current or selected document version |
+| GET | `` | Access Token | v0.7.0 | List improvement runs for a document |
+| GET | `/{runId}` | Access Token | v0.7.0 | Get an improvement run with suggestions, sources, and actions |
+| POST | `/{runId}/retry` | Access Token | v0.7.0 | Retry an existing improvement run with the same base settings |
+| DELETE | `/{runId}` | Access Token | v0.7.0 | Delete an unapplied improvement run |
+| PATCH | `/{runId}/suggestions/{suggestionId}` | Access Token | v0.7.0 | Approve/reject/select one sentence suggestion |
+| POST | `/{runId}/apply` | Access Token | v0.7.0 | Apply approved/selected suggestions and create a new document version |
+| POST | `/{runId}/reject` | Access Token | v0.7.0 | Reject an improvement run |
+
+### Create request
+
+```json
+{
+  "improvement_type": "JOB_ALIGNMENT",
+  "custom_instruction": "FastAPI 경험을 직무 적합도와 연결해 주세요.",
+  "base_version_id": 1,
+  "target_min_length": 500,
+  "target_max_length": 700,
+  "target_tone": "전문적이고 간결한 한국어",
+  "source_ids": []
+}
+```
+
+### Apply request
+
+```json
+{
+  "apply_all": false,
+  "suggestion_ids": [1, 2],
+  "version_title": "AI 개선 승인본"
+}
+```
+
+Rules:
+
+- Improvements extend v0.3.3 application document generation; they do not create a parallel document-generation feature.
+- The base document version is preserved until the user applies suggestions.
+- Applying suggestions creates a new `application_document_versions` row and links `result_version_id` to the run.
+- If a newer version exists after the run's `base_version_id`, apply is blocked with `DOCUMENT_IMPROVEMENT_OUTDATED`.
+- AI output must be structured and evidence-backed.
+- Unsupported facts, metrics, companies, skills, dates, certifications, or projects must not be invented.
+- Source documents and custom user instructions are treated as untrusted input for prompt-injection defense.
 
 ## v0.6.1 Recommendation Automation API
 
