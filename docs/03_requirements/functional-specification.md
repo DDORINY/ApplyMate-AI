@@ -1,6 +1,31 @@
 # Functional Specification
 
-Current implemented version: `v0.8.0`
+Current implemented version: `v0.9.0`
+
+## v0.9.0 E2E·성능·보안 안정화 Functional Specification
+
+### Purpose
+
+v1.0.0 MVP 릴리스 전 운영 안정성, 보안 기본값, 관측성, 테스트 자동화 기반을 강화한다.
+
+### Requirements
+
+- 모든 API 응답은 `X-Request-ID`를 포함한다.
+- 공통 오류 응답은 가능한 경우 `error.request_id`를 포함한다.
+- 보안 헤더를 기본 적용한다.
+- 운영 CORS 허용 origin은 환경변수로 명시한다.
+- 주요 민감 API는 rate limit을 적용하고 429 응답과 관련 header를 반환한다.
+- `/health/live`는 프로세스 liveness를 반환한다.
+- `/health/ready`는 DB, Redis, 운영 필수 설정 readiness를 반환한다.
+- 감사 로그는 민감정보 없이 사용자 주요 action과 request id를 저장한다.
+- E2E smoke test는 인증/보호 화면/알림 설정 화면의 기본 접근성을 확인한다.
+
+### Prohibited
+
+- Secret, token, raw provider error를 응답 또는 로그에 노출
+- 운영 CORS wildcard 사용
+- 실제 실행하지 않은 성능 수치를 완료로 표시
+- 운영 복구 리허설을 문서 작성만으로 완료 처리
 
 ## v0.8.0 Notification Operations Functional Specification
 

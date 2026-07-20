@@ -1,12 +1,12 @@
 # Current Project Status
 
-## 2026-07-20 v0.8.0 상태 업데이트
+## 2026-07-20 v0.9.0 상태 업데이트
 
-- 현재 완료 릴리스: `v0.8.0`
-- 현재 작업 브랜치: `feature/v0.8.0-notification-operations`
-- 현재 migration head: `20260720_0200`
-- 직전 완료 릴리스: `v0.7.0` AI 지원 문서 개선 루프
-- 신규 완료 범위: 알림·리마인더 운영화
+- 현재 완료 릴리스: `v0.9.0`
+- 현재 작업 브랜치: `feature/v0.9.0-stability-hardening`
+- 현재 migration head: `20260720_0300`
+- 직전 완료 릴리스: `v0.8.0` 알림·리마인더 운영화
+- 신규 완료 범위: E2E·성능·보안 안정화 기반
 - AI provider 검증 기준: `AI_PROVIDER=mock`
 - 실제 OpenAI 문서 개선 호출은 `OPENAI_API_KEY`, `OPENAI_MODEL`, 비용 및 운영 프롬프트 검증이 필요하므로 `NEEDS_VERIFICATION` 상태이다.
 
@@ -14,9 +14,9 @@
 
 ## 현재 버전
 
-- 버전: `v0.8.0`
-- 최신 migration: `20260720_0200_create_notification_tables.py`
-- 최신 릴리스 범위: In-app 알림, 알림 설정, delivery/retry 구조, worker task, mock email provider
+- 버전: `v0.9.0`
+- 최신 migration: `20260720_0300_create_audit_logs.py`
+- 최신 릴리스 범위: Request ID, 보안 헤더, CORS origin 설정, rate limit, live/ready health, audit log, E2E 스캐폴딩, 운영 문서
 
 ## 구현 완료 기능
 
@@ -39,6 +39,10 @@
 - 저장된 채용공고 기반 규칙 추천
 - 추천 실행 설정, Snapshot, 변화 판정, 추천 알림 후보
 - 알림 설정, In-app 알림, worker 기반 리마인더 처리, mock email delivery
+- Request ID 기반 오류 추적, 보안 헤더, 주요 API rate limit
+- live/ready health check와 운영 환경변수 readiness 검증
+- 감사 로그 `audit_logs`와 알림 설정/Delivery retry 감사 기록
+- Playwright 기반 E2E smoke test
 
 ## 주요 화면
 
@@ -62,7 +66,11 @@
 
 ## 현재 DB
 
-최신 migration: `20260720_0200_create_notification_tables.py`
+최신 migration: `20260720_0300_create_audit_logs.py`
+
+v0.9.0 신규 테이블:
+
+- `audit_logs`
 
 v0.8.0 신규 테이블:
 
@@ -74,12 +82,13 @@ v0.8.0 신규 테이블:
 ## 최근 검증 기준
 
 - Backend ruff: 통과
-- Backend pytest: `167 passed`
+- Backend pytest: `171 passed`
 - Frontend lint: 통과
 - Frontend type-check: 통과
 - Frontend build: 통과
 - Docker compose config: 통과
-- Alembic heads: `20260720_0200 (head)`
+- Playwright E2E: `3 passed`
+- Alembic heads: `20260720_0300 (head)`
 - 별도 Docker Compose project PostgreSQL migration upgrade/downgrade/upgrade: 통과
 - 별도 Docker Compose project worker 실행: 통과
 
@@ -94,3 +103,5 @@ v0.8.0 신규 테이블:
 - 운영 SMTP
 - 운영 HTTPS Cookie
 - 운영 배포
+- `pip-audit` 실행: 현재 로컬에 미설치
+- npm audit moderate 2건: Next 내부 PostCSS advisory, 자동 fix가 major downgrade 제안이라 보류

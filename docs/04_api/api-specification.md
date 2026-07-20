@@ -45,6 +45,19 @@ Error response:
 | Job Recommendations | `/recommendations/jobs` | v0.6.0 | Rule-based saved job recommendations |
 | Recommendation Automation | `/recommendations/settings`, `/recommendations/jobs/snapshots`, `/recommendation-notifications` | v0.6.1 | Recommendation settings, snapshots, change detection, notification candidates |
 | Notifications | `/notifications`, `/notification-settings`, `/notification-deliveries` | v0.8.0 | In-app notifications, user preferences, delivery/retry |
+| Health | `/health`, `/health/live`, `/health/ready` | v0.9.0 | Liveness/readiness checks |
+
+## v0.9.0 Operational API Behavior
+
+- Error responses can include `error.request_id`.
+- Responses include `X-Request-ID`.
+- Rate-limited APIs return `429` with `Retry-After`, `X-RateLimit-Limit`, `X-RateLimit-Remaining`.
+- Security headers are applied by middleware when enabled.
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| GET | `/health/live` | None | v0.9.0 | Process liveness |
+| GET | `/health/ready` | None | v0.9.0 | DB/Redis/required settings readiness |
 
 ## v0.8.0 Notification Operations API
 

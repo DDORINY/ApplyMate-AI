@@ -1,5 +1,16 @@
 # Database Design
 
+## v0.9.0 Stability Hardening Database
+
+v0.9.0 adds `audit_logs`. Current migration head is `20260720_0300`.
+
+- `audit_logs`: user action audit trail with resource, result, request id, hashed IP, user agent, metadata
+
+Migration:
+
+- 신규 revision: `20260720_0300`
+- 이전 revision: `20260720_0200`
+
 ## v0.8.0 Notification Operations Database
 
 v0.8.0 adds notification settings, notifications, channel deliveries, and processing runs. Current migration head is `20260720_0200`.
@@ -78,13 +89,13 @@ Migration:
 - Datetime values are stored in UTC.
 - User-owned data has `user_id`.
 - Schema changes are managed with Alembic migrations.
-- Current migration head: `20260720_0200`.
+- Current migration head: `20260720_0300`.
 
 ## Main tables
 
 | Domain | Tables |
 | --- | --- |
-| Auth | `users`, `refresh_tokens`, `email_verification_tokens`, `password_reset_tokens`, `security_events` |
+| Auth | `users`, `refresh_tokens`, `email_verification_tokens`, `password_reset_tokens`, `security_events`, `audit_logs` |
 | OAuth | `oauth_accounts`, `oauth_states`, `oauth_login_tickets` |
 | Profile | `career_profiles`, `skills`, `user_skills`, `experiences`, `projects`, `job_preferences`, `excluded_conditions`, `portfolio_links` |
 | Jobs | `companies`, `job_postings`, `job_analyses`, `job_analysis_runs`, `job_matches`, `job_match_runs`, `job_match_feedback`, `job_recommendation_runs`, `job_recommendations`, `job_recommendation_reasons`, `job_recommendation_feedback`, `job_recommendation_settings`, `job_recommendation_snapshots`, `job_recommendation_snapshot_items`, `recommendation_notification_candidates` |

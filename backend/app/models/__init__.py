@@ -14,6 +14,7 @@ from app.models.application import (
     ApplicationStatusHistory,
     ApplicationStatusHistorySource,
 )
+from app.models.audit import AuditLog
 from app.models.application_document import (
     ApplicationDocument,
     ApplicationDocumentSource,
@@ -266,6 +267,7 @@ __all__ = [
     "NotificationProcessingRunStatus",
     "NotificationProcessingTaskType",
     "NotificationSetting",
+    "AuditLog",
     "NotificationStatus",
     "JobSourceType",
     "JobWorkType",

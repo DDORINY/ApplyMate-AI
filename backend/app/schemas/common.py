@@ -14,6 +14,7 @@ class ApiResponse(BaseModel, Generic[DataT]):
 class ErrorDetail(BaseModel):
     code: str
     message: str
+    request_id: str | None = None
 
 
 class ErrorResponse(BaseModel):
@@ -25,3 +26,4 @@ class HealthData(BaseModel):
     status: str
     database: str
     redis: str
+    required_settings: str = "UP"

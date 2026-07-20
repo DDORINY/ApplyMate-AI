@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps.auth import get_current_user
@@ -16,6 +16,7 @@ from app.schemas.notification import (
     NotificationSettingUpdate,
     NotificationUnreadCountData,
 )
+from app.services.audit import AuditLogService
 from app.services.notification import NotificationService
 
 router = APIRouter(tags=["notifications"])
@@ -112,10 +113,19 @@ async def get_notification_settings(
 @router.patch("/notification-settings", response_model=ApiResponse[NotificationSettingPublic])
 async def update_notification_settings(
     payload: NotificationSettingUpdate,
+    request: Request,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> ApiResponse[NotificationSettingPublic]:
     data = await NotificationService(session).update_settings(current_user.id, payload)
+    await AuditLogService(session).record(
+        user_id=current_user.id,
+        action="NOTIFICATION_SETTINGS_UPDATED",
+        request=request,
+        resource_type="notification_settings",
+        resource_id=data.id,
+        metadata={"updated_fields": sorted(payload.model_dump(exclude_unset=True).keys())},
+    )
     return ApiResponse(success=True, data=data, message="알림 설정이 수정되었습니다.")
 
 
@@ -143,8 +153,17 @@ async def get_notification_delivery(
 @router.post("/notification-deliveries/{delivery_id}/retry", response_model=ApiResponse[NotificationDeliveryPublic])
 async def retry_notification_delivery(
     delivery_id: int,
+    request: Request,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ) -> ApiResponse[NotificationDeliveryPublic]:
     data = await NotificationService(session).retry_delivery(current_user.id, delivery_id)
+    await AuditLogService(session).record(
+        user_id=current_user.id,
+        action="NOTIFICATION_DELIVERY_RETRIED",
+        request=request,
+        resource_type="notification_delivery",
+        resource_id=delivery_id,
+        metadata={"channel": data.channel.value, "status": data.status.value},
+    )
     return ApiResponse(success=True, data=data, message="알림 delivery 재시도를 실행했습니다.")

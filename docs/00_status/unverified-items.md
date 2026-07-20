@@ -13,6 +13,10 @@
 | SMTP 실제 발송 | NEEDS_VERIFICATION | SMTP credential은 설정되어 있으나 실제 외부 메일 발송은 이번 확인 범위에서 검증하지 않았다. |
 | 추천 자동 실행 스케줄러 | DEFERRED | v0.6.0은 수동 생성 API/화면까지 구현하고 일일 자동 실행은 후속 범위로 둔다. |
 | 실제 Background Worker 추천 실행 | DEFERRED | v0.6.1은 설정, 실행 조건, 수동 API, Snapshot, 알림 후보까지만 구현한다. |
+| `pip-audit` | NEEDS_VERIFICATION | 현재 로컬 Python 환경에 `pip_audit` 모듈이 설치되어 있지 않다. |
+| npm audit moderate 2건 | NEEDS_REVIEW | Next 내부 PostCSS advisory이며 자동 fix가 Next major downgrade를 제안해 보류했다. |
+| 실제 운영 부하 테스트 | NEEDS_VERIFICATION | v0.9.0은 성능 목표와 대상 endpoint를 문서화했으며 실측 부하 테스트는 수행하지 않았다. |
+| 운영 DB 복구 리허설 | NEEDS_VERIFICATION | 백업/복구 문서는 작성했지만 실제 운영 복구 테스트는 수행하지 않았다. |
 
 자세한 안전 요약은 [환경 연결 상태](environment-connection-status.md)를 기준으로 한다.
 
@@ -25,7 +29,17 @@
 | 운영 SMTP | NEEDS_VERIFICATION | 실제 메일 발송 계정과 도메인 검증 필요 |
 | HTTPS Cookie/SameSite | NEEDS_VERIFICATION | 운영 도메인과 HTTPS 환경에서 검증 필요 |
 | 운영 배포 | NEEDS_VERIFICATION | 서버/도메인/DB/Redis 환경 필요 |
-| 브라우저 E2E 자동화 | PLANNED | v0.9.0 안정화 단계에서 강화 예정 |
+| 브라우저 E2E 자동화 | VERIFIED_LOCALLY | v0.9.0 Playwright smoke 3개 시나리오 통과 |
+
+## v0.9.0 제외 또는 후속 범위
+
+| 항목 | 상태 | 후속 버전 |
+| --- | --- | --- |
+| Redis 기반 분산 rate limit | DEFERRED | 다중 backend instance 운영 시 |
+| 장기 scheduler/분산 worker lock | DEFERRED | v1.0.0 운영 설계 |
+| 실제 운영 부하 테스트 | NEEDS_VERIFICATION | staging/production-like 환경 |
+| 운영 DB restore 리허설 | NEEDS_VERIFICATION | staging DB |
+| Critical/High dependency audit 자동화 | NEEDS_VERIFICATION | CI 구성 후 |
 
 ## v0.7.0 제외 또는 후속 범위
 

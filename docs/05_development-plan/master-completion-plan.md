@@ -2,9 +2,9 @@
 
 ## 현재 위치
 
-- 완료: `v0.8.0` 알림/리마인더 운영화
-- 다음: `v0.9.0` 안정화와 운영 검증
-- 최신 DB head: `20260720_0200`
+- 완료: `v0.9.0` E2E/성능/보안 안정화
+- 다음: `v1.0.0` MVP 릴리스
+- 최신 DB head: `20260720_0300`
 
 ## 완료된 큰 흐름
 
@@ -23,12 +23,13 @@
 13. 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 기반
 14. AI 지원 문서 개선 루프
 15. 알림·리마인더 운영화
+16. E2E·성능·보안 안정화 기반
 
 ## 남은 큰 흐름
 
-1. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
-2. Worker 안정화, 로그·감사, rate limit을 점검한다.
-3. v1.0.0 MVP 릴리스를 완료한다.
+1. v1.0.0 MVP 인수 테스트를 완료한다.
+2. 실제 OpenAI/Google/Gmail/SMTP 운영 검증 여부를 확정한다.
+3. 운영 배포와 사용자 가이드를 마무리한다.
 
 ## v0.4.2 방향
 
@@ -93,3 +94,13 @@
 - mock email delivery와 retry 구조를 구현한다.
 - Push provider 실발송과 실제 SMTP 운영 발송은 `NEEDS_VERIFICATION`으로 남긴다.
 - v0.8.0 완료 후 다음 개발 브랜치는 `feature/v0.9.0-stability-hardening`이다.
+
+# v0.9.0 Completion Update
+
+- Request ID middleware와 공통 오류 응답의 `request_id`를 추가한다.
+- 보안 헤더, CORS origin 설정, 주요 민감 API rate limit을 추가한다.
+- `/health/live`, `/health/ready`를 분리하고 readiness에서 DB/Redis/운영 필수 설정을 점검한다.
+- `audit_logs` 테이블과 감사 로그 서비스를 추가하고 알림 설정 변경/Delivery retry를 기록한다.
+- Playwright E2E smoke test와 E2E/성능/배포/백업 문서를 추가한다.
+- 실제 운영 부하 테스트, `pip-audit`, 운영 복구 리허설은 `NEEDS_VERIFICATION`으로 남긴다.
+- v0.9.0 완료 후 다음 개발 브랜치는 `feature/v1.0.0-mvp-release`이다.
