@@ -8,8 +8,42 @@
 
 body {
   margin: 0;
-  background: #f7f8fb;
-  color: #18202f;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgb(255 255 255 / 0.86), transparent 34rem),
+    linear-gradient(135deg, #ddd7f5 0%, #eeeafd 46%, #f8f7ff 100%);
+  color: #211a3d;
+}
+
+body::before {
+  pointer-events: none;
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 16px 16px, rgb(124 88 255 / 0.08) 1px, transparent 0),
+    radial-gradient(circle at 72px 72px, rgb(124 88 255 / 0.06) 1px, transparent 0);
+  background-size: 96px 96px;
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+.page-shell {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 20px 56px;
+}
+
+@media (min-width: 1024px) {
+  body:has(.app-sidebar) main {
+    width: calc(100% - 292px);
+    margin-left: 292px;
+    padding-right: 28px;
+  }
 }
 
 .auth-page {
@@ -23,40 +57,50 @@ body {
 .panel {
   width: 100%;
   max-width: 440px;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #ffffff;
+  border: 1px solid rgb(255 255 255 / 0.74);
+  border-radius: 26px;
+  background: rgb(255 255 255 / 0.88);
   padding: 24px;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
+  box-shadow: 0 20px 55px rgb(77 54 146 / 0.13);
+  backdrop-filter: blur(18px);
 }
 
 .input {
   width: 100%;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  border: 1px solid #ddd6fe;
   padding: 10px 12px;
-  color: #0f172a;
+  color: #211a3d;
   outline: none;
+  background: rgb(255 255 255 / 0.88);
 }
 
 .input:focus {
-  border-color: #0369a1;
-  box-shadow: 0 0 0 3px rgb(14 165 233 / 0.18);
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 4px rgb(124 58 237 / 0.15);
 }
 
 .button-primary,
 .button-secondary {
-  border-radius: 6px;
-  padding: 10px 14px;
+  border-radius: 999px;
+  padding: 10px 16px;
   font-weight: 600;
   transition:
     background-color 120ms ease,
-    color 120ms ease;
+    color 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.button-primary:hover,
+.button-secondary:hover {
+  transform: translateY(-1px);
 }
 
 .button-primary {
-  background: #0369a1;
+  background: linear-gradient(135deg, #7c3aed, #6554ff);
   color: #ffffff;
+  box-shadow: 0 12px 26px rgb(124 58 237 / 0.28);
 }
 
 .button-primary:disabled,
@@ -65,23 +109,92 @@ body {
 }
 
 .button-secondary {
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  color: #0f172a;
+  border: 1px solid #ded7ff;
+  background: rgb(255 255 255 / 0.8);
+  color: #4c3d8f;
 }
 
 .nav-link {
-  border-radius: 999px;
-  padding: 8px 12px;
-  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 16px;
+  padding: 10px 12px;
+  color: #6d6388;
   font-size: 14px;
   font-weight: 600;
   transition:
     background-color 120ms ease,
-    color 120ms ease;
+    color 120ms ease,
+    transform 120ms ease;
 }
 
 .nav-link:hover {
-  background: #e0f2fe;
-  color: #0369a1;
+  background: #f1edff;
+  color: #6d28d9;
+  transform: translateX(2px);
+}
+
+.nav-link-active {
+  background: linear-gradient(135deg, #7c3aed, #6d5dfc);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgb(124 58 237 / 0.22);
+}
+
+.app-sidebar {
+  position: relative;
+  z-index: 10;
+  margin: 18px;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 28px;
+  background: rgb(255 255 255 / 0.86);
+  box-shadow: 0 20px 60px rgb(77 54 146 / 0.16);
+  backdrop-filter: blur(20px);
+}
+
+.app-sidebar-inner {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.app-brand-mark {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7c3aed, #5b7cfa);
+  color: #ffffff;
+  box-shadow: 0 14px 24px rgb(124 58 237 / 0.26);
+}
+
+.app-sidebar-cta {
+  border-radius: 22px;
+  background: linear-gradient(135deg, #7c3aed, #6d5dfc);
+  color: #ffffff;
+  padding: 16px;
+  box-shadow: 0 16px 32px rgb(124 58 237 / 0.24);
+}
+
+@media (min-width: 1024px) {
+  .app-sidebar {
+    position: fixed;
+    inset: 24px auto 24px 24px;
+    width: 244px;
+    margin: 0;
+  }
+
+  .app-sidebar-inner {
+    min-height: calc(100vh - 48px);
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+@media (max-width: 1023px) {
+  .app-sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
