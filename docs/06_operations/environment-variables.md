@@ -1,5 +1,19 @@
 # Environment Variables
 
+## 2026-07-20 현재 로컬 연결 메모
+
+현재 로컬 `.env`에는 일부 실제 secret 형식의 값이 있으므로, 문서에는 값 자체를 기록하지 않는다.
+
+안전하게 확인한 상태는 다음과 같다.
+
+- `AI_PROVIDER=mock`; `OPENAI_API_KEY`, `OPENAI_MODEL`이 비어 있어 실제 OpenAI 호출은 연결되지 않는다.
+- `CALENDAR_PROVIDER=google`; Calendar credential은 있으나 실제 Google Calendar API 동작은 live 검증이 필요하다.
+- `GMAIL_PROVIDER`가 비어 있어 Docker Compose 기준 Gmail은 사실상 disabled이며 Gmail OAuth credential도 없다.
+- `EMAIL_PROVIDER=smtp`; SMTP credential은 있으나 실제 외부 메일 발송은 별도 검증이 필요하다.
+- 기본 Docker PostgreSQL은 기존 named volume이 현재 `.env`와 다른 비밀번호로 초기화된 경우 연결 실패가 발생할 수 있다.
+
+상세 상태: [환경 연결 상태](../00_status/environment-connection-status.md)
+
 실제 secret 값은 `.env` 또는 운영 secret manager에만 저장한다. `.env.example`과 문서에는 변수명과 예시 형식만 기록한다.
 
 ## Common

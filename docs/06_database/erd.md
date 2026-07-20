@@ -1,5 +1,67 @@
 # ERD
 
+## v0.6.0 Job Recommendations ERD
+
+```mermaid
+erDiagram
+    users ||--o{ job_recommendation_runs : owns
+    users ||--o{ job_recommendations : receives
+    users ||--o{ job_recommendation_feedback : records
+    job_recommendation_runs ||--o{ job_recommendations : produces
+    job_postings ||--o{ job_recommendations : recommended
+    job_recommendations ||--o{ job_recommendation_reasons : explains
+    job_recommendations ||--o{ job_recommendation_feedback : has
+
+    job_recommendation_runs {
+      int id PK
+      int user_id FK
+      string status
+      string recommendation_type
+      string policy_version
+      int input_job_count
+      int recommended_count
+      int excluded_count
+      int failed_count
+      datetime started_at
+      datetime completed_at
+    }
+
+    job_recommendations {
+      int id PK
+      int user_id FK
+      int job_id FK
+      int run_id FK
+      int score
+      string grade
+      string status
+      string recommendation_type
+      bool has_blocking_mismatch
+      string profile_hash
+      string job_hash
+      string policy_version
+    }
+
+    job_recommendation_reasons {
+      int id PK
+      int recommendation_id FK
+      string reason_type
+      string requirement_type
+      string match_status
+      string severity
+      string label
+      int score_delta
+    }
+
+    job_recommendation_feedback {
+      int id PK
+      int user_id FK
+      int recommendation_id FK
+      int job_id FK
+      string feedback_type
+      string feedback_reason
+    }
+```
+
 ## v0.5.1 Gmail Analysis ERD
 
 ```mermaid

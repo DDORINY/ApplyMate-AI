@@ -2,9 +2,9 @@
 
 ## 현재 위치
 
-- 완료: `v0.4.1` 일정 관리
-- 다음: `v0.4.2` 대시보드
-- 최신 DB head: `20260719_2000`
+- 완료: `v0.6.0` 규칙 기반 채용공고 추천
+- 다음: `v0.6.1` 추천 UX 개선과 추천 실행 자동화 기반
+- 최신 DB head: `20260719_2300`
 
 ## 완료된 큰 흐름
 
@@ -16,14 +16,17 @@
 6. 근거 기반 지원 문서 생성
 7. 지원 현황 관리
 8. 지원 일정 관리
+9. 대시보드
+10. Google Calendar 연동 기반
+11. Gmail 채용 메일 분석 기반
+12. 규칙 기반 채용공고 추천
 
 ## 남은 큰 흐름
 
-1. 대시보드에서 지원/일정/AI 작업을 요약한다.
-2. Google Calendar와 Gmail 같은 외부 서비스 연동을 사용자 명시 승인 기반으로 추가한다.
-3. 일일 맞춤 채용공고 추천을 구현한다.
-4. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
-5. v1.0.0 MVP 릴리스를 완료한다.
+1. 추천 UX 개선과 일일 추천 실행 자동화 기반을 정리한다.
+2. AI 자기소개서 개선 루프를 구현한다.
+3. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
+4. v1.0.0 MVP 릴리스를 완료한다.
 
 ## v0.4.2 방향
 
@@ -53,3 +56,11 @@
 - Gmail OAuth, 읽기 전용 scope, mock Gmail Provider, 메일 후보 생성, 사용자 승인 기반 지원 상태/일정 반영을 구현한다.
 - 실제 Gmail API token exchange/search/fetch와 실제 OpenAI 메일 분석은 `NEEDS_VERIFICATION`으로 남긴다.
 - v0.5.1 완료 후 다음 개발 브랜치는 `feature/v0.6.0-job-recommendations`이다.
+
+# v0.6.0 Completion Update
+
+- 저장된 채용공고만 후보로 사용하는 `RULE_BASED` 추천 생성/조회/상세/피드백 API를 구현한다.
+- 추천 점수, 등급, 추천 이유, 부족 조건, 필수 조건 불일치, 정책 버전, 입력 snapshot/hash를 저장한다.
+- `/recommendations`, `/recommendations/{recommendationId}`, 대시보드 추천 카드, 공고 상세 추천 CTA를 구현한다.
+- AI/ML 호출, 외부 크롤링, 자동 지원 제출은 제외한다.
+- v0.6.0 완료 후 다음 개발 브랜치는 `feature/v0.6.1-recommendation-automation`이다.

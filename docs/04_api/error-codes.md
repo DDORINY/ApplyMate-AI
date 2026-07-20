@@ -10,6 +10,21 @@
 | `RESOURCE_NOT_FOUND` | 404 | Resource or route not found |
 | `INTERNAL_SERVER_ERROR` | 500 | Internal server error |
 
+## v0.6.0 Job Recommendation Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| `JOB_RECOMMENDATION_NOT_FOUND` | 404 | Recommendation was not found or does not belong to user |
+| `JOB_RECOMMENDATION_RUN_NOT_FOUND` | 404 | Recommendation run was not found |
+| `JOB_RECOMMENDATION_PROFILE_INSUFFICIENT` | 409 | Profile data is insufficient for strict generation |
+| `JOB_RECOMMENDATION_JOB_NOT_FOUND` | 404 | Job for recommendation refresh was not found |
+| `JOB_RECOMMENDATION_JOB_ALREADY_APPLIED` | 409 | Job is already applied and excluded |
+| `JOB_RECOMMENDATION_POLICY_INVALID` | 400 | Recommendation policy is invalid |
+| `JOB_RECOMMENDATION_GENERATION_FAILED` | 500 | Recommendation generation failed safely |
+| `JOB_RECOMMENDATION_FEEDBACK_INVALID` | 400 | Feedback payload is invalid |
+| `JOB_RECOMMENDATION_FEEDBACK_NOT_FOUND` | 404 | Feedback was not found |
+| `JOB_RECOMMENDATION_FORBIDDEN` | 403 | Recommendation access is forbidden |
+
 ## v0.4.2 Dashboard Error Codes
 
 | Code | HTTP | Description |

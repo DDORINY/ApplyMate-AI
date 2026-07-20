@@ -175,6 +175,9 @@ export function JobDetailPanel({ jobId }: JobDetailPanelProps) {
         <Link className="button-secondary" href={`/calendar?jobId=${job.id}`}>
           연결 일정 보기
         </Link>
+        <Link className="button-secondary" href={`/recommendations?keyword=${encodeURIComponent(job.title)}`}>
+          추천 점수 확인
+        </Link>
         <Link className="button-primary" href="/jobs/new">
           새 공고 등록
         </Link>

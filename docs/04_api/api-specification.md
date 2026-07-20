@@ -41,6 +41,31 @@ Error response:
 | Dashboard | `/dashboard` | v0.4.2 | Read-only application dashboard |
 | Calendar Integration | `/integrations/calendar` | v0.5.0 | Google Calendar connection and sync |
 | Gmail Integration | `/integrations/gmail`, `/email-candidates` | v0.5.1 | Gmail recruitment email analysis candidates |
+| Job Recommendations | `/recommendations/jobs` | v0.6.0 | Rule-based saved job recommendations |
+
+## v0.6.0 Rule-based Job Recommendations API
+
+Base path: `/api/v1/recommendations/jobs`
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| POST | `/generate` | Access Token | v0.6.0 | Generate rule-based recommendations from saved jobs |
+| GET | `` | Access Token | v0.6.0 | List recommendations with filters |
+| GET | `/{recommendationId}` | Access Token | v0.6.0 | Get recommendation detail |
+| POST | `/{recommendationId}/feedback` | Access Token | v0.6.0 | Create or update user feedback |
+| DELETE | `/{recommendationId}/feedback` | Access Token | v0.6.0 | Delete user feedback |
+| POST | `/{recommendationId}/refresh` | Access Token | v0.6.0 | Recalculate one recommendation |
+| GET | `/runs` | Access Token | v0.6.0 | List recommendation generation runs |
+| GET | `/runs/{runId}` | Access Token | v0.6.0 | Get one generation run |
+| GET | `/policy` | Access Token | v0.6.0 | Get rule-based policy and weights |
+
+Rules:
+
+- Recommendation type is always `RULE_BASED`.
+- No AI, machine learning, external crawling, or automatic application submission is used.
+- Scores are calculated by backend only.
+- User ownership is checked for recommendation, run, feedback, and job data.
+- Hidden and not-interested feedback can exclude jobs from later generation.
 
 ## v0.5.1 Gmail Integration API
 
