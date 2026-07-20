@@ -44,5 +44,6 @@
 - [Gmail 분석 스키마](10_ai/gmail-analysis-schema.md)
 - [v0.5.1 릴리스 노트](11_releases/v0.5.1-gmail-analysis.md)
 - [v0.6.0 규칙 기반 채용공고 추천 계획](05_development-plan/releases/v0.6.0-plan.md)
+- [v0.6.1 일일 맞춤 추천 계획](05_development-plan/releases/v0.6.1-plan.md)
 - [채용공고 추천 정책](07_policies/job-recommendation-policy.md)
 - [v0.6.0 릴리스 노트](11_releases/v0.6.0-job-recommendations.md)
