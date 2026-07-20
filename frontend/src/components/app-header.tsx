@@ -1,7 +1,10 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+import { getNotificationUnreadCount } from "@/lib/api/notification";
 
 const navItems = [
   { href: "/", label: "홈", icon: "⌂" },
@@ -12,6 +15,7 @@ const navItems = [
   { href: "/documents", label: "지원 문서", icon: "✎" },
   { href: "/applications", label: "지원 현황", icon: "●" },
   { href: "/calendar", label: "일정", icon: "◷" },
+  { href: "/notifications", label: "알림", icon: "◉" },
   { href: "/inbox-candidates", label: "메일 후보", icon: "✉" },
   { href: "/recommendations", label: "공고 추천", icon: "★" },
 ];
@@ -23,6 +27,7 @@ const accountItems = [
   { href: "/settings/accounts", label: "계정 연결" },
   { href: "/settings/integrations", label: "외부 연동" },
   { href: "/settings/recommendations", label: "추천 설정" },
+  { href: "/settings/notifications", label: "알림 설정" },
   { href: "/settings/security", label: "보안" },
 ];
 
@@ -35,6 +40,12 @@ function isActive(pathname: string, href: string) {
 
 export function AppHeader() {
   const pathname = usePathname();
+  const unreadQuery = useQuery({
+    queryKey: ["notification-unread-count"],
+    queryFn: getNotificationUnreadCount,
+    retry: false,
+  });
+  const unreadCount = unreadQuery.data?.data.unread_count ?? 0;
 
   return (
     <aside className="app-sidebar" aria-label="ApplyMate AI 앱 내비게이션">
@@ -59,6 +70,9 @@ export function AppHeader() {
                   {item.icon}
                 </span>
                 <span>{item.label}</span>
+                {item.href === "/notifications" && unreadCount > 0 ? (
+                  <span className="ml-auto rounded-full bg-rose-500 px-2 py-0.5 text-xs font-bold text-white">{unreadCount}</span>
+                ) : null}
               </Link>
             ))}
           </nav>

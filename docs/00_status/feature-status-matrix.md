@@ -4,6 +4,7 @@
 
 | Area | Feature | Implementation | Current environment status |
 | --- | --- | --- | --- |
+| Release | v0.8.0 notification operations | Done locally | In-app notifications, settings, due reminders, mock email delivery verified locally. |
 | Release | v0.7.0 AI document improvement loop | Done locally | Improvement run, sentence suggestions, approval-based versioning verified locally with mock AI. |
 | Release | v0.6.1 recommendation automation foundation | Done locally | Settings, run-if-due, snapshots, changes, notification candidates verified locally. |
 | Release | v0.6.0 rule-based job recommendations | Done, merged, tagged `v0.6.0` | Saved-job-only rule-based flow verified. |
@@ -15,7 +16,7 @@
 Detailed environment notes: [Environment Connection Status](environment-connection-status.md)
 
 문서 기준일: 2026-07-20
-현재 릴리스: `v0.7.0`
+현재 릴리스: `v0.8.0`
 
 ## 버전별 기능 상태
 
@@ -41,7 +42,23 @@ Detailed environment notes: [Environment Connection Status](environment-connecti
 | 추천 | 저장된 채용공고 기반 규칙 추천 | 완료 | v0.6.0 | RULE_BASED 점수/등급/이유/피드백 |
 | 추천 | 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 | 완료 | v0.6.1 | 실제 알림 발송/외부 수집 제외 |
 | 지원 문서 | AI 지원 문서 개선 루프, 문장별 제안, 승인 기반 새 버전 생성 | 완료 | v0.7.0 | backend tests, frontend lint/type-check/build |
+| 알림 | In-app 알림, 사용자 설정, worker, mock email delivery | 완료 | v0.8.0 | backend tests, frontend lint/type-check/build |
 | Release | MVP 안정화, E2E, 운영 문서, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
+
+## v0.8.0 세부 상태
+
+| 기능 | 상태 | 검증 |
+| --- | --- | --- |
+| `GET /api/v1/notifications` | 완료 | `backend/tests/test_notifications.py` |
+| `GET /api/v1/notifications/unread-count` | 완료 | unread count 테스트 |
+| `PATCH /api/v1/notifications/{notificationId}/read` | 완료 | 읽음 처리 테스트 |
+| `PATCH /api/v1/notifications/{notificationId}/dismiss` | 완료 | 해제 처리 테스트 |
+| `PATCH /api/v1/notifications/{notificationId}/archive` | 완료 | 보관 처리 테스트 |
+| `POST /api/v1/notifications/run-due` | 완료 | due reminder/idempotency 테스트 |
+| `GET/PATCH /api/v1/notification-settings` | 완료 | 기본값/수정/invalid timezone 테스트 |
+| `GET /api/v1/notification-deliveries` | 완료 | mock email delivery 테스트 |
+| `/notifications` | 완료 | frontend lint/type-check/build |
+| `/settings/notifications` | 완료 | frontend lint/type-check/build |
 
 ## v0.7.0 세부 상태
 

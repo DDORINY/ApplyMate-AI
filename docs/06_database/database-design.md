@@ -1,5 +1,19 @@
 # Database Design
 
+## v0.8.0 Notification Operations Database
+
+v0.8.0 adds notification settings, notifications, channel deliveries, and processing runs. Current migration head is `20260720_0200`.
+
+- `notification_settings`: per-user channel and event preferences
+- `notifications`: in-app notification event with source, status, priority, deduplication key
+- `notification_deliveries`: channel-specific delivery attempts and retry metadata
+- `notification_processing_runs`: worker task execution summary
+
+Migration:
+
+- 신규 revision: `20260720_0200`
+- 이전 revision: `20260720_0100`
+
 ## v0.7.0 Document Improvement Database
 
 v0.7.0 adds AI document improvement runs on top of existing application document versions. Current migration head is `20260720_0100`.
@@ -64,7 +78,7 @@ Migration:
 - Datetime values are stored in UTC.
 - User-owned data has `user_id`.
 - Schema changes are managed with Alembic migrations.
-- Current migration head: `20260720_0100`.
+- Current migration head: `20260720_0200`.
 
 ## Main tables
 
@@ -76,6 +90,7 @@ Migration:
 | Jobs | `companies`, `job_postings`, `job_analyses`, `job_analysis_runs`, `job_matches`, `job_match_runs`, `job_match_feedback`, `job_recommendation_runs`, `job_recommendations`, `job_recommendation_reasons`, `job_recommendation_feedback`, `job_recommendation_settings`, `job_recommendation_snapshots`, `job_recommendation_snapshot_items`, `recommendation_notification_candidates` |
 | Resumes | `resumes`, `resume_files`, `resume_file_extractions`, `resume_extraction_runs`, `resume_analyses`, `resume_analysis_runs` |
 | Documents | `application_documents`, `application_document_versions`, `application_document_sources`, `generation_runs`, `document_improvement_runs`, `document_improvement_suggestions`, `document_improvement_sources`, `document_improvement_actions` |
+| Notifications | `notification_settings`, `notifications`, `notification_deliveries`, `notification_processing_runs` |
 | Applications | `applications`, `application_status_history`, `application_notes` |
 | Calendar | `schedule_events`, `schedule_reminders`, `schedule_event_history` |
 

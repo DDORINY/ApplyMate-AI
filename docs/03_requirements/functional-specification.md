@@ -1,6 +1,33 @@
 # Functional Specification
 
-Current implemented version: `v0.7.0`
+Current implemented version: `v0.8.0`
+
+## v0.8.0 Notification Operations Functional Specification
+
+### Purpose
+
+일정, 추천, Gmail 후보, 문서 개선 결과, 동기화 실패 이벤트를 사용자 알림으로 통합한다.
+
+### Requirements
+
+- In-app 알림은 기본 활성화한다.
+- Email과 Push는 기본 비활성화한다.
+- 알림은 event type, priority, status, title, message, source, deduplication key를 가진다.
+- 사용자는 알림 목록, 읽지 않은 개수, 상세, 읽음, 전체 읽음, 해제, 보관을 사용할 수 있다.
+- 사용자는 알림 설정을 조회하고 수정할 수 있다.
+- 일정 리마인더 due 처리 시 취소/보관 일정은 제외한다.
+- 동일 source/event는 deduplication key로 중복 생성하지 않는다.
+- Delivery는 Notification과 분리한다.
+- Mock email provider를 검증한다.
+- 실제 SMTP와 Push 실발송은 완료로 표시하지 않는다.
+
+### Prohibited
+
+- 사용자 동의 없는 외부 발송
+- Push provider 실발송 완료 표시
+- raw provider error, token, secret을 알림 본문에 포함
+- 중복 알림 반복 생성
+- 대시보드 조회 시 worker 자동 실행
 
 ## v0.7.0 AI Document Improvement Loop Functional Specification
 

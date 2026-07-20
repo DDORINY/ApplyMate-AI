@@ -10,6 +10,21 @@
 | `RESOURCE_NOT_FOUND` | 404 | Resource or route not found |
 | `INTERNAL_SERVER_ERROR` | 500 | Internal server error |
 
+## v0.8.0 Notification Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| `NOTIFICATION_NOT_FOUND` | 404 | Notification was not found or does not belong to user |
+| `NOTIFICATION_ALREADY_DISMISSED` | 409 | Notification is already dismissed |
+| `NOTIFICATION_SETTINGS_INVALID` | 400 | Notification settings are invalid |
+| `NOTIFICATION_DELIVERY_NOT_FOUND` | 404 | Delivery was not found or does not belong to user |
+| `NOTIFICATION_DELIVERY_NOT_RETRYABLE` | 409 | Delivery cannot be retried |
+| `NOTIFICATION_PROVIDER_DISABLED` | 503 | External notification provider is disabled |
+| `NOTIFICATION_DELIVERY_FAILED` | 502 | Delivery failed safely |
+| `NOTIFICATION_DEDUPLICATED` | 409 | Duplicate notification was skipped |
+| `NOTIFICATION_FORBIDDEN` | 403 | Notification resource access is forbidden |
+| `NOTIFICATION_WORKER_FAILED` | 500 | Notification worker task failed safely |
+
 ## v0.7.0 Document Improvement Error Codes
 
 | Code | HTTP | Description |

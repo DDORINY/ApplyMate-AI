@@ -44,6 +44,36 @@ Error response:
 | Gmail Integration | `/integrations/gmail`, `/email-candidates` | v0.5.1 | Gmail recruitment email analysis candidates |
 | Job Recommendations | `/recommendations/jobs` | v0.6.0 | Rule-based saved job recommendations |
 | Recommendation Automation | `/recommendations/settings`, `/recommendations/jobs/snapshots`, `/recommendation-notifications` | v0.6.1 | Recommendation settings, snapshots, change detection, notification candidates |
+| Notifications | `/notifications`, `/notification-settings`, `/notification-deliveries` | v0.8.0 | In-app notifications, user preferences, delivery/retry |
+
+## v0.8.0 Notification Operations API
+
+Base path: `/api/v1`
+
+| Method | Path | Auth | Version | Description |
+| --- | --- | --- | --- | --- |
+| GET | `/notifications` | Access Token | v0.8.0 | List notifications with status filter and pagination |
+| GET | `/notifications/unread-count` | Access Token | v0.8.0 | Get unread notification count |
+| GET | `/notifications/{notificationId}` | Access Token | v0.8.0 | Get one notification |
+| PATCH | `/notifications/{notificationId}/read` | Access Token | v0.8.0 | Mark one notification as read |
+| PATCH | `/notifications/{notificationId}/dismiss` | Access Token | v0.8.0 | Dismiss one notification |
+| PATCH | `/notifications/{notificationId}/archive` | Access Token | v0.8.0 | Archive one notification |
+| POST | `/notifications/read-all` | Access Token | v0.8.0 | Mark all unread notifications as read |
+| POST | `/notifications/run-due` | Access Token | v0.8.0 | Run user-scoped notification processing tasks |
+| GET | `/notification-settings` | Access Token | v0.8.0 | Get or create user notification settings |
+| PATCH | `/notification-settings` | Access Token | v0.8.0 | Update user notification settings |
+| GET | `/notification-deliveries` | Access Token | v0.8.0 | List notification deliveries |
+| GET | `/notification-deliveries/{deliveryId}` | Access Token | v0.8.0 | Get one delivery |
+| POST | `/notification-deliveries/{deliveryId}/retry` | Access Token | v0.8.0 | Retry a retryable delivery |
+
+Rules:
+
+- In-app is enabled by default.
+- Email and Push are disabled by default.
+- Push delivery is skipped because no push provider is implemented in v0.8.0.
+- Notification deduplication is enforced by `deduplication_key`.
+- Delivery status is separated from notification status.
+- External SMTP delivery remains `NEEDS_VERIFICATION` unless tested with operational credentials.
 
 ## v0.7.0 Document Improvement API
 

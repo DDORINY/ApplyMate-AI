@@ -110,6 +110,34 @@ services:
       timeout: 5s
       retries: 5
 
+  worker:
+    build:
+      context: ./backend
+    command: ["python", "-m", "app.workers.tasks"]
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://applymate:change_me@postgres:5432/applymate}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-}
+      JWT_REFRESH_SECRET_KEY: ${JWT_REFRESH_SECRET_KEY:-}
+      EMAIL_PROVIDER: ${EMAIL_PROVIDER:-development}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USERNAME: ${SMTP_USERNAME:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_USE_TLS: ${SMTP_USE_TLS:-true}
+      EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-no-reply@example.com}
+      EMAIL_FROM_NAME: ${EMAIL_FROM_NAME:-ApplyMate AI}
+      AI_PROVIDER: ${AI_PROVIDER:-disabled}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"
+
   frontend:
     build:
       context: ./frontend

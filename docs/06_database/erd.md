@@ -1,5 +1,45 @@
 # ERD
 
+## v0.8.0 Notification Operations ERD
+
+```mermaid
+erDiagram
+    users ||--o| notification_settings : configures
+    users ||--o{ notifications : receives
+    notifications ||--o{ notification_deliveries : delivered_by
+
+    notification_settings {
+      int id PK
+      int user_id FK
+      bool in_app_enabled
+      bool email_enabled
+      bool push_enabled
+      string timezone
+      bool quiet_hours_enabled
+    }
+
+    notifications {
+      int id PK
+      int user_id FK
+      string event_type
+      string priority
+      string status
+      string source_type
+      string source_id
+      string deduplication_key
+    }
+
+    notification_deliveries {
+      int id PK
+      int notification_id FK
+      int user_id FK
+      string channel
+      string status
+      string provider
+      int attempt_count
+    }
+```
+
 ## v0.7.0 Document Improvement ERD
 
 ```mermaid
