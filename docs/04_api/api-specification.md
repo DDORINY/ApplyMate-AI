@@ -1,5 +1,9 @@
 # API Specification
 
+Document baseline: `v1.0.0`
+
+v1.0.0 does not introduce new API groups. It freezes the MVP API surface implemented through v0.9.0 and adds release-level verification, documentation, smoke tests, and deployment preparation. Real OpenAI, Gmail, Google Calendar, and SMTP calls remain `NEEDS_VERIFICATION` until operational credentials are verified.
+
 ## Base
 
 - Base URL: `/api/v1`

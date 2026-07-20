@@ -39,6 +39,15 @@
 - `/api/v1/health/ready` 확인
 - smoke test 실행
 
+## Nginx / Reverse Proxy
+
+예시 설정은 `deploy/nginx/`에 둔다.
+
+- `/api/`는 backend로 proxy한다.
+- 그 외 route는 frontend로 proxy한다.
+- 업로드 제한은 `client_max_body_size`로 관리한다.
+- HTTPS termination, 인증서 갱신, HSTS는 실제 운영 도메인에서 별도 검증한다.
+
 ## Rollback
 
 - 이미지/커밋 rollback

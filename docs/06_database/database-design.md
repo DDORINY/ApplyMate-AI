@@ -1,5 +1,11 @@
 # Database Design
 
+## v1.0.0 MVP Database Baseline
+
+v1.0.0 does not add a new migration. The MVP release uses the v0.9.0 schema with `audit_logs`; current migration head is `20260720_0300`.
+
+Docker release verification confirmed `alembic upgrade head`, `alembic downgrade -1`, and `alembic upgrade head` successfully.
+
 ## v0.9.0 Stability Hardening Database
 
 v0.9.0 adds `audit_logs`. Current migration head is `20260720_0300`.

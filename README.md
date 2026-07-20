@@ -1,10 +1,26 @@
 # ApplyMate AI
 
-현재 버전: `v0.9.0`
+현재 버전: `v1.0.0`
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 이력서, 채용공고, AI 분석 결과, 지원 문서, 지원 현황, 일정을 연결해 취업 준비 흐름을 한곳에서 관리합니다.
 
-## v0.9.0 주요 기능
+## v1.0.0 MVP
+
+ApplyMate AI v1.0.0은 회원가입부터 프로필, 공고, AI 분석, 이력서, 지원 문서, 지원 현황, 일정, 추천, 알림까지 취업 준비 MVP 흐름을 통합한다.
+
+## 주요 기능
+
+- 회원가입·로그인·계정 보안
+- 커리어 프로필과 이력서 관리
+- 채용공고 등록·분석·적합도 분석
+- 지원 문서 생성·개선
+- 지원 현황과 일정 관리
+- Google Calendar/Gmail 연동 기반
+- 규칙 기반 공고 추천
+- In-app 알림과 리마인더 worker
+- 감사 로그, 보안 헤더, rate limit, health check
+
+## v0.9.0 안정화 기능
 
 - Request ID 기반 오류 추적
 - 보안 헤더 적용
@@ -116,6 +132,15 @@ cp .env.example .env
 docker compose up --build
 ```
 
+## Demo
+
+데모 seed payload는 실제 비밀번호나 OAuth token 없이 생성한다.
+
+```bash
+cd backend
+python scripts/seed_demo_data.py --email demo@example.com
+```
+
 ## 주요 화면
 
 - `/dashboard`
@@ -152,6 +177,7 @@ cd frontend
 npm run lint
 npm run type-check
 npm run build
+npm run test:e2e
 ```
 
 ## 문서
@@ -160,9 +186,14 @@ npm run build
 - [현재 프로젝트 상태](docs/00_status/current-project-status.md)
 - [Feature Status Matrix](docs/00_status/feature-status-matrix.md)
 - [환경 연결 상태](docs/00_status/environment-connection-status.md)
+- [Known Limitations](docs/00_status/known-limitations.md)
 - [버전 로드맵](docs/05_development-plan/version-roadmap.md)
+- [사용자 가이드](docs/09_guides/user-guide.md)
+- [운영자 가이드](docs/09_guides/operations-guide.md)
+- [릴리스 체크리스트](docs/09_guides/release-checklist.md)
 - [API 명세](docs/04_api/api-specification.md)
 - [DB 설계](docs/06_database/database-design.md)
+- [v1.0.0 릴리스 노트](docs/11_releases/v1.0.0-mvp-release.md)
 - [v0.9.0 릴리스 노트](docs/11_releases/v0.9.0-stability-hardening.md)
 - [v0.8.0 릴리스 노트](docs/11_releases/v0.8.0-notification-operations.md)
 - [v0.7.0 릴리스 노트](docs/11_releases/v0.7.0-document-improvement.md)
@@ -175,7 +206,7 @@ npm run build
 
 `20260720_0300`
 
-v0.9.0은 감사 로그 `audit_logs` 테이블을 추가합니다.
+v1.0.0 기준 최신 migration head는 `20260720_0300`입니다.
 
 ## 미검증/운영 확인 필요
 
@@ -184,4 +215,4 @@ v0.9.0은 감사 로그 `audit_logs` 테이블을 추가합니다.
 - 운영 Google/GitHub OAuth, SMTP, HTTPS Cookie는 실제 도메인/시크릿 환경에서 별도 검증이 필요합니다.
 - 실제 Gmail API 호출과 실제 OpenAI 메일 분석은 `NEEDS_VERIFICATION`입니다.
 - 실제 SMTP 알림 발송과 Push provider 실발송은 `NEEDS_VERIFICATION`입니다.
-- `pip-audit`은 현재 로컬 미설치로 미검증이며, npm audit moderate 2건은 Next 내부 PostCSS advisory로 추적 중입니다.
+- v1.0.0 기준 `pip-audit`과 `npm audit`은 모두 취약점 0건으로 확인했습니다.

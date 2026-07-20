@@ -2,6 +2,8 @@
 .env.*
 !.env.example
 !.env.e2e.example
+!.env.development.example
+!.env.production.example
 
 __pycache__/
 *.py[cod]
@@ -17,6 +19,7 @@ node_modules/
 .next/
 out/
 dist/
+build/
 coverage/
 test-results/
 e2e-report/

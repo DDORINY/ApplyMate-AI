@@ -2,8 +2,8 @@
 
 ## 현재 위치
 
-- 완료: `v0.9.0` E2E/성능/보안 안정화
-- 다음: `v1.0.0` MVP 릴리스
+- 완료: `v1.0.0` MVP 릴리스 준비
+- 다음: 운영 검증과 배포
 - 최신 DB head: `20260720_0300`
 
 ## 완료된 큰 흐름
@@ -27,9 +27,9 @@
 
 ## 남은 큰 흐름
 
-1. v1.0.0 MVP 인수 테스트를 완료한다.
-2. 실제 OpenAI/Google/Gmail/SMTP 운영 검증 여부를 확정한다.
-3. 운영 배포와 사용자 가이드를 마무리한다.
+1. 실제 OpenAI/Google/Gmail/SMTP 운영 검증 여부를 확정한다.
+2. 운영 배포를 수행하고 smoke test를 실행한다.
+3. 사용자 피드백 기반 후속 개선을 계획한다.
 
 ## v0.4.2 방향
 
@@ -102,5 +102,14 @@
 - `/health/live`, `/health/ready`를 분리하고 readiness에서 DB/Redis/운영 필수 설정을 점검한다.
 - `audit_logs` 테이블과 감사 로그 서비스를 추가하고 알림 설정 변경/Delivery retry를 기록한다.
 - Playwright E2E smoke test와 E2E/성능/배포/백업 문서를 추가한다.
-- 실제 운영 부하 테스트, `pip-audit`, 운영 복구 리허설은 `NEEDS_VERIFICATION`으로 남긴다.
+- 실제 운영 부하 테스트와 운영 복구 리허설은 `NEEDS_VERIFICATION`으로 남긴다. v1.0.0 준비 과정에서 프로젝트 전용 `pip-audit`은 취약점 0건으로 확인했다.
 - v0.9.0 완료 후 다음 개발 브랜치는 `feature/v1.0.0-mvp-release`이다.
+
+# v1.0.0 Completion Update
+
+- MVP 확정 범위와 제외 범위를 문서화한다.
+- 사용자 가이드, 운영자 가이드, release checklist, known limitations, security review를 추가한다.
+- Playwright E2E smoke를 MVP 주요 화면 10개 이상으로 확장한다.
+- demo seed payload 생성기와 smoke/performance script를 추가한다.
+- GitHub Actions CI 초안을 추가한다.
+- 실제 운영 배포, 실제 provider 검증, 운영 DB 복구 리허설은 `NEEDS_VERIFICATION`으로 남긴다.
