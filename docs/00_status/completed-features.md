@@ -23,6 +23,7 @@
 | v0.5.1 | Gmail 전용 OAuth, 읽기 전용 메일 조회, 후보 생성, 사용자 승인 기반 상태/일정 반영 |
 | v0.6.0 | 저장된 채용공고 기반 규칙 추천, 추천 점수/이유/부족 조건, 사용자 피드백 |
 | v0.6.1 | 추천 실행 설정, run-if-due, Snapshot, 변화 판정, 알림 후보, 추천 UX 개선 |
+| v0.7.0 | AI 지원 문서 개선 루프, 문장별 제안, 승인 기반 새 버전 생성 |
 
 ## v0.4.2 완료 상세
 
@@ -85,3 +86,15 @@
 - `/recommendations/history` 추천 이력 화면 추가
 - `/settings/recommendations` 추천 설정 화면 추가
 - 신규 migration `20260720_0000`
+
+## v0.7.0 완료 상세
+
+- 기존 지원 문서 최신/선택 버전을 기준으로 AI 개선 실행 생성
+- 개선 유형 `CLARITY`, `CONCISENESS`, `PROFESSIONAL_TONE`, `JOB_ALIGNMENT`, `COMPANY_ALIGNMENT`, `SKILL_EMPHASIS`, `EXPERIENCE_EMPHASIS`, `PROJECT_EMPHASIS`, `ACHIEVEMENT_EMPHASIS`, `STRUCTURE`, `GRAMMAR`, `LENGTH_REDUCTION`, `LENGTH_EXPANSION`, `CUSTOM` 지원
+- 문장별 원문/개선안, 변경 유형, 근거, 위험도, 선택 상태 저장
+- 승인 전 기존 문서 버전을 변경하지 않고, 적용 시 새 `application_document_versions` 생성
+- 기준 버전보다 최신 문서가 있으면 적용 차단 및 outdated 표시
+- 개선 실행 source/action 이력 저장
+- `/documents/{documentId}/improve` 개선 요청 화면 추가
+- `/documents/{documentId}/improvements/{runId}` before/after 비교와 제안 승인 화면 추가
+- 신규 migration `20260720_0100`

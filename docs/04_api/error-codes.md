@@ -10,6 +10,21 @@
 | `RESOURCE_NOT_FOUND` | 404 | Resource or route not found |
 | `INTERNAL_SERVER_ERROR` | 500 | Internal server error |
 
+## v0.7.0 Document Improvement Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| `DOCUMENT_IMPROVEMENT_BASE_VERSION_NOT_FOUND` | 404 | Base application document version was not found |
+| `DOCUMENT_IMPROVEMENT_NOT_FOUND` | 404 | Improvement run was not found or does not belong to user |
+| `DOCUMENT_IMPROVEMENT_SUGGESTION_NOT_FOUND` | 404 | Sentence suggestion was not found |
+| `DOCUMENT_IMPROVEMENT_INVALID_LENGTH` | 400 | Target length range is invalid |
+| `DOCUMENT_IMPROVEMENT_INVALID_REQUEST` | 400 | Improvement update/apply request is invalid |
+| `DOCUMENT_IMPROVEMENT_OUTDATED` | 409 | A newer document version exists after the improvement base version |
+| `DOCUMENT_IMPROVEMENT_ALREADY_APPLIED` | 409 | Improvement run has already been applied or cannot be changed |
+| `AI_PROVIDER_DISABLED` | 503 | AI provider is disabled |
+| `AI_PROVIDER_CONFIG_INVALID` | 503 | AI provider credentials/model are missing |
+| `AI_PROVIDER_INVALID_RESPONSE` | 502 | AI output did not match the required structured schema |
+
 ## v0.6.1 Recommendation Automation Error Codes
 
 | Code | HTTP | Description |

@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 기본 Docker PostgreSQL 연결 | NOT_CONNECTED | 기존 기본 Docker volume의 DB 비밀번호가 현재 `.env` DB 자격 증명과 맞지 않는다. volume은 삭제하지 않았다. |
 | 현재 `.env` 기준 Gmail 연동 | NOT_CONNECTED | `GMAIL_PROVIDER`가 비어 있고 Gmail OAuth client/secret 변수가 없어서 Compose에서 `disabled`로 해석된다. |
-| 실제 OpenAI 호출 | NOT_CONNECTED | `AI_PROVIDER=mock`이며 `OPENAI_API_KEY`, `OPENAI_MODEL`이 비어 있다. |
+| 실제 OpenAI 호출 | NOT_CONNECTED | `AI_PROVIDER=mock`이며 `OPENAI_API_KEY`, `OPENAI_MODEL`이 비어 있다. v0.7.0 문서 개선은 mock provider로 검증했다. |
 | Google Calendar live API | NEEDS_VERIFICATION | Calendar provider와 credential은 설정되어 있으나 실제 Google OAuth/API 동작은 별도 live 검증이 필요하다. |
 | SMTP 실제 발송 | NEEDS_VERIFICATION | SMTP credential은 설정되어 있으나 실제 외부 메일 발송은 이번 확인 범위에서 검증하지 않았다. |
 | 추천 자동 실행 스케줄러 | DEFERRED | v0.6.0은 수동 생성 API/화면까지 구현하고 일일 자동 실행은 후속 범위로 둔다. |
@@ -24,6 +24,15 @@
 | HTTPS Cookie/SameSite | NEEDS_VERIFICATION | 운영 도메인과 HTTPS 환경에서 검증 필요 |
 | 운영 배포 | NEEDS_VERIFICATION | 서버/도메인/DB/Redis 환경 필요 |
 | 브라우저 E2E 자동화 | PLANNED | v0.9.0 안정화 단계에서 강화 예정 |
+
+## v0.7.0 제외 또는 후속 범위
+
+| 항목 | 상태 | 후속 버전 |
+| --- | --- | --- |
+| 실제 OpenAI 기반 지원 문서 개선 | NEEDS_VERIFICATION | API key/model 설정, 비용, 운영 프롬프트 검증 후 |
+| 자동 전체 적용 | EXCLUDED | 사용자가 제안을 승인해야만 새 버전을 생성한다. |
+| 근거 없는 성과/수치 자동 생성 | EXCLUDED | 사실성 정책상 금지 |
+| 외부 웹 검색 기반 기업 인재상 추정 | EXCLUDED | 사용자/저장 공고/분석 근거 없이 추가하지 않는다. |
 
 ## v0.6.0 제외 또는 후속 범위
 

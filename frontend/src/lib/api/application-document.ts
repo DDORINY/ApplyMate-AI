@@ -12,6 +12,14 @@ import type {
   DocumentProviderStatus,
   GenerationRunPublic,
 } from "@/types/application-document";
+import type {
+  DocumentImprovementApplyData,
+  DocumentImprovementCreatePayload,
+  DocumentImprovementListData,
+  DocumentImprovementRunPublic,
+  DocumentImprovementSuggestionPublic,
+  DocumentImprovementSuggestionStatus,
+} from "@/types/document-improvement";
 
 async function parseError(response: Response): Promise<Error> {
   try {
@@ -148,4 +156,57 @@ export async function duplicateApplicationDocument(documentId: number, title?: s
 
 export async function getDocumentProviderStatus() {
   return request<DocumentProviderStatus>("/ai/document-providers");
+}
+
+export async function createDocumentImprovement(documentId: number, payload: DocumentImprovementCreatePayload) {
+  return request<DocumentImprovementRunPublic>(`/documents/${documentId}/improvements`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function listDocumentImprovements(documentId: number) {
+  return request<DocumentImprovementListData>(`/documents/${documentId}/improvements`);
+}
+
+export async function getDocumentImprovement(documentId: number, runId: number) {
+  return request<DocumentImprovementRunPublic>(`/documents/${documentId}/improvements/${runId}`);
+}
+
+export async function retryDocumentImprovement(documentId: number, runId: number) {
+  return request<DocumentImprovementRunPublic>(`/documents/${documentId}/improvements/${runId}/retry`, {
+    method: "POST",
+  });
+}
+
+export async function updateDocumentImprovementSuggestion(
+  documentId: number,
+  runId: number,
+  suggestionId: number,
+  payload: { status?: DocumentImprovementSuggestionStatus; selected?: boolean },
+) {
+  return request<DocumentImprovementSuggestionPublic>(
+    `/documents/${documentId}/improvements/${runId}/suggestions/${suggestionId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    },
+  );
+}
+
+export async function applyDocumentImprovement(
+  documentId: number,
+  runId: number,
+  payload: { apply_all?: boolean; suggestion_ids?: number[]; version_title?: string | null },
+) {
+  return request<DocumentImprovementApplyData>(`/documents/${documentId}/improvements/${runId}/apply`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function rejectDocumentImprovement(documentId: number, runId: number) {
+  return request<{ rejected: true }>(`/documents/${documentId}/improvements/${runId}/reject`, {
+    method: "POST",
+  });
 }

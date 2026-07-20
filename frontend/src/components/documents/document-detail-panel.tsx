@@ -11,9 +11,11 @@ import {
   listApplicationDocumentGenerationRuns,
   listApplicationDocumentSources,
   listApplicationDocumentVersions,
+  listDocumentImprovements,
   regenerateApplicationDocument,
   restoreApplicationDocumentVersion,
 } from "@/lib/api/application-document";
+import { documentImprovementStatusLabels, documentImprovementTypeLabels } from "./document-improvement-labels";
 import { documentStatusLabels, documentTypeLabels } from "./document-labels";
 
 export function DocumentDetailPanel({ documentId }: { documentId: number }) {
@@ -39,6 +41,11 @@ export function DocumentDetailPanel({ documentId }: { documentId: number }) {
   const runsQuery = useQuery({
     queryKey: ["application-document-runs", documentId],
     queryFn: () => listApplicationDocumentGenerationRuns(documentId),
+    retry: false,
+  });
+  const improvementsQuery = useQuery({
+    queryKey: ["document-improvements", documentId],
+    queryFn: () => listDocumentImprovements(documentId),
     retry: false,
   });
 
@@ -72,6 +79,7 @@ export function DocumentDetailPanel({ documentId }: { documentId: number }) {
     queryClient.invalidateQueries({ queryKey: ["application-document-versions", documentId] });
     queryClient.invalidateQueries({ queryKey: ["application-document-sources", documentId] });
     queryClient.invalidateQueries({ queryKey: ["application-document-runs", documentId] });
+    queryClient.invalidateQueries({ queryKey: ["document-improvements", documentId] });
   };
 
   const saveMutation = useMutation({
@@ -110,9 +118,14 @@ export function DocumentDetailPanel({ documentId }: { documentId: number }) {
               {documentTypeLabels[document.document_type]} · {documentStatusLabels[document.status]}
             </p>
             <h1 className="mt-1 text-2xl font-bold text-slate-950">{document.title}</h1>
-            <Link className="button-primary mt-3 inline-flex" href={`/applications/new?documentId=${document.id}`}>
-              이 문서로 지원 항목 생성
-            </Link>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Link className="button-primary inline-flex" href={`/documents/${document.id}/improve`}>
+                AI 문서 개선
+              </Link>
+              <Link className="button-secondary inline-flex" href={`/applications/new?documentId=${document.id}`}>
+                이 문서로 지원 항목 생성
+              </Link>
+            </div>
             <p className="mt-2 text-sm text-slate-600">
               현재 버전 {document.current_version_number ?? "-"} · 제한 {document.character_limit ?? "없음"}자
             </p>
@@ -142,7 +155,7 @@ export function DocumentDetailPanel({ documentId }: { documentId: number }) {
         </div>
       </section>
 
-      <section className="grid gap-5 lg:grid-cols-3">
+      <section className="grid gap-5 lg:grid-cols-4">
         <div className="panel max-w-none lg:col-span-1">
           <h2 className="text-lg font-semibold text-slate-950">버전</h2>
           <div className="mt-3 grid gap-2">
@@ -185,6 +198,25 @@ export function DocumentDetailPanel({ documentId }: { documentId: number }) {
                 {run.error_code ? <p className="mt-1 text-rose-700">{run.error_code}</p> : null}
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="panel max-w-none lg:col-span-1">
+          <h2 className="text-lg font-semibold text-slate-950">개선 이력</h2>
+          <div className="mt-3 grid gap-2">
+            {improvementsQuery.data?.data.items.map((run) => (
+              <Link
+                className="rounded-xl border border-slate-200 p-3 text-sm hover:bg-violet-50"
+                href={`/documents/${documentId}/improvements/${run.id}`}
+                key={run.id}
+              >
+                <p className="font-semibold text-slate-700">
+                  {documentImprovementTypeLabels[run.improvement_type]} · {documentImprovementStatusLabels[run.status]}
+                </p>
+                <p className="mt-1 text-slate-500">{run.created_at.slice(0, 10)}</p>
+              </Link>
+            ))}
+            {improvementsQuery.data?.data.items.length === 0 ? <p className="text-sm text-slate-600">아직 개선 이력이 없습니다.</p> : null}
           </div>
         </div>
       </section>

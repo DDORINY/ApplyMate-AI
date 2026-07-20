@@ -4,6 +4,7 @@
 
 | Area | Feature | Implementation | Current environment status |
 | --- | --- | --- | --- |
+| Release | v0.7.0 AI document improvement loop | Done locally | Improvement run, sentence suggestions, approval-based versioning verified locally with mock AI. |
 | Release | v0.6.1 recommendation automation foundation | Done locally | Settings, run-if-due, snapshots, changes, notification candidates verified locally. |
 | Release | v0.6.0 rule-based job recommendations | Done, merged, tagged `v0.6.0` | Saved-job-only rule-based flow verified. |
 | Release | v0.5.1 Gmail recruitment email analysis | Done, merged, tagged `v0.5.1` | Mock flow verified; real Gmail is not connected in current `.env`. |
@@ -14,7 +15,7 @@
 Detailed environment notes: [Environment Connection Status](environment-connection-status.md)
 
 문서 기준일: 2026-07-20
-현재 릴리스: `v0.6.1`
+현재 릴리스: `v0.7.0`
 
 ## 버전별 기능 상태
 
@@ -39,7 +40,22 @@ Detailed environment notes: [Environment Connection Status](environment-connecti
 | 연동 | Gmail 채용 메일 분석, 후보 생성, 사용자 승인 반영 | 완료 | v0.5.1 | mock provider 검증, 실제 Gmail은 NEEDS_VERIFICATION |
 | 추천 | 저장된 채용공고 기반 규칙 추천 | 완료 | v0.6.0 | RULE_BASED 점수/등급/이유/피드백 |
 | 추천 | 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 | 완료 | v0.6.1 | 실제 알림 발송/외부 수집 제외 |
+| 지원 문서 | AI 지원 문서 개선 루프, 문장별 제안, 승인 기반 새 버전 생성 | 완료 | v0.7.0 | backend tests, frontend lint/type-check/build |
 | Release | MVP 안정화, E2E, 운영 문서, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
+
+## v0.7.0 세부 상태
+
+| 기능 | 상태 | 검증 |
+| --- | --- | --- |
+| `POST /api/v1/documents/{documentId}/improvements` | 완료 | `backend/tests/test_document_improvements.py` |
+| `GET /api/v1/documents/{documentId}/improvements` | 완료 | 목록 응답/소유권 검증 |
+| `GET /api/v1/documents/{documentId}/improvements/{runId}` | 완료 | 상세 응답/소유권 검증 |
+| `POST /api/v1/documents/{documentId}/improvements/{runId}/retry` | 완료 | 적용 완료 실행 재시도 차단 |
+| `PATCH /api/v1/documents/{documentId}/improvements/{runId}/suggestions/{suggestionId}` | 완료 | 승인/거절 상태 변경 검증 |
+| `POST /api/v1/documents/{documentId}/improvements/{runId}/apply` | 완료 | 승인 시 새 문서 버전 생성 |
+| `POST /api/v1/documents/{documentId}/improvements/{runId}/reject` | 완료 | 실행 거절 기록 |
+| `/documents/{documentId}/improve` | 완료 | frontend lint/type-check/build |
+| `/documents/{documentId}/improvements/{runId}` | 완료 | frontend lint/type-check/build |
 
 ## v0.6.1 세부 상태
 

@@ -1,7 +1,7 @@
 # Environment Connection Status
 
 Last updated: 2026-07-20  
-Local branch at update time: `feature/v0.6.1-recommendation-automation`
+Local branch at update time: `feature/v0.7.0-document-improvement`
 
 This document summarizes the current local environment connection state without exposing secret values. It is based on `.env` key presence, provider modes, and the latest local Docker/API checks.
 
@@ -12,7 +12,7 @@ This document summarizes the current local environment connection state without 
 | Backend application | Connectable in a clean Compose project | Backend became healthy and `/api/v1/health` returned 200 when started with a fresh Compose project. |
 | PostgreSQL | Not connectable in the default Compose project | The existing default Docker volume appears to have been initialized with an older PostgreSQL password, so the current `.env` credentials do not match that volume. |
 | Redis | Connectable in a clean Compose project | Redis became healthy in the isolated Compose check. |
-| AI / OpenAI | Mock only, not real OpenAI | `AI_PROVIDER=mock`; `OPENAI_API_KEY` and `OPENAI_MODEL` are empty. |
+| AI / OpenAI | Mock only, not real OpenAI | `AI_PROVIDER=mock`; `OPENAI_API_KEY` and `OPENAI_MODEL` are empty. v0.7.0 document improvement uses mock AI locally. |
 | Google Calendar | Configured for Google provider, live API still unverified | `CALENDAR_PROVIDER=google` and required Google Calendar credential variables are present, but live Google Calendar event operations still require OAuth consent/API verification. |
 | Gmail | Not connected with current `.env` | `GMAIL_PROVIDER` is empty, so Compose falls back to disabled. Gmail client id/secret variables are missing. |
 | Social login OAuth | Credentials present, live browser flow still needs verification | Google/GitHub login client and secret variables are present, but production-domain OAuth behavior is not yet verified. |
@@ -104,11 +104,11 @@ Calendar and SMTP have credential-shaped environment values, but this pass did n
 
 ## Last verified behavior
 
-- Backend tests: `157 passed`
+- Backend tests: `163 passed`
 - Frontend lint/type-check/build: passed
 - Docker Compose config: passed
-- Alembic head: `20260720_0000`
-- v0.6.1 isolated Docker PostgreSQL migration upgrade/downgrade/upgrade: passed
+- Alembic head: `20260720_0100`
+- v0.7.0 isolated Docker PostgreSQL migration upgrade/downgrade/upgrade: passed
 - Clean Compose backend/PostgreSQL/Redis health: passed
 - Gmail mock flow with temporary `GMAIL_PROVIDER=mock`: connect/callback/sync passed
 

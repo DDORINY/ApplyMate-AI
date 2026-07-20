@@ -155,5 +155,7 @@ export type DocumentProviderStatus = {
   active_provider: string;
   enabled: boolean;
   model: string | null;
+  analysis_available: boolean;
   generation_available: boolean;
+  improvement_available: boolean;
 };

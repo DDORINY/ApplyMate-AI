@@ -13,6 +13,16 @@ from app.schemas.application_document import (
     ApplicationDocumentSourceReference,
     ApplicationDocumentStructuredData,
 )
+from app.schemas.document_improvement import (
+    DocumentImprovementEvidence,
+    DocumentImprovementSentenceSuggestionData,
+    DocumentImprovementStructuredData,
+)
+from app.models.document_improvement import (
+    DocumentImprovementChangeType,
+    DocumentImprovementRiskLevel,
+    DocumentImprovementSourceType,
+)
 from app.schemas.job_analysis import JobAnalysisStructuredData
 from app.schemas.resume_analysis import (
     ResumeAnalysisEvidence,
@@ -66,6 +76,15 @@ class AIProvider(Protocol):
     ) -> AIProviderResult:
         ...
 
+    async def improve_application_document(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        response_schema: type[BaseModel],
+    ) -> AIProviderResult:
+        ...
+
 
 class DisabledAIProvider:
     provider = "disabled"
@@ -79,6 +98,9 @@ class DisabledAIProvider:
 
     async def generate_application_document(self, **_kwargs: object) -> AIProviderResult:
         raise AppError("AI_PROVIDER_DISABLED", "AI document generation provider is disabled.", 503)
+
+    async def improve_application_document(self, **_kwargs: object) -> AIProviderResult:
+        raise AppError("AI_PROVIDER_DISABLED", "AI document improvement provider is disabled.", 503)
 
 
 class MockAIProvider:
@@ -247,6 +269,58 @@ class MockAIProvider:
         parsed = response_schema.model_validate(data.model_dump())
         return _result(parsed, self.provider, "mock-application-document-writer", "mock-application-document", user_prompt + content, started)
 
+    async def improve_application_document(
+        self,
+        *,
+        system_prompt: str,
+        user_prompt: str,
+        response_schema: type[BaseModel],
+    ) -> AIProviderResult:
+        _ = system_prompt
+        started = time.perf_counter()
+        current = _section_after(user_prompt, "current_document:", "sources:").strip()
+        first_sentence = _first_sentence(current) or current[:200] or "지원 문서 내용"
+        source_text = _first_source_text(user_prompt) or first_sentence
+        improvement_type = _line_after(user_prompt, "improvement_type") or "CLARITY"
+        suggested = _mock_improved_sentence(first_sentence, improvement_type, source_text)
+        suggested_content = current.replace(first_sentence, suggested, 1) if current else suggested
+        evidence = DocumentImprovementEvidence(
+            source_type=DocumentImprovementSourceType.CURRENT_DOCUMENT,
+            source_id="base_version",
+            source_text=first_sentence[:1000],
+        )
+        source_evidence = DocumentImprovementEvidence(
+            source_type=DocumentImprovementSourceType.USER_INSTRUCTION,
+            source_id="request",
+            source_text=source_text[:1000],
+        )
+        data = DocumentImprovementStructuredData(
+            summary="Mock Provider가 기존 문서의 첫 문장을 기준으로 개선안을 생성했습니다.",
+            overall_feedback="승인 전 기존 문서는 변경되지 않습니다. 제안 문장의 사실 여부를 검토해 주세요.",
+            suggested_title=_line_after(user_prompt, "title") or "AI 개선본",
+            suggested_content=suggested_content,
+            sentence_suggestions=[
+                DocumentImprovementSentenceSuggestionData(
+                    id="mock-1",
+                    paragraph_index=0,
+                    sentence_index=0,
+                    original_text=first_sentence,
+                    suggested_text=suggested,
+                    change_type=DocumentImprovementChangeType.REWRITE,
+                    reason="문장의 목적과 직무 연결성을 더 명확히 표현했습니다.",
+                    evidence=[evidence, source_evidence],
+                    risk_level=DocumentImprovementRiskLevel.LOW,
+                    selected=True,
+                )
+            ],
+            warnings=["MOCK_PROVIDER: 실제 OpenAI 호출 없이 결정론적 개선안을 생성했습니다."],
+            missing_information=[],
+            used_sources=[evidence, source_evidence],
+            confidence={"overall": 0.72, "evidence": 0.7},
+        )
+        parsed = response_schema.model_validate(data.model_dump())
+        return _result(parsed, self.provider, "mock-document-improver", "mock-document-improvement", user_prompt + suggested_content, started)
+
 
 class OpenAIProvider:
     provider = "openai"
@@ -262,6 +336,9 @@ class OpenAIProvider:
         return await self._request_json(system_prompt=system_prompt, user_prompt=user_prompt, response_schema=response_schema)
 
     async def generate_application_document(self, *, system_prompt: str, user_prompt: str, response_schema: type[BaseModel]) -> AIProviderResult:
+        return await self._request_json(system_prompt=system_prompt, user_prompt=user_prompt, response_schema=response_schema)
+
+    async def improve_application_document(self, *, system_prompt: str, user_prompt: str, response_schema: type[BaseModel]) -> AIProviderResult:
         return await self._request_json(system_prompt=system_prompt, user_prompt=user_prompt, response_schema=response_schema)
 
     async def _request_json(
@@ -344,6 +421,7 @@ def provider_status(settings: Settings) -> dict[str, str | bool | None]:
         "model": model,
         "analysis_available": available,
         "generation_available": available,
+        "improvement_available": available,
     }
 
 
@@ -448,3 +526,46 @@ def _application_document_sentence(sequence: int, question: str, evidence_text: 
     if sequence == 2:
         return f"특히 '{clean}' 근거는 직무 수행에 필요한 역량을 보여주는 핵심 자료입니다."
     return f"따라서 '{clean}' 내용을 기반으로 지원 문서의 결론을 신중하게 정리하겠습니다."
+
+
+def _section_after(text: str, start_marker: str, end_marker: str) -> str:
+    if start_marker not in text:
+        return ""
+    section = text.split(start_marker, 1)[1]
+    if end_marker in section:
+        section = section.split(end_marker, 1)[0]
+    return section
+
+
+def _first_sentence(text: str) -> str:
+    normalized = " ".join(line.strip() for line in text.splitlines() if line.strip())
+    if not normalized:
+        return ""
+    for marker in [".", "!", "?", "다.", "요."]:
+        if marker in normalized:
+            index = normalized.find(marker) + len(marker)
+            return normalized[:index].strip()
+    return normalized[:200]
+
+
+def _first_source_text(prompt: str) -> str:
+    for line in prompt.splitlines():
+        cleaned = line.strip()
+        if cleaned.startswith("text:"):
+            return cleaned.split(":", 1)[1].strip()
+    return ""
+
+
+def _mock_improved_sentence(original: str, improvement_type: str, source_text: str) -> str:
+    source = source_text.strip().rstrip(".")
+    if improvement_type == "CONCISENESS":
+        return f"{source} 경험을 바탕으로 직무에 필요한 역량을 명확히 보여드리겠습니다."
+    if improvement_type == "PROFESSIONAL_TONE":
+        return f"{source} 경험을 기반으로, 지원 직무에서 요구되는 문제 해결 역량을 체계적으로 발휘하겠습니다."
+    if improvement_type in {"SKILL_EMPHASIS", "JOB_ALIGNMENT"}:
+        return f"{source} 경험을 통해 확인한 기술 역량을 지원 직무의 요구사항과 연결해 기여하겠습니다."
+    if improvement_type == "LENGTH_REDUCTION":
+        return f"{source} 경험으로 직무 적합성을 보여드리겠습니다."
+    if improvement_type == "LENGTH_EXPANSION":
+        return f"{source} 경험을 바탕으로 문제를 구조화하고 실행 가능한 개선안을 만들며, 그 과정에서 얻은 역량을 지원 직무에 연결하겠습니다."
+    return f"{original.rstrip()} 이 경험을 지원 직무와 더 직접적으로 연결해 설명하겠습니다."
