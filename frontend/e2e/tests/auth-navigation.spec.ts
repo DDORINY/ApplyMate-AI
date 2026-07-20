@@ -13,6 +13,7 @@ test.describe('인증 및 기본 내비게이션', () => {
 
   test('보호 화면은 인증이 없을 때 로그인 흐름으로 안내한다', async ({ page }) => {
     await page.goto('/notifications');
-    await expect(page.getByText(/로그인|인증|토큰/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/login/);
+    await expect(page.getByRole('heading', { name: /로그인/i })).toBeVisible();
   });
 });
