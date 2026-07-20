@@ -1,6 +1,34 @@
 # Functional Specification
 
-Current implemented version: `v0.5.1`
+Current implemented version: `v0.6.0`
+
+## v0.6.0 Rule-Based Job Recommendation Functional Specification
+
+### Purpose
+
+사용자의 저장된 채용공고와 커리어 프로필을 비교해 외부 크롤링이나 AI/ML 호출 없이 설명 가능한 추천 목록을 제공한다.
+
+### Requirements
+
+- 추천 후보는 사용자가 저장한 채용공고만 사용한다.
+- 추천 방식은 `RULE_BASED`로 표시한다.
+- 커리어 프로필, 경력, 프로젝트, 기술, 희망 조건과 공고 분석/공고 원문 정보를 점수화한다.
+- 추천 결과는 점수, 등급, 추천 이유, 부족 조건, 필수 조건 불일치 여부를 포함한다.
+- 추천 실행 이력은 상태, 정책 버전, 후보 수, 생성/완료/실패 시각을 저장한다.
+- 프로필, 공고, 정책 hash가 달라진 기존 추천은 오래된 추천으로 표시할 수 있어야 한다.
+- 사용자는 추천 상세를 조회하고 관심/비관심/숨김/지원함/나중에 보기 피드백을 남길 수 있어야 한다.
+- 숨김 또는 비관심 피드백을 남긴 공고는 기본 재추천에서 제외한다.
+- 모든 추천 조회, 생성, 피드백 API는 `user_id` 소유권을 검증한다.
+- `/recommendations`와 `/recommendations/{recommendationId}` 화면은 로딩, 오류, 빈 상태를 제공한다.
+
+### Prohibited
+
+- 외부 채용 사이트 자동 크롤링
+- 사용자 저장 공고 외부의 임의 추천 생성
+- OpenAI 또는 다른 AI provider 호출
+- ML 모델 추천이라고 표현
+- 사용자 승인 없는 지원 상태 변경
+- 지원 확률을 확정적으로 표현
 
 ## v0.5.1 Gmail Recruitment Email Analysis Functional Specification
 

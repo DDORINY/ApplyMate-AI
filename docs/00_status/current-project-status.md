@@ -2,11 +2,11 @@
 
 ## 2026-07-20 환경 상태 업데이트
 
-- 현재 완료 릴리스: `v0.5.1`
+- 현재 완료 릴리스: `v0.6.0`
 - 현재 작업 브랜치: `feature/v0.6.0-job-recommendations`
-- 현재 migration head: `20260719_2200`
+- 현재 migration head: `20260719_2300`
 - `v0.5.1`은 `main`에 병합되었고 `v0.5.1` 태그가 생성되었다.
-- `v0.6.0` 계획 브랜치가 생성되었고 `docs/05_development-plan/releases/v0.6.0-plan.md`가 추가되었다.
+- `v0.6.0`은 저장된 공고 기반 규칙 추천을 구현하고 검증 중이다.
 - 현재 `.env` 기준 Gmail은 실제 연결되지 않는다. `GMAIL_PROVIDER`가 비어 있고 Gmail OAuth credential이 없다.
 - 현재 `.env` 기준 AI는 `AI_PROVIDER=mock`이므로 실제 OpenAI 호출은 연결되지 않는다.
 - 기본 Docker PostgreSQL 연결은 기존 로컬 volume 비밀번호 불일치로 막혀 있다. 깨끗한 별도 Compose project에서는 backend/PostgreSQL/Redis 연결이 정상 확인되었다.
@@ -15,9 +15,9 @@
 
 ## 현재 버전
 
-- 버전: `v0.5.1`
-- 현재 migration head: `20260719_2200`
-- 최신 릴리스 범위: Gmail 채용 메일 분석 기반
+- 버전: `v0.6.0`
+- 현재 migration head: `20260719_2300`
+- 최신 릴리스 범위: 규칙 기반 채용공고 추천
 - Calendar provider 검증 기준: `CALENDAR_PROVIDER=mock`
 - AI provider 검증 기준: `AI_PROVIDER=mock`
 
@@ -38,6 +38,7 @@
 - 대시보드 집계 API와 `/dashboard` 화면
 - Google Calendar 전용 OAuth state, token 암호화 저장, Calendar 선택, mock 동기화, mapping/run/error 기록, 연결 해제
 - Gmail 전용 OAuth state, 읽기 전용 scope, mock 메일 조회, 채용 메일 후보 생성, 사용자 승인 기반 상태 변경/일정 생성
+- 저장된 채용공고 기반 규칙 추천, 추천 점수/등급/이유/부족 조건, 추천 피드백, `/recommendations` 화면
 
 ## 주요 화면
 
@@ -48,11 +49,13 @@
 - `/settings/accounts`
 - `/settings/integrations`
 - `/inbox-candidates`
+- `/recommendations`
+- `/recommendations/{recommendationId}`
 - `/settings/security`
 
 ## 현재 DB
 
-최신 migration: `20260719_2200_create_gmail_analysis_tables.py`
+최신 migration: `20260719_2300_create_job_recommendation_tables.py`
 
 v0.5.0 신규 테이블:
 
@@ -73,15 +76,23 @@ v0.5.1 신규 테이블:
 - `email_candidates`
 - `email_candidate_actions`
 
+v0.6.0 신규 테이블:
+
+- `job_recommendation_runs`
+- `job_recommendations`
+- `job_recommendation_reasons`
+- `job_recommendation_feedback`
+
 ## 최근 검증 기준
 
-- Backend ruff
-- Backend pytest
-- Frontend lint
-- Frontend type-check
-- Frontend build
-- Docker compose config
-- Alembic heads/history/upgrade/downgrade
+- Backend ruff: 통과
+- Backend pytest: `153 passed`
+- Frontend lint: 통과
+- Frontend type-check: 통과
+- Frontend build: 통과
+- Docker compose config: 통과
+- Alembic heads: `20260719_2300 (head)`
+- 별도 Docker Compose project PostgreSQL migration upgrade: 통과
 
 ## 미검증
 

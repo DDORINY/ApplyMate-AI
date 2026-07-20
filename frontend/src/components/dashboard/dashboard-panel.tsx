@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 
 import { getDashboard } from "@/lib/api/dashboard";
+import { listJobRecommendations } from "@/lib/api/job-recommendation";
 import type {
   DashboardActivityItem,
   DashboardData,
@@ -18,6 +19,7 @@ import type {
   DashboardRecentResumeAnalysis,
   DashboardScheduleItem,
 } from "@/types/dashboard";
+import type { JobRecommendation } from "@/types/job-recommendation";
 
 const periodOptions: { label: string; value: DashboardPeriod }[] = [
   { label: "최근 7일", value: "7d" },
@@ -51,6 +53,11 @@ export function DashboardPanel() {
   const dashboardQuery = useQuery({
     queryKey: ["dashboard", period],
     queryFn: () => getDashboard({ period, timezone: "Asia/Seoul", recent_limit: 6 }),
+    retry: false,
+  });
+  const recommendationsQuery = useQuery({
+    queryKey: ["dashboard-job-recommendations"],
+    queryFn: () => listJobRecommendations({ include_outdated: false, size: 3 }),
     retry: false,
   });
 
@@ -105,6 +112,26 @@ export function DashboardPanel() {
         </p>
       </section>
 
+      <section className="panel max-w-none overflow-hidden">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-violet-600">RULE_BASED</p>
+            <h2 className="mt-1 text-2xl font-black text-slate-950">규칙 기반 채용공고 추천</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              저장된 공고와 커리어 프로필을 비교해 추천 점수, 추천 이유, 부족 조건을 확인합니다.
+            </p>
+          </div>
+          <Link className="button-primary" href="/recommendations">
+            추천 공고 보기
+          </Link>
+        </div>
+      </section>
+
+      <DashboardRecommendationSection
+        isLoading={recommendationsQuery.isLoading}
+        items={recommendationsQuery.data?.data.items ?? []}
+      />
+
       <SummaryCards dashboard={dashboard} />
 
       <div className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
@@ -130,6 +157,56 @@ export function DashboardPanel() {
         <DocumentSection items={dashboard.recent_documents} />
       </div>
     </div>
+  );
+}
+
+function DashboardRecommendationSection({
+  isLoading,
+  items,
+}: {
+  isLoading: boolean;
+  items: JobRecommendation[];
+}) {
+  const gradeLabels: Record<string, string> = {
+    EXCELLENT: "매우 적합",
+    GOOD: "적합",
+    POSSIBLE: "검토 가능",
+    LOW: "낮음",
+    BLOCKED: "필수 조건 확인",
+  };
+
+  return (
+    <section className="grid gap-3 lg:grid-cols-3">
+      {isLoading ? (
+        <div className="panel max-w-none lg:col-span-3">
+          <p className="text-sm text-slate-500">추천 공고를 불러오는 중입니다.</p>
+        </div>
+      ) : null}
+      {!isLoading && items.length === 0 ? (
+        <Link className="panel max-w-none border-dashed lg:col-span-3" href="/recommendations">
+          <p className="text-sm font-semibold text-violet-600">추천 준비</p>
+          <h2 className="mt-1 text-lg font-bold text-slate-950">아직 생성된 추천 공고가 없습니다.</h2>
+          <p className="mt-2 text-sm text-slate-600">저장된 공고와 프로필을 기준으로 추천을 생성해 보세요.</p>
+        </Link>
+      ) : null}
+      {items.map((item) => (
+        <Link className="rounded-3xl border border-violet-100 bg-white p-5 shadow-sm transition hover:border-violet-300" href={`/recommendations/${item.id}`} key={item.id}>
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-violet-600">{item.job.company_name}</p>
+              <h2 className="mt-1 text-lg font-bold text-slate-950">{item.job.title}</h2>
+            </div>
+            <div className="rounded-2xl bg-violet-50 px-3 py-2 text-right">
+              <p className="text-xl font-black text-violet-600">{item.score}</p>
+              <p className="text-[11px] font-bold text-violet-500">{gradeLabels[item.grade]}</p>
+            </div>
+          </div>
+          <p className="mt-3 text-xs text-slate-500">
+            {item.recommendation_type} · {item.job.location ?? "지역 미상"}
+          </p>
+        </Link>
+      ))}
+    </section>
   );
 }
 

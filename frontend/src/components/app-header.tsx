@@ -13,6 +13,7 @@ const navItems = [
   { href: "/applications", label: "지원 현황", icon: "●" },
   { href: "/calendar", label: "일정", icon: "◷" },
   { href: "/inbox-candidates", label: "메일 후보", icon: "✉" },
+  { href: "/recommendations", label: "공고 추천", icon: "★" },
 ];
 
 const accountItems = [

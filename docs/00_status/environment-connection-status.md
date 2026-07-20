@@ -104,10 +104,11 @@ Calendar and SMTP have credential-shaped environment values, but this pass did n
 
 ## Last verified behavior
 
-- Backend tests: `148 passed`
+- Backend tests: `153 passed`
 - Frontend lint/type-check/build: passed
 - Docker Compose config: passed
-- Alembic head: `20260719_2200`
+- Alembic head: `20260719_2300`
+- v0.6.0 isolated Docker PostgreSQL migration upgrade: passed
 - Clean Compose backend/PostgreSQL/Redis health: passed
 - Gmail mock flow with temporary `GMAIL_PROVIDER=mock`: connect/callback/sync passed
 

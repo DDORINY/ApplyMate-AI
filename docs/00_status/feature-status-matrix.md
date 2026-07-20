@@ -4,8 +4,8 @@
 
 | Area | Feature | Implementation | Current environment status |
 | --- | --- | --- | --- |
+| Release | v0.6.0 rule-based job recommendations | Implemented locally | Saved-job-only rule-based flow verified locally; release finalization in progress. |
 | Release | v0.5.1 Gmail recruitment email analysis | Done, merged, tagged `v0.5.1` | Mock flow verified; real Gmail is not connected in current `.env`. |
-| Planning | v0.6.0 daily job recommendations | Branch and plan created | `feature/v0.6.0-job-recommendations` is active. |
 | AI | AI provider abstraction | Done | Current `.env` uses `AI_PROVIDER=mock`; real OpenAI is not connected. |
 | Calendar | Google Calendar integration foundation | Done | `CALENDAR_PROVIDER=google` and credentials exist; live Google API verification remains. |
 | Infrastructure | Docker Compose backend/PostgreSQL/Redis | Done | Clean Compose project connects; default local PostgreSQL volume has password mismatch. |
@@ -13,7 +13,7 @@
 Detailed environment notes: [Environment Connection Status](environment-connection-status.md)
 
 문서 기준일: 2026-07-20
-현재 릴리스: `v0.5.1`
+현재 릴리스: `v0.6.0`
 
 ## 버전별 기능 상태
 
@@ -36,8 +36,21 @@ Detailed environment notes: [Environment Connection Status](environment-connecti
 | 대시보드 | 지원/일정/마감/AI/문서/활동 요약 화면 | 완료 | v0.4.2 | backend tests, frontend type-check |
 | 연동 | Google Calendar OAuth, Calendar 선택, mock 동기화, mapping/run/error | 완료 | v0.5.0 | mock provider 검증, 실제 Google은 NEEDS_VERIFICATION |
 | 연동 | Gmail 채용 메일 분석, 후보 생성, 사용자 승인 반영 | 완료 | v0.5.1 | mock provider 검증, 실제 Gmail은 NEEDS_VERIFICATION |
-| 추천 | 일일 맞춤 채용공고 추천 | 예정 | v0.6.0 | 추천 규칙/피드백 기반 |
+| 추천 | 저장된 채용공고 기반 규칙 추천 | 완료 | v0.6.0 | RULE_BASED 점수/등급/이유/피드백 |
 | Release | MVP 안정화, E2E, 운영 문서, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
+
+## v0.6.0 세부 상태
+
+| 기능 | 상태 | 검증 |
+| --- | --- | --- |
+| `POST /api/v1/recommendations/jobs/generate` | 완료 | `backend/tests/test_job_recommendations.py` |
+| `GET /api/v1/recommendations/jobs` | 완료 | 목록/필터 테스트 |
+| `GET /api/v1/recommendations/jobs/{recommendationId}` | 완료 | 소유권 테스트 |
+| 추천 정책 메타데이터 | 완료 | `RULE_BASED`, 정책 버전 응답 |
+| 추천 피드백 | 완료 | 숨김 후 재추천 제외 테스트 |
+| `/recommendations` 목록 화면 | 완료 | frontend lint/type-check/build |
+| `/recommendations/{recommendationId}` 상세 화면 | 완료 | frontend lint/type-check/build |
+| 대시보드 상위 추천 카드 | 완료 | frontend lint/type-check/build |
 
 ## v0.4.2 세부 상태
 
