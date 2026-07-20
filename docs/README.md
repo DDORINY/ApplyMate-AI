@@ -46,6 +46,7 @@
 - [v0.6.0 규칙 기반 채용공고 추천 계획](05_development-plan/releases/v0.6.0-plan.md)
 - [v0.6.1 일일 맞춤 추천 계획](05_development-plan/releases/v0.6.1-plan.md)
 - [v0.7.0 자기소개서 개선 루프 계획](05_development-plan/releases/v0.7.0-plan.md)
+- [v0.8.0 알림/리마인더 운영화 계획](05_development-plan/releases/v0.8.0-plan.md)
 - [지원 문서 개선 정책](07_policies/document-improvement-policy.md)
 - [지원 문서 개선 프롬프트](10_ai/document-improvement-prompt.md)
 - [지원 문서 개선 스키마](10_ai/document-improvement-schema.md)
