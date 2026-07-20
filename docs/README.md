@@ -48,6 +48,7 @@
 - [v0.7.0 자기소개서 개선 루프 계획](05_development-plan/releases/v0.7.0-plan.md)
 - [v0.8.0 알림/리마인더 운영화 계획](05_development-plan/releases/v0.8.0-plan.md)
 - [v0.9.0 안정화·운영 준비 계획](05_development-plan/releases/v0.9.0-plan.md)
+- [v1.0.0 MVP 릴리스 계획](05_development-plan/releases/v1.0.0-plan.md)
 - [E2E 테스트 가이드](09_guides/e2e-testing.md)
 - [성능 테스트 가이드](09_guides/performance-testing.md)
 - [배포 체크리스트](09_guides/deployment-checklist.md)

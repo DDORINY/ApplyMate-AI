@@ -3,7 +3,7 @@
 ## 2026-07-20 현재 상태
 
 - 최신 완료 버전: `v0.9.0`
-- 현재 작업 브랜치: `feature/v0.9.0-stability-hardening`
+- 현재 작업 브랜치: `feature/v1.0.0-mvp-release`
 - 다음 개발 버전: `v1.0.0`
 - 현재 migration head: `20260720_0300`
 - `v0.5.1`은 `main` 병합 및 `v0.5.1` 태그 push가 완료되었다.
