@@ -47,6 +47,7 @@
 - [v0.6.1 일일 맞춤 추천 계획](05_development-plan/releases/v0.6.1-plan.md)
 - [v0.7.0 자기소개서 개선 루프 계획](05_development-plan/releases/v0.7.0-plan.md)
 - [v0.8.0 알림/리마인더 운영화 계획](05_development-plan/releases/v0.8.0-plan.md)
+- [v0.9.0 안정화·운영 준비 계획](05_development-plan/releases/v0.9.0-plan.md)
 - [알림 정책](07_policies/notification-policy.md)
 - [알림 운영 가이드](09_guides/notification-operations.md)
 - [v0.8.0 릴리스 노트](11_releases/v0.8.0-notification-operations.md)
