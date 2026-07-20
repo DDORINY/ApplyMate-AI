@@ -1,6 +1,6 @@
 # Database Design Overview
 
-문서 기준 버전: `v0.7.0`
+문서 기준 버전: `v0.8.0`
 
 상세 DB 문서는 [docs/06_database/database-design.md](../06_database/database-design.md)를 기준으로 한다.
 
@@ -9,7 +9,7 @@
 - DB: PostgreSQL
 - ORM: SQLAlchemy
 - Migration: Alembic
-- 현재 migration head: `20260720_0100`
+- 현재 migration head: `20260720_0200`
 
 ## 현재 구현 테이블
 
@@ -60,6 +60,10 @@ document_improvement_runs
 document_improvement_suggestions
 document_improvement_sources
 document_improvement_actions
+notification_settings
+notifications
+notification_deliveries
+notification_processing_runs
 applications
 application_status_history
 application_notes
@@ -91,3 +95,4 @@ email_candidate_actions
 - 업로드 파일은 원본 파일명과 내부 저장명을 분리한다.
 - 지원 항목은 제출 문서 버전을 `application_document_version_id`로 고정한다.
 - 문서 개선은 승인 전 기존 문서를 변경하지 않고 적용 시 새 문서 버전을 생성한다.
+- 알림 중복은 `deduplication_key` DB unique constraint로 방지한다.

@@ -24,6 +24,7 @@
 | v0.6.0 | 저장된 채용공고 기반 규칙 추천, 추천 점수/이유/부족 조건, 사용자 피드백 |
 | v0.6.1 | 추천 실행 설정, run-if-due, Snapshot, 변화 판정, 알림 후보, 추천 UX 개선 |
 | v0.7.0 | AI 지원 문서 개선 루프, 문장별 제안, 승인 기반 새 버전 생성 |
+| v0.8.0 | In-app 알림, 알림 설정, 리마인더 worker, mock email delivery |
 
 ## v0.4.2 완료 상세
 
@@ -98,3 +99,15 @@
 - `/documents/{documentId}/improve` 개선 요청 화면 추가
 - `/documents/{documentId}/improvements/{runId}` before/after 비교와 제안 승인 화면 추가
 - 신규 migration `20260720_0100`
+
+## v0.8.0 완료 상세
+
+- 사용자별 `notification_settings` 추가
+- `notifications`, `notification_deliveries`, `notification_processing_runs` 추가
+- 일정 리마인더 due 처리와 중복 방지
+- 추천 알림 후보, Gmail 후보, 문서 개선 결과, 동기화 실패 알림 연결
+- 알림 목록, 읽지 않은 개수, 읽음/전체 읽음/해제/보관 API 추가
+- Email delivery mock provider와 retry 구조 추가
+- `/notifications` 알림 센터 화면 추가
+- `/settings/notifications` 알림 설정 화면 추가
+- 신규 migration `20260720_0200`

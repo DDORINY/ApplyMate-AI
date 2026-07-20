@@ -7,6 +7,8 @@
 | 기본 Docker PostgreSQL 연결 | NOT_CONNECTED | 기존 기본 Docker volume의 DB 비밀번호가 현재 `.env` DB 자격 증명과 맞지 않는다. volume은 삭제하지 않았다. |
 | 현재 `.env` 기준 Gmail 연동 | NOT_CONNECTED | `GMAIL_PROVIDER`가 비어 있고 Gmail OAuth client/secret 변수가 없어서 Compose에서 `disabled`로 해석된다. |
 | 실제 OpenAI 호출 | NOT_CONNECTED | `AI_PROVIDER=mock`이며 `OPENAI_API_KEY`, `OPENAI_MODEL`이 비어 있다. v0.7.0 문서 개선은 mock provider로 검증했다. |
+| 실제 SMTP 알림 발송 | NEEDS_VERIFICATION | v0.8.0은 mock email provider와 delivery 구조를 검증했고 실제 외부 SMTP 발송은 검증하지 않았다. |
+| Push 알림 실발송 | EXCLUDED | v0.8.0은 push 설정 구조만 제공하며 provider 실발송은 구현하지 않는다. |
 | Google Calendar live API | NEEDS_VERIFICATION | Calendar provider와 credential은 설정되어 있으나 실제 Google OAuth/API 동작은 별도 live 검증이 필요하다. |
 | SMTP 실제 발송 | NEEDS_VERIFICATION | SMTP credential은 설정되어 있으나 실제 외부 메일 발송은 이번 확인 범위에서 검증하지 않았다. |
 | 추천 자동 실행 스케줄러 | DEFERRED | v0.6.0은 수동 생성 API/화면까지 구현하고 일일 자동 실행은 후속 범위로 둔다. |
@@ -33,6 +35,14 @@
 | 자동 전체 적용 | EXCLUDED | 사용자가 제안을 승인해야만 새 버전을 생성한다. |
 | 근거 없는 성과/수치 자동 생성 | EXCLUDED | 사실성 정책상 금지 |
 | 외부 웹 검색 기반 기업 인재상 추정 | EXCLUDED | 사용자/저장 공고/분석 근거 없이 추가하지 않는다. |
+
+## v0.8.0 제외 또는 후속 범위
+
+| 항목 | 상태 | 후속 버전 |
+| --- | --- | --- |
+| 실제 SMTP 알림 발송 | NEEDS_VERIFICATION | 운영 SMTP 계정과 도메인 검증 후 |
+| Push provider 실발송 | EXCLUDED | provider 선정 후 별도 구현 |
+| 장기 실행 production queue worker | DEFERRED | v0.9.0 worker 안정화 |
 
 ## v0.6.0 제외 또는 후속 범위
 

@@ -16,6 +16,7 @@ from app.api.v1.endpoints.job_match import router as job_match_router
 from app.api.v1.endpoints.job_recommendation_automation import router as job_recommendation_automation_router
 from app.api.v1.endpoints.job_recommendations import router as job_recommendations_router
 from app.api.v1.endpoints.jobs import router as jobs_router
+from app.api.v1.endpoints.notifications import router as notifications_router
 from app.api.v1.endpoints.oauth import router as oauth_router
 from app.api.v1.endpoints.profiles import router as profiles_router
 from app.api.v1.endpoints.resumes import router as resumes_router
@@ -37,6 +38,7 @@ api_router.include_router(job_match_router)
 api_router.include_router(job_recommendation_automation_router)
 api_router.include_router(job_recommendations_router)
 api_router.include_router(jobs_router)
+api_router.include_router(notifications_router)
 api_router.include_router(oauth_router)
 api_router.include_router(profiles_router)
 api_router.include_router(resumes_router)

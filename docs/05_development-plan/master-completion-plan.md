@@ -2,9 +2,9 @@
 
 ## 현재 위치
 
-- 완료: `v0.7.0` AI 지원 문서 개선 루프
-- 다음: `v0.8.0` 알림/리마인더 운영화
-- 최신 DB head: `20260720_0100`
+- 완료: `v0.8.0` 알림/리마인더 운영화
+- 다음: `v0.9.0` 안정화와 운영 검증
+- 최신 DB head: `20260720_0200`
 
 ## 완료된 큰 흐름
 
@@ -22,11 +22,12 @@
 12. 규칙 기반 채용공고 추천
 13. 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 기반
 14. AI 지원 문서 개선 루프
+15. 알림·리마인더 운영화
 
 ## 남은 큰 흐름
 
-1. 알림/리마인더 운영화를 구현한다.
-2. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
+1. 브라우저 E2E, 운영 배포 문서, 보안 검증을 강화한다.
+2. Worker 안정화, 로그·감사, rate limit을 점검한다.
 3. v1.0.0 MVP 릴리스를 완료한다.
 
 ## v0.4.2 방향
@@ -83,3 +84,12 @@
 - `/documents/{documentId}/improve`와 `/documents/{documentId}/improvements/{runId}` 화면을 추가한다.
 - 실제 OpenAI 개선 호출은 `NEEDS_VERIFICATION`으로 남긴다.
 - v0.7.0 완료 후 다음 개발 브랜치는 `feature/v0.8.0-notification-operations`이다.
+
+# v0.8.0 Completion Update
+
+- `notification_settings`, `notifications`, `notification_deliveries`, `notification_processing_runs`를 추가한다.
+- In-app 알림 목록, 읽지 않은 개수, 읽음/해제/보관 API와 화면을 구현한다.
+- 일정 리마인더, 추천 알림 후보, Gmail 후보, 문서 개선 결과, 동기화 실패를 notification으로 연결한다.
+- mock email delivery와 retry 구조를 구현한다.
+- Push provider 실발송과 실제 SMTP 운영 발송은 `NEEDS_VERIFICATION`으로 남긴다.
+- v0.8.0 완료 후 다음 개발 브랜치는 `feature/v0.9.0-stability-hardening`이다.

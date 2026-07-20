@@ -12,6 +12,7 @@
 - `/documents`
 - `/applications`
 - `/calendar`
+- `/notifications`
 - `/inbox-candidates`
 
 ## Account navigation
@@ -22,6 +23,7 @@
 - `/settings/accounts`
 - `/settings/integrations`
 - `/settings/recommendations`
+- `/settings/notifications`
 - `/settings/security`
 
 ## v0.5.1 Gmail screens
@@ -49,9 +51,15 @@
 - `/documents/{documentId}/improve`: 개선 유형, 추가 요청, 목표 톤/길이 입력 후 AI 개선 실행 생성
 - `/documents/{documentId}/improvements/{runId}`: before/after 비교, 문장별 승인/제외, 새 버전 적용, 재시도/거절
 
+## v0.8.0 Notification screens
+
+- `/notifications`: 알림 목록, 읽지 않은 개수, 상태 필터, 읽음/해제/보관, due 처리 실행
+- `/settings/notifications`: In-app, Email, Push, quiet hours, 이벤트별 알림 설정
+
 ## Rule
 
 로그인, 회원가입, 내 계정, 계정 연결, 외부 연동, 보안 메뉴는 계정 네비게이션 영역에 배치한다.
 공고 추천은 주요 서비스 기능이므로 왼쪽/메인 네비게이션에 배치한다.
 추천 실행 설정은 계정/환경 설정 성격이므로 계정 관리 영역에 배치한다.
 지원 문서 개선은 문서 상세의 하위 작업이므로 별도 메인 네비게이션 항목을 만들지 않고 `/documents` 흐름 안에 둔다.
+알림은 주요 서비스 전반의 상태를 모으므로 메인 네비게이션에 배치하고, 알림 설정은 계정 관리 영역에 배치한다.
