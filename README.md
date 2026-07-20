@@ -1,8 +1,20 @@
 # ApplyMate AI
 
-현재 버전: `v0.8.0`
+현재 버전: `v0.9.0`
 
 ApplyMate AI는 개인용 AI 취업 매니저입니다. 사용자의 커리어 프로필, 이력서, 채용공고, AI 분석 결과, 지원 문서, 지원 현황, 일정을 연결해 취업 준비 흐름을 한곳에서 관리합니다.
+
+## v0.9.0 주요 기능
+
+- Request ID 기반 오류 추적
+- 보안 헤더 적용
+- CORS 허용 origin 환경변수화
+- 주요 민감 API rate limit
+- `/health/live`, `/health/ready` 분리
+- 운영 필수 설정 readiness 검증
+- 감사 로그 `audit_logs`
+- Playwright E2E smoke test
+- E2E/성능/배포/백업 운영 문서
 
 ## v0.8.0 주요 기능
 
@@ -151,6 +163,7 @@ npm run build
 - [버전 로드맵](docs/05_development-plan/version-roadmap.md)
 - [API 명세](docs/04_api/api-specification.md)
 - [DB 설계](docs/06_database/database-design.md)
+- [v0.9.0 릴리스 노트](docs/11_releases/v0.9.0-stability-hardening.md)
 - [v0.8.0 릴리스 노트](docs/11_releases/v0.8.0-notification-operations.md)
 - [v0.7.0 릴리스 노트](docs/11_releases/v0.7.0-document-improvement.md)
 - [v0.6.1 릴리스 노트](docs/11_releases/v0.6.1-recommendation-automation.md)
@@ -160,9 +173,9 @@ npm run build
 
 ## 현재 migration head
 
-`20260720_0200`
+`20260720_0300`
 
-v0.8.0은 알림 설정, 알림, delivery, processing run 테이블을 추가합니다.
+v0.9.0은 감사 로그 `audit_logs` 테이블을 추가합니다.
 
 ## 미검증/운영 확인 필요
 
@@ -171,3 +184,4 @@ v0.8.0은 알림 설정, 알림, delivery, processing run 테이블을 추가합
 - 운영 Google/GitHub OAuth, SMTP, HTTPS Cookie는 실제 도메인/시크릿 환경에서 별도 검증이 필요합니다.
 - 실제 Gmail API 호출과 실제 OpenAI 메일 분석은 `NEEDS_VERIFICATION`입니다.
 - 실제 SMTP 알림 발송과 Push provider 실발송은 `NEEDS_VERIFICATION`입니다.
+- `pip-audit`은 현재 로컬 미설치로 미검증이며, npm audit moderate 2건은 Next 내부 PostCSS advisory로 추적 중입니다.

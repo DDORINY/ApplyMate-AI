@@ -8,6 +8,9 @@
 * 인증 오류는 공격자가 계정 존재 여부를 추론하기 어렵게 처리한다.
 * 내부 예외 메시지, SQL 오류, Secret 값은 API 응답에 노출하지 않는다.
 * 운영 환경에서는 HTTPS와 `COOKIE_SECURE=true`를 사용한다.
+* v0.9.0부터 공통 보안 헤더를 적용한다.
+* 운영 CORS는 `CORS_ALLOWED_ORIGINS`에 명시된 origin만 허용한다.
+* 주요 민감 API는 rate limit을 적용하고 초과 시 429를 반환한다.
 
 ## 개인정보
 
@@ -19,6 +22,8 @@
 ## 가용성
 
 * Health API는 Backend, Database, Redis 상태를 확인할 수 있어야 한다.
+* v0.9.0부터 `/health/live`와 `/health/ready`를 구분한다.
+* readiness는 DB, Redis, 운영 필수 설정을 점검한다.
 * PostgreSQL 또는 Redis 연결 실패 시 서비스 전체가 불필요하게 민감정보를 노출하지 않는다.
 * 외부 API 연동 실패가 내부 데이터 저장 실패로 이어지지 않도록 설계한다.
 
@@ -27,6 +32,7 @@
 * 일반 API 응답은 로컬 개발 환경 기준 1초 이내를 목표로 한다.
 * 대용량 문서 파싱, AI 분석, 추천 계산은 향후 비동기 작업으로 분리한다.
 * 목록 API는 페이지네이션을 고려한다.
+* 로컬 성능 목표와 측정 대상은 `docs/09_guides/performance-testing.md`를 기준으로 한다.
 
 ## 유지보수성
 
@@ -47,3 +53,4 @@
 * Frontend는 최소 lint, type-check, production build를 통과해야 한다.
 * Docker Compose config와 실행 가능성을 검증한다.
 * DB 변경은 Alembic upgrade/downgrade를 검증한다.
+* v0.9.0부터 Playwright E2E smoke test를 운영한다.

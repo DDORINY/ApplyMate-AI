@@ -12,6 +12,7 @@ os.environ["AI_PROVIDER"] = "mock"
 from fastapi.testclient import TestClient  # noqa: E402
 from sqlalchemy import select  # noqa: E402
 
+from app.models.audit import AuditLog  # noqa: E402
 from app.models.notification import Notification, NotificationDelivery  # noqa: E402
 from app.models.schedule import ScheduleReminder, ScheduleReminderStatus  # noqa: E402
 from app.notifications.providers.mock import clear_mock_notification_email_outbox, mock_notification_email_outbox  # noqa: E402
@@ -40,6 +41,12 @@ async def delivery_statuses(testing_session) -> list[str]:
         return [item.status.value for item in result.scalars().all()]
 
 
+async def audit_actions(testing_session) -> list[str]:
+    async with testing_session() as session:
+        result = await session.execute(select(AuditLog).order_by(AuditLog.id))
+        return [item.action for item in result.scalars().all()]
+
+
 async def reminder_status(testing_session, reminder_id: int) -> str:
     async with testing_session() as session:
         reminder = await session.get(ScheduleReminder, reminder_id)
@@ -63,6 +70,7 @@ def test_notification_settings_defaults_and_update(client: TestClient):
     assert updated.status_code == 200
     assert updated.json()["data"]["email_enabled"] is True
     assert updated.json()["data"]["default_reminder_minutes"] == 45
+    assert "NOTIFICATION_SETTINGS_UPDATED" in asyncio.run(audit_actions(client.testing_session))
 
     invalid = client.patch("/api/v1/notification-settings", headers=headers, json={"timezone": "Invalid/Timezone"})
     assert invalid.status_code == 400

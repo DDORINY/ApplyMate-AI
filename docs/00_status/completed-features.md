@@ -25,6 +25,7 @@
 | v0.6.1 | 추천 실행 설정, run-if-due, Snapshot, 변화 판정, 알림 후보, 추천 UX 개선 |
 | v0.7.0 | AI 지원 문서 개선 루프, 문장별 제안, 승인 기반 새 버전 생성 |
 | v0.8.0 | In-app 알림, 알림 설정, 리마인더 worker, mock email delivery |
+| v0.9.0 | Request ID, 보안 헤더, CORS, rate limit, live/ready health, audit logs, E2E smoke |
 
 ## v0.4.2 완료 상세
 
@@ -111,3 +112,18 @@
 - `/notifications` 알림 센터 화면 추가
 - `/settings/notifications` 알림 설정 화면 추가
 - 신규 migration `20260720_0200`
+
+## v0.9.0 완료 상세
+
+- Request ID middleware 추가
+- 공통 오류 응답에 `request_id` 추가
+- 보안 헤더 middleware 추가
+- CORS 허용 origin을 `CORS_ALLOWED_ORIGINS`로 분리
+- 주요 민감 API rate limit과 429 응답 header 추가
+- `/api/v1/health/live`, `/api/v1/health/ready` 추가
+- 운영 필수 환경변수 readiness 검증 추가
+- `audit_logs` 테이블과 감사 로그 서비스 추가
+- 알림 설정 변경과 notification delivery retry 감사 기록
+- Playwright E2E smoke test 추가
+- E2E/성능/배포/백업 가이드 추가
+- 신규 migration `20260720_0300`

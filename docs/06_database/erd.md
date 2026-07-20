@@ -1,5 +1,26 @@
 # ERD
 
+## v0.9.0 Stability Hardening ERD
+
+```mermaid
+erDiagram
+    users ||--o{ audit_logs : performs
+
+    audit_logs {
+      int id PK
+      int user_id FK
+      string action
+      string resource_type
+      string resource_id
+      string result
+      string request_id
+      string ip_hash
+      string user_agent
+      json audit_metadata
+      datetime created_at
+    }
+```
+
 ## v0.8.0 Notification Operations ERD
 
 ```mermaid

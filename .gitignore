@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+!.env.e2e.example
 
 __pycache__/
 *.py[cod]
@@ -17,6 +18,8 @@ node_modules/
 out/
 dist/
 coverage/
+test-results/
+e2e-report/
 *.tsbuildinfo
 
 *.log

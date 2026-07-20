@@ -32,6 +32,13 @@ services:
       APP_ENV: ${APP_ENV:-development}
       FRONTEND_URL: ${FRONTEND_URL:-http://localhost:3000}
       BACKEND_URL: ${BACKEND_URL:-http://localhost:8000}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      SECURITY_HEADERS_ENABLED: ${SECURITY_HEADERS_ENABLED:-true}
+      HSTS_ENABLED: ${HSTS_ENABLED:-false}
+      REQUEST_ID_HEADER: ${REQUEST_ID_HEADER:-X-Request-ID}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      RATE_LIMIT_DEFAULT_LIMIT: ${RATE_LIMIT_DEFAULT_LIMIT:-60}
+      RATE_LIMIT_DEFAULT_WINDOW_SECONDS: ${RATE_LIMIT_DEFAULT_WINDOW_SECONDS:-60}
       DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://applymate:change_me@postgres:5432/applymate}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-}
@@ -105,7 +112,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health', timeout=5)"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health/ready', timeout=5)"]
       interval: 10s
       timeout: 5s
       retries: 5

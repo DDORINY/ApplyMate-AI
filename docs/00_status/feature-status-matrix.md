@@ -4,7 +4,8 @@
 
 | Area | Feature | Implementation | Current environment status |
 | --- | --- | --- | --- |
-| Release | v0.8.0 notification operations | Done locally | In-app notifications, settings, due reminders, mock email delivery verified locally. |
+| Release | v0.9.0 stability hardening | Done locally | Request ID, security headers, rate limit, health ready/live, audit logs, E2E smoke verified locally. |
+| Release | v0.8.0 notification operations | Done, merged, tagged `v0.8.0` | In-app notifications, settings, due reminders, mock email delivery verified locally. |
 | Release | v0.7.0 AI document improvement loop | Done locally | Improvement run, sentence suggestions, approval-based versioning verified locally with mock AI. |
 | Release | v0.6.1 recommendation automation foundation | Done locally | Settings, run-if-due, snapshots, changes, notification candidates verified locally. |
 | Release | v0.6.0 rule-based job recommendations | Done, merged, tagged `v0.6.0` | Saved-job-only rule-based flow verified. |
@@ -16,7 +17,7 @@
 Detailed environment notes: [Environment Connection Status](environment-connection-status.md)
 
 문서 기준일: 2026-07-20
-현재 릴리스: `v0.8.0`
+현재 릴리스: `v0.9.0`
 
 ## 버전별 기능 상태
 
@@ -43,7 +44,8 @@ Detailed environment notes: [Environment Connection Status](environment-connecti
 | 추천 | 추천 실행 설정, Snapshot, 변화 판정, 알림 후보 | 완료 | v0.6.1 | 실제 알림 발송/외부 수집 제외 |
 | 지원 문서 | AI 지원 문서 개선 루프, 문장별 제안, 승인 기반 새 버전 생성 | 완료 | v0.7.0 | backend tests, frontend lint/type-check/build |
 | 알림 | In-app 알림, 사용자 설정, worker, mock email delivery | 완료 | v0.8.0 | backend tests, frontend lint/type-check/build |
-| Release | MVP 안정화, E2E, 운영 문서, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
+| 안정화 | Request ID, 보안 헤더, rate limit, live/ready health, audit logs, E2E smoke | 완료 | v0.9.0 | backend tests 171 passed, Playwright E2E 3 passed |
+| Release | MVP 릴리스, 인수 테스트, 운영 검증, v1.0.0 태그 | 예정 | v1.0.0 | 운영 검증 필요 |
 
 ## v0.8.0 세부 상태
 
@@ -59,6 +61,19 @@ Detailed environment notes: [Environment Connection Status](environment-connecti
 | `GET /api/v1/notification-deliveries` | 완료 | mock email delivery 테스트 |
 | `/notifications` | 완료 | frontend lint/type-check/build |
 | `/settings/notifications` | 완료 | frontend lint/type-check/build |
+
+## v0.9.0 세부 상태
+
+| 기능 | 상태 | 검증 |
+| --- | --- | --- |
+| Request ID middleware | 완료 | `backend/tests/test_health.py` |
+| 공통 오류 응답 `request_id` | 완료 | unknown path 테스트 |
+| 보안 헤더 | 완료 | `X-Content-Type-Options`, `X-Frame-Options` 테스트 |
+| CORS origin 설정 | 완료 | preflight 테스트 |
+| 주요 API rate limit | 완료 | 429/header 테스트 |
+| `/health/live`, `/health/ready` | 완료 | health 테스트 |
+| `audit_logs` | 완료 | 알림 설정 변경 감사 로그 테스트 |
+| Playwright E2E smoke | 완료 | 3 passed |
 
 ## v0.7.0 세부 상태
 
@@ -126,4 +141,6 @@ Detailed environment notes: [Environment Connection Status](environment-connecti
 | Gmail 실제 메일 조회/분석 | NEEDS_VERIFICATION | 운영 Google Gmail API credentials 필요 |
 | 이메일/푸시 알림 실제 발송 | 예정 | 현재는 알림 저장 중심 |
 | 운영 SMTP | NEEDS_VERIFICATION | 운영 SMTP 계정 필요 |
-| 브라우저 E2E 자동화 | 예정 | v0.9.0 이후 강화 |
+| 실제 운영 부하 테스트 | NEEDS_VERIFICATION | 로컬 smoke 기준만 문서화 |
+| `pip-audit` | NEEDS_VERIFICATION | 현재 로컬에 미설치 |
+| npm audit moderate 2건 | NEEDS_REVIEW | Next 내부 PostCSS advisory, 자동 fix가 major downgrade 제안 |

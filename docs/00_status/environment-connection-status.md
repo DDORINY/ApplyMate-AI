@@ -1,7 +1,7 @@
 # Environment Connection Status
 
 Last updated: 2026-07-20  
-Local branch at update time: `feature/v0.8.0-notification-operations`
+Local branch at update time: `feature/v0.9.0-stability-hardening`
 
 This document summarizes the current local environment connection state without exposing secret values. It is based on `.env` key presence, provider modes, and the latest local Docker/API checks.
 
@@ -18,6 +18,7 @@ This document summarizes the current local environment connection state without 
 | Social login OAuth | Credentials present, live browser flow still needs verification | Google/GitHub login client and secret variables are present, but production-domain OAuth behavior is not yet verified. |
 | SMTP email | Credentials present, live send still needs verification | `EMAIL_PROVIDER=smtp` and SMTP credentials are present, but real outbound email delivery has not been verified in this pass. |
 | Notification email | Mock verified, real SMTP unverified | v0.8.0 notification delivery uses mock provider in tests; actual SMTP notification delivery remains `NEEDS_VERIFICATION`. |
+| Operational hardening | Verified locally | v0.9.0 request id, security headers, rate limit, health ready/live, audit log, and E2E smoke passed locally. |
 
 ## Current `.env` interpretation
 
@@ -105,10 +106,11 @@ Calendar and SMTP have credential-shaped environment values, but this pass did n
 
 ## Last verified behavior
 
-- Backend tests: `167 passed`
+- Backend tests: `171 passed`
 - Frontend lint/type-check/build: passed
+- Playwright E2E smoke: `3 passed`
 - Docker Compose config: passed
-- Alembic head: `20260720_0200`
+- Alembic head: `20260720_0300`
 - v0.7.0 isolated Docker PostgreSQL migration upgrade/downgrade/upgrade: passed
 - Clean Compose backend/PostgreSQL/Redis health: passed
 - Gmail mock flow with temporary `GMAIL_PROVIDER=mock`: connect/callback/sync passed

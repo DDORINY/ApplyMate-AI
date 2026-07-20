@@ -8,6 +8,13 @@ class Settings:
     app_env: str
     frontend_url: str
     backend_url: str
+    cors_allowed_origins: tuple[str, ...]
+    security_headers_enabled: bool
+    hsts_enabled: bool
+    rate_limit_enabled: bool
+    rate_limit_default_limit: int
+    rate_limit_default_window_seconds: int
+    request_id_header: str
     database_url: str
     redis_url: str
     jwt_secret_key: str
@@ -81,6 +88,17 @@ def get_settings() -> Settings:
         app_env=os.getenv("APP_ENV", "development"),
         frontend_url=os.getenv("FRONTEND_URL", "http://localhost:3000"),
         backend_url=os.getenv("BACKEND_URL", "http://localhost:8000"),
+        cors_allowed_origins=tuple(
+            item.strip()
+            for item in os.getenv("CORS_ALLOWED_ORIGINS", os.getenv("FRONTEND_URL", "http://localhost:3000")).split(",")
+            if item.strip()
+        ),
+        security_headers_enabled=os.getenv("SECURITY_HEADERS_ENABLED", "true").lower() == "true",
+        hsts_enabled=os.getenv("HSTS_ENABLED", "false").lower() == "true",
+        rate_limit_enabled=os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true",
+        rate_limit_default_limit=int(os.getenv("RATE_LIMIT_DEFAULT_LIMIT", "60")),
+        rate_limit_default_window_seconds=int(os.getenv("RATE_LIMIT_DEFAULT_WINDOW_SECONDS", "60")),
+        request_id_header=os.getenv("REQUEST_ID_HEADER", "X-Request-ID"),
         database_url=os.getenv(
             "DATABASE_URL",
             "postgresql+psycopg://applymate:change_me@localhost:5432/applymate",

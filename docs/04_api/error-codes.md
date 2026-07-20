@@ -138,3 +138,10 @@
 | `SCHEDULE_REMINDER_INVALID_TIME` | 400 | Reminder time must be before event start |
 | `SCHEDULE_REMINDER_DUPLICATE` | 409 | Duplicate reminder exists |
 | `SCHEDULE_EVENT_FORBIDDEN` | 403 | Schedule event access is forbidden |
+# v0.9.0 Operational Error Codes
+
+| Code | HTTP | Description |
+| --- | --- | --- |
+| `RATE_LIMIT_EXCEEDED` | 429 | 요청 횟수 제한 초과 |
+
+공통 오류 응답은 가능한 경우 `error.request_id`를 포함한다.

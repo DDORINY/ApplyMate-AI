@@ -17,6 +17,12 @@ _login_failures: dict[str, LoginFailureState] = {}
 
 def reset_login_rate_limit_store() -> None:
     _login_failures.clear()
+    try:
+        from app.core.middleware import reset_rate_limit_store
+
+        reset_rate_limit_store()
+    except Exception:
+        pass
 
 
 class LoginRateLimiter:

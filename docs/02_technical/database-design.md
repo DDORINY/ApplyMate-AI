@@ -1,6 +1,6 @@
 # Database Design Overview
 
-문서 기준 버전: `v0.8.0`
+문서 기준 버전: `v0.9.0`
 
 상세 DB 문서는 [docs/06_database/database-design.md](../06_database/database-design.md)를 기준으로 한다.
 
@@ -9,7 +9,7 @@
 - DB: PostgreSQL
 - ORM: SQLAlchemy
 - Migration: Alembic
-- 현재 migration head: `20260720_0200`
+- 현재 migration head: `20260720_0300`
 
 ## 현재 구현 테이블
 
@@ -19,6 +19,7 @@ refresh_tokens
 email_verification_tokens
 password_reset_tokens
 security_events
+audit_logs
 oauth_accounts
 oauth_states
 oauth_login_tickets
