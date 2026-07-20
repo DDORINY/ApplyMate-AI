@@ -26,6 +26,7 @@
 | v0.7.0 | AI 지원 문서 개선 루프, 문장별 제안, 승인 기반 새 버전 생성 |
 | v0.8.0 | In-app 알림, 알림 설정, 리마인더 worker, mock email delivery |
 | v0.9.0 | Request ID, 보안 헤더, CORS, rate limit, live/ready health, audit logs, E2E smoke |
+| v1.0.0 | MVP 릴리스 문서, 사용자/운영 가이드, E2E 확장, demo seed, release checklist |
 
 ## v0.4.2 완료 상세
 
@@ -127,3 +128,16 @@
 - Playwright E2E smoke test 추가
 - E2E/성능/배포/백업 가이드 추가
 - 신규 migration `20260720_0300`
+
+## v1.0.0 완료 상세
+
+- MVP 확정 범위와 제외 범위 문서화
+- 사용자 가이드와 운영자 가이드 추가
+- Known Limitations 문서 추가
+- v1.0.0 security review와 release checklist 추가
+- v1.0.0 릴리스 노트 추가
+- Playwright E2E smoke를 MVP 주요 화면 10개 이상으로 확장
+- demo seed payload 생성기 추가
+- release smoke/performance smoke script 추가
+- E2E 전용 Compose override와 Nginx reverse proxy 예시 추가
+- GitHub Actions CI 초안 추가

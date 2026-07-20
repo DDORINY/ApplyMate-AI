@@ -1,6 +1,6 @@
 # ApplyMate AI Documentation
 
-현재 문서 기준 버전: `v0.9.0`
+현재 문서 기준 버전: `v1.0.0`
 
 ## 문서 구조
 
@@ -19,7 +19,7 @@
 - `10_ai`: AI 프롬프트와 출력 스키마
 - `11_releases`: 버전별 릴리스 노트
 
-## v0.9.0에서 최신화된 주요 문서
+## v1.0.0에서 최신화된 주요 문서
 
 - [현재 프로젝트 상태](00_status/current-project-status.md)
 - [환경 연결 상태](00_status/environment-connection-status.md)
@@ -49,6 +49,12 @@
 - [v0.8.0 알림/리마인더 운영화 계획](05_development-plan/releases/v0.8.0-plan.md)
 - [v0.9.0 안정화·운영 준비 계획](05_development-plan/releases/v0.9.0-plan.md)
 - [v1.0.0 MVP 릴리스 계획](05_development-plan/releases/v1.0.0-plan.md)
+- [Known Limitations](00_status/known-limitations.md)
+- [사용자 가이드](09_guides/user-guide.md)
+- [운영자 가이드](09_guides/operations-guide.md)
+- [릴리스 체크리스트](09_guides/release-checklist.md)
+- [v1.0.0 보안 리뷰](12_audits/v1.0.0-security-review.md)
+- [v1.0.0 릴리스 노트](11_releases/v1.0.0-mvp-release.md)
 - [E2E 테스트 가이드](09_guides/e2e-testing.md)
 - [성능 테스트 가이드](09_guides/performance-testing.md)
 - [배포 체크리스트](09_guides/deployment-checklist.md)

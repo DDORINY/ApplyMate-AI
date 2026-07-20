@@ -1,12 +1,12 @@
 # Current Project Status
 
-## 2026-07-20 v0.9.0 상태 업데이트
+## 2026-07-20 v1.0.0 상태 업데이트
 
-- 현재 완료 릴리스: `v0.9.0`
-- 현재 작업 브랜치: `feature/v0.9.0-stability-hardening`
+- 현재 완료 릴리스: `v1.0.0`
+- 현재 작업 브랜치: `feature/v1.0.0-mvp-release`
 - 현재 migration head: `20260720_0300`
-- 직전 완료 릴리스: `v0.8.0` 알림·리마인더 운영화
-- 신규 완료 범위: E2E·성능·보안 안정화 기반
+- 직전 완료 릴리스: `v0.9.0` E2E·성능·보안 안정화
+- 신규 완료 범위: MVP 릴리스 준비, 인수 테스트 확장, 사용자/운영 가이드, 릴리스 체크리스트
 - AI provider 검증 기준: `AI_PROVIDER=mock`
 - 실제 OpenAI 문서 개선 호출은 `OPENAI_API_KEY`, `OPENAI_MODEL`, 비용 및 운영 프롬프트 검증이 필요하므로 `NEEDS_VERIFICATION` 상태이다.
 
@@ -14,9 +14,9 @@
 
 ## 현재 버전
 
-- 버전: `v0.9.0`
+- 버전: `v1.0.0`
 - 최신 migration: `20260720_0300_create_audit_logs.py`
-- 최신 릴리스 범위: Request ID, 보안 헤더, CORS origin 설정, rate limit, live/ready health, audit log, E2E 스캐폴딩, 운영 문서
+- 최신 릴리스 범위: MVP 범위 확정, 릴리스 문서, E2E 확장, demo seed payload, smoke/performance script, CI workflow
 
 ## 구현 완료 기능
 
@@ -43,6 +43,8 @@
 - live/ready health check와 운영 환경변수 readiness 검증
 - 감사 로그 `audit_logs`와 알림 설정/Delivery retry 감사 기록
 - Playwright 기반 E2E smoke test
+- v1.0.0 MVP 사용자 가이드와 운영자 가이드
+- v1.0.0 릴리스 체크리스트와 보안 리뷰
 
 ## 주요 화면
 
@@ -71,6 +73,10 @@
 v0.9.0 신규 테이블:
 
 - `audit_logs`
+
+v1.0.0 신규 테이블:
+
+- 없음
 
 v0.8.0 신규 테이블:
 
@@ -103,5 +109,5 @@ v0.8.0 신규 테이블:
 - 운영 SMTP
 - 운영 HTTPS Cookie
 - 운영 배포
-- `pip-audit` 실행: 현재 로컬에 미설치
-- npm audit moderate 2건: Next 내부 PostCSS advisory, 자동 fix가 major downgrade 제안이라 보류
+- `pip-audit` 실행: 프로젝트 전용 임시 venv 기준 known vulnerabilities 0
+- `npm audit` 실행: vulnerabilities 0
